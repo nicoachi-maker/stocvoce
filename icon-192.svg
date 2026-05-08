@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="32" fill="#0a0c0f"/>
+  <rect width="192" height="4" y="188" rx="0" fill="#00e5a0"/>
+  <text x="96" y="85" font-family="Arial Black, sans-serif" font-weight="900" font-size="48" fill="#e8ecf0" text-anchor="middle">STOC</text>
+  <text x="96" y="140" font-family="Arial Black, sans-serif" font-weight="900" font-size="48" fill="#00e5a0" text-anchor="middle">VOCE</text>
+  <rect x="20" y="155" width="152" height="4" rx="2" fill="#00e5a0" opacity="0.4"/>
+</svg>
