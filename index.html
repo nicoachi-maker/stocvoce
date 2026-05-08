@@ -783,8 +783,30 @@ function renderStock(){
     const pct=Math.min(100,Math.round((p.qty/(p.maxQty||Math.max(p.qty*2,100)))*100));
     const isLow=p.qty<=p.min,isZero=p.qty===0;
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
-    return `<div class="stock-card ${cls}" id="card-${p.id}"><div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div><div class="card-name">${p.name}</div><div class="card-location">📍 ${p.loc||'—'}</div><div class="card-qty-row"><div class="card-qty ${qc}">${p.qty}</div><div class="card-unit">${p.unit}</div></div><div class="card-bar"><div class="card-bar-fill ${qc}" style="width:${pct}%"></div></div></div>`;
+    return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
+      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
+        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
+        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
+      </div>
+      <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-location">📍 ${p.loc||'—'}</div>
+      <div class="card-qty-row"><div class="card-qty ${qc}">${p.qty}</div><div class="card-unit">${p.unit}</div></div>
+      <div class="card-bar"><div class="card-bar-fill ${qc}" style="width:${pct}%"></div></div>
+    </div>`;
   }).join('');
+  
+  // Show action buttons on hover
+  document.querySelectorAll('.stock-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      const actions = card.querySelector('.card-actions');
+      if (actions) actions.style.opacity = '1';
+    });
+    card.addEventListener('mouseleave', () => {
+      const actions = card.querySelector('.card-actions');
+      if (actions) actions.style.opacity = '0';
+    });
+  });
 }
 function openAddModal(){if(!currentUser){speak('Conectați-vă mai întâi.');return;}document.getElementById('add-modal').classList.add('show');}
 function closeAddModal(){document.getElementById('add-modal').classList.remove('show');}
@@ -1085,6 +1107,71 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+// ── EDIT / DELETE PRODUCT ──
+function openEditModal(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  document.getElementById('edit-id').value = productId;
+  document.getElementById('edit-name').value = p.name;
+  document.getElementById('edit-cat').value = p.cat || '';
+  document.getElementById('edit-qty').value = p.qty;
+  document.getElementById('edit-unit').value = p.unit;
+  document.getElementById('edit-loc').value = p.loc || '';
+  document.getElementById('edit-min').value = p.min;
+  document.getElementById('edit-sensitive').checked = p.sensitive || false;
+  document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').style.display = 'none';
+}
+
+function saveEdit() {
+  const id = parseInt(document.getElementById('edit-id').value);
+  const p = stock.find(s => s.id === id);
+  if (!p) return;
+
+  const oldName = p.name;
+  const oldQty = p.qty;
+  const newQty = parseInt(document.getElementById('edit-qty').value) || 0;
+
+  p.name      = document.getElementById('edit-name').value.trim() || p.name;
+  p.cat       = document.getElementById('edit-cat').value.trim() || p.cat;
+  p.qty       = newQty;
+  p.unit      = document.getElementById('edit-unit').value.trim() || p.unit;
+  p.loc       = document.getElementById('edit-loc').value.trim() || p.loc;
+  p.min       = parseInt(document.getElementById('edit-min').value) || p.min;
+  p.sensitive = document.getElementById('edit-sensitive').checked;
+  p.maxQty    = Math.max(p.maxQty || 100, newQty * 2);
+
+  saveStockToFirebase();
+  closeEditModal();
+  renderStock();
+  updateStats();
+
+  const qtyChange = newQty !== oldQty ? ` (cantitate: ${oldQty}→${newQty})` : '';
+  addLog(`Editat: ${p.name}`, `Produs modificat${qtyChange}`, 'in');
+  speak(`Produs ${p.name} actualizat.`);
+  setFeedback(`✅ ${p.name} actualizat cu succes!`, 'ok');
+}
+
+function deleteProduct(productId, productName) {
+  if (!confirm(`Ștergi produsul "${productName}" din stoc? Această acțiune nu poate fi anulată!`)) return;
+  
+  const index = stock.findIndex(s => s.id === productId);
+  if (index === -1) return;
+  
+  stock.splice(index, 1);
+  saveStockToFirebase();
+  renderStock();
+  updateStats();
+  
+  addLog(`Șters: ${productName}`, 'Produs eliminat din stoc', 'out');
+  speak(`Produs ${productName} șters din stoc.`);
+  setFeedback(`🗑️ ${productName} șters din stoc.`, 'warn');
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -1144,6 +1231,54 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
     <div style="display:flex;gap:10px">
       <button onclick="closeImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
       <button onclick="doImport()" id="import-btn" disabled style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase;opacity:0.5">IMPORTĂ PRODUSELE →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- EDIT PRODUCT MODAL -->
+<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:32px;max-width:400px;width:90%">
+    <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:20px">✏️ Editează Produs</h3>
+    <input type="hidden" id="edit-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Nume</div>
+        <input class="form-input" id="edit-name" placeholder="Nume produs">
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Categorie</div>
+        <input class="form-input" id="edit-cat" placeholder="Categorie">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Cantitate</div>
+        <input class="form-input" id="edit-qty" type="number" placeholder="0">
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Unitate</div>
+        <input class="form-input" id="edit-unit" placeholder="buc/kg/palet">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Locație</div>
+        <input class="form-input" id="edit-loc" placeholder="Raft A-3">
+      </div>
+      <div>
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Stoc Minim</div>
+        <input class="form-input" id="edit-min" type="number" placeholder="10">
+      </div>
+    </div>
+    <div style="margin-bottom:18px">
+      <label style="font-size:12px;color:#6b7a8d;display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="edit-sensitive"> Produs sensibil 🔒
+      </label>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeEditModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="saveEdit()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
     </div>
   </div>
 </div>
