@@ -1125,6 +1125,7 @@ let nextId = Math.max(...stock.map(s => s.id), 0) + 1;
 function saveData() {
   localStorage.setItem('stocvoce_stock', JSON.stringify(stock));
   localStorage.setItem('stocvoce_log', JSON.stringify(log.slice(0, 200)));
+  if (window.fbReady && window.fbSaveStock) window.fbSaveStock(stock);
 }
 
 // ── PIN ──
@@ -1436,6 +1437,7 @@ function addLog(cmd, result, type) {
   const timeStr=now.toLocaleString('ro-RO',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const entry = {time:timeStr,cmd,result,type,user:currentUser,ts:now.toISOString()};
   log.unshift(entry);
+  if (window.fbReady && window.fbSaveLog) window.fbSaveLog(entry);
   saveData(); renderLog(); updateStats();
 }
 function renderLog() {
@@ -1519,6 +1521,22 @@ document.addEventListener('keydown', e => {
 window.speechSynthesis.onvoiceschanged = () => { synth.getVoices(); };
 updatePinDisplay();
 
+// Firebase real-time sync
+window.onFirebaseStock = (remoteStock) => {
+  const localStr = JSON.stringify(stock);
+  const remoteStr = JSON.stringify(remoteStock);
+  if (localStr !== remoteStr) {
+    stock = remoteStock;
+    localStorage.setItem('stocvoce_stock', remoteStr);
+    renderStock(); updateStats();
+  }
+};
+
+window.onFirebaseLog = (remoteLog) => {
+  log = remoteLog;
+  renderLog();
+};
+
 // Firebase real-time: sync stock from other devices
 window.onFirebaseStock = (remoteStock) => {
   // Only update if different from local (avoid echo)
@@ -1539,6 +1557,71 @@ window.onFirebaseLog = (remoteLog) => {
   renderLog();
 };
 document.getElementById('manual-input').addEventListener('keydown', e => { if(e.key==='Enter') processManual(); });
+</script>
+
+<!-- Firebase - încărcat după aplicație -->
+<script>
+// Încarcă Firebase asincron ca să nu blocheze vocea
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    var s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+    s1.onload = function() {
+      var s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js';
+      s2.onload = function() {
+        try {
+          firebase.initializeApp({
+            apiKey: "AIzaSyDtkb0S-XnFM9hMGoPJtNGwhCYhzQqSqv4",
+            authDomain: "stocvoce.firebaseapp.com",
+            databaseURL: "https://stocvoce-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "stocvoce",
+            storageBucket: "stocvoce.firebasestorage.app",
+            messagingSenderId: "488778374604",
+            appId: "1:488778374604:web:58727301fba4ff26d89169"
+          });
+          var db = firebase.database();
+
+          // Salvează stoc în Firebase
+          window.fbSaveStock = function(stockData) {
+            db.ref('stocvoce/stock').set(stockData).catch(function(e){ console.error('FB:', e); });
+          };
+
+          // Salvează log în Firebase  
+          window.fbSaveLog = function(entry) {
+            db.ref('stocvoce/log').push(entry).catch(function(e){ console.error('FB:', e); });
+          };
+
+          // Ascultă modificări stoc de pe alte dispozitive
+          db.ref('stocvoce/stock').on('value', function(snapshot) {
+            var data = snapshot.val();
+            if (data && Array.isArray(data) && typeof window.onFirebaseStock === 'function') {
+              window.onFirebaseStock(data);
+            }
+          });
+
+          // Ascultă log de pe alte dispozitive
+          db.ref('stocvoce/log').on('value', function(snapshot) {
+            var data = snapshot.val();
+            if (data && typeof window.onFirebaseLog === 'function') {
+              var entries = Object.values(data).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+              window.onFirebaseLog(entries);
+            }
+          });
+
+          window.fbReady = true;
+          var el = document.getElementById('fb-status');
+          if (el) el.textContent = '🔥 LIVE';
+          console.log('✅ Firebase conectat!');
+        } catch(e) {
+          console.error('Firebase error:', e);
+        }
+      };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  }, 3000); // Asteapta 3 secunde dupa ce vocea e gata
+});
 </script>
 </body>
 </html>
