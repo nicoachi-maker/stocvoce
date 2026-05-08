@@ -761,6 +761,12 @@ function executeOperation(opType,product,qty,originalText){
   addLog(originalText,`${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`,opType==='in'?'in':'out');
   const card=document.getElementById(`card-${product.id}`);
   if(card){const f=opType==='in'?'flash-in':(product.qty<=product.min?'flash-warn':'flash-out');card.classList.add(f);setTimeout(()=>card.classList.remove(f),600);}
+  // Trigger alerts
+  if(product.qty===0){
+    setTimeout(()=>triggerAlert(`🔴 EPUIZAT: ${product.name} — stoc zero!`,'zero'),300);
+  } else if(product.qty<=product.min){
+    setTimeout(()=>triggerAlert(`⚠️ STOC SCĂZUT: ${product.name} — mai sunt doar ${product.qty} ${product.unit}!`,'warn'),300);
+  }
   renderStock();updateStats();
 }
 function confirmAction(yes){
@@ -1822,17 +1828,7 @@ function closeAlert() {
   setTimeout(showNextAlert, 500);
 }
 
-// Hook into executeOperation to trigger alerts
-const _origExecute = executeOperation;
-function executeOperation(opType, product, qty, originalText) {
-  _origExecute(opType, product, qty, originalText);
-  // Check after operation
-  if (product.qty === 0) {
-    triggerAlert(`🔴 EPUIZAT: ${product.name} — stoc zero!`, 'zero');
-  } else if (product.qty <= product.min) {
-    triggerAlert(`⚠️ STOC SCĂZUT: ${product.name} — mai sunt doar ${product.qty} ${product.unit}!`, 'warn');
-  }
-}
+// Alerts are now integrated directly in executeOperation below
 
 // ── PRODUCT HISTORY ──
 function openHistoryModal(productId) {
