@@ -1625,23 +1625,9 @@ async function loadDashboardData() {
         </div>
       `).join('');
 
-    // All users
-    const allUsers = Object.entries(usersData).map(([uid,u]) => ({uid,...u}));
-    document.getElementById('all-users').innerHTML = allUsers.length === 0
-      ? '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator.</div>'
-      : allUsers.map(u => {
-          const statusColor = u.status==='approved'?'#00e5a0':u.status==='pending'?'#ffa502':'#ff4757';
-          const statusText  = u.status==='approved'?'ACTIV':u.status==='pending'?'AȘTEPTARE':'REFUZAT';
-          return `<div style="background:#111418;border:1px solid #1e2530;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
-            <div style="width:40px;height:40px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name||'—'}</div>
-              <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||'—'}</div>
-              <div style="font-size:11px;color:#00e5a0;margin-top:2px">🏭 ${u.depot||'—'}</div>
-            </div>
-            <div style="background:rgba(0,0,0,0.3);border:1px solid ${statusColor};border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:${statusColor};flex-shrink:0">${statusText}</div>
-          </div>`;
-        }).join('');
+    // All users - store globally for filtering
+    window.dashUsers = Object.entries(usersData).map(([uid,u]) => ({uid,...u}));
+    renderDashUsers('all');
 
   } catch(err) {
     console.error('Dashboard error:', err);
@@ -1654,6 +1640,112 @@ document.addEventListener('keydown', e => {
     closeDashboard();
   }
 });
+
+function filterUsers(status) {
+  // Update filter buttons
+  ['all','pending','approved','rejected'].forEach(s => {
+    const btn = document.getElementById('filter-'+s);
+    if (!btn) return;
+    if (s === status) {
+      btn.style.background = 'rgba(0,229,160,0.15)';
+      btn.style.borderColor = '#00e5a0';
+      btn.style.color = '#00e5a0';
+    } else {
+      btn.style.background = 'none';
+      btn.style.borderColor = '#1e2530';
+      btn.style.color = '#6b7a8d';
+    }
+  });
+  renderDashUsers(status);
+}
+
+function renderDashUsers(filter) {
+  const users = window.dashUsers || [];
+  const filtered = filter === 'all' ? users : users.filter(u => u.status === filter);
+  const el = document.getElementById('all-users');
+  if (!el) return;
+
+  if (filtered.length === 0) {
+    el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:14px">Niciun utilizator în această categorie.</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(u => {
+    const statusColor = u.status==='approved' ? '#00e5a0' : u.status==='pending' ? '#ffa502' : '#ff4757';
+    const statusText  = u.status==='approved' ? 'ACTIV' : u.status==='pending' ? 'AȘTEPTARE' : 'REFUZAT';
+    
+    // Action buttons based on status
+    let actionBtns = '';
+    if (u.status === 'pending') {
+      actionBtns = `
+        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:#00e5a0;border:none;border-radius:6px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">
+          ✅ APROBĂ
+        </button>
+        <button onclick="dashReject('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:#ff4757;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">
+          ❌ REFUZĂ
+        </button>`;
+    } else if (u.status === 'approved') {
+      actionBtns = `
+        <button onclick="dashRevoke('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:none;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">
+          REVOCĂ
+        </button>`;
+    } else {
+      actionBtns = `
+        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:none;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">
+          REACTIVEAZĂ
+        </button>`;
+    }
+
+    return `
+      <div style="background:#111418;border:1px solid ${statusColor}33;border-radius:12px;padding:16px;border-left:3px solid ${statusColor}">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:42px;height:42px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;color:#e8ecf0">${u.name||'—'}</div>
+            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||'—'}</div>
+            <div style="font-size:11px;color:#00e5a0;margin-top:2px">🏭 ${u.depot||'—'}</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.4);border:1px solid ${statusColor};border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:${statusColor};flex-shrink:0;letter-spacing:1px">${statusText}</div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          ${actionBtns}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function dashApprove(uid, name) {
+  await db.ref('users/' + uid + '/status').set('approved');
+  // Update local data
+  const u = (window.dashUsers||[]).find(u => u.uid === uid);
+  if (u) u.status = 'approved';
+  renderDashUsers('all');
+  // Update pending count in stats
+  const pending = (window.dashUsers||[]).filter(u=>u.status==='pending').length;
+  setFeedback(`✅ ${name} aprobat cu succes!`, 'ok');
+}
+
+async function dashReject(uid, name) {
+  if (!confirm(`Refuzi accesul pentru ${name}?`)) return;
+  await db.ref('users/' + uid + '/status').set('rejected');
+  const u = (window.dashUsers||[]).find(u => u.uid === uid);
+  if (u) u.status = 'rejected';
+  renderDashUsers('all');
+  setFeedback(`❌ ${name} refuzat.`, 'warn');
+}
+
+async function dashRevoke(uid, name) {
+  if (!confirm(`Revoci accesul pentru ${name}? Nu va mai putea intra în aplicație.`)) return;
+  await db.ref('users/' + uid + '/status').set('pending');
+  const u = (window.dashUsers||[]).find(u => u.uid === uid);
+  if (u) u.status = 'pending';
+  renderDashUsers('all');
+  setFeedback(`⚠️ Accesul lui ${name} revocat.`, 'warn');
+}
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
@@ -1828,10 +1920,18 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
       <div id="all-depots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
     </div>
 
-    <!-- Users list -->
+    <!-- Users list with approve/reject -->
     <div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">👥 UTILIZATORI</div>
-      <div id="all-users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase">👥 UTILIZATORI & APROBARE</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="filterUsers('all')" id="filter-all" style="background:rgba(0,229,160,0.15);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">TOȚI</button>
+          <button onclick="filterUsers('pending')" id="filter-pending" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">AȘTEPTARE</button>
+          <button onclick="filterUsers('approved')" id="filter-approved" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">APROBAȚI</button>
+          <button onclick="filterUsers('rejected')" id="filter-rejected" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">REFUZAȚI</button>
+        </div>
+      </div>
+      <div id="all-users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px"></div>
     </div>
 
   </div>
