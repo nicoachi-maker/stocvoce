@@ -334,6 +334,9 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db   = firebase.database();
 
+// ── ADMIN ──
+const ADMIN_EMAIL = 'now_lord@yahoo.com';
+
 // ── STATE ──
 let currentUser = null;
 let userProfile = null;
@@ -390,9 +393,12 @@ async function doRegister() {
       name: name,
       depot: depot,
       email: email,
+      status: 'pending',
       createdAt: firebase.database.ServerValue.TIMESTAMP
     });
-    sucEl.textContent = `✅ Cont creat! Bun venit, ${name}!`;
+    // Sign out immediately - wait for approval
+    await auth.signOut();
+    sucEl.textContent = `✅ Cerere trimisă! Așteptați aprobarea administratorului.`;
     sucEl.classList.add('show');
   } catch(e) {
     let msg = 'Eroare la creare cont.';
@@ -442,9 +448,35 @@ auth.onAuthStateChanged(async (user) => {
     currentUser = user;
     // Load profile
     const snap = await db.ref('users/' + user.uid).once('value');
-    userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email };
+    userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email, status: 'approved' };
 
-    // Update UI
+    // Check if admin
+    if (user.email === ADMIN_EMAIL) {
+      userProfile.status = 'approved';
+      showAdminPanel();
+      return;
+    }
+
+    // Check approval status
+    if (userProfile.status === 'pending') {
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('login-error').textContent = '⏳ Contul tău așteaptă aprobare. Contactați administratorul.';
+      document.getElementById('login-error').classList.add('show');
+      showTab('login');
+      await auth.signOut();
+      return;
+    }
+
+    if (userProfile.status === 'rejected') {
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('login-error').textContent = '❌ Accesul tău a fost refuzat. Contactați administratorul.';
+      document.getElementById('login-error').classList.add('show');
+      showTab('login');
+      await auth.signOut();
+      return;
+    }
+
+    // Approved - show app
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('current-user').textContent  = userProfile.name;
     document.getElementById('stat-user').textContent     = userProfile.name;
@@ -454,7 +486,6 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById('fb-dot').style.cssText      = 'background:var(--accent);box-shadow:0 0 6px var(--accent)';
     document.getElementById('fb-dot').className          = 'dot';
 
-    // Load stock from Firebase
     loadStockFromFirebase();
     loadLogFromFirebase();
 
@@ -788,7 +819,109 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){document.getElementById('confirm-modal').classList.remove('show');document.getElementById('add-modal').classList.remove('show');}
 });
 document.getElementById('manual-input').addEventListener('keydown',e=>{if(e.key==='Enter')processManual();});
+
+// ── ADMIN PANEL ──
+function showAdminPanel() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+  loadAllUsers();
+}
+
+function loadAllUsers() {
+  db.ref('users').on('value', (snap) => {
+    const data = snap.val();
+    if (!data) {
+      document.getElementById('pending-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Nicio cerere.</div>';
+      document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator.</div>';
+      return;
+    }
+
+    const users = Object.entries(data).map(([uid, u]) => ({ uid, ...u }));
+    const pending  = users.filter(u => u.status === 'pending');
+    const approved = users.filter(u => u.status === 'approved');
+    const rejected = users.filter(u => u.status === 'rejected');
+
+    // Pending
+    if (pending.length === 0) {
+      document.getElementById('pending-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Nicio cerere în așteptare. 🎉</div>';
+    } else {
+      document.getElementById('pending-users').innerHTML = pending.map(u => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#181d24;border-radius:10px;margin-bottom:10px;border:1px solid #1e2530">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">${u.name}</div>
+            <div style="font-size:12px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email}</div>
+            <div style="font-size:13px;color:#00e5a0;margin-top:3px">🏭 ${u.depot}</div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button onclick="approveUser('${u.uid}', '${u.name}')" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 18px;cursor:pointer">✅ APROBĂ</button>
+            <button onclick="rejectUser('${u.uid}', '${u.name}')" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 18px;cursor:pointer">❌ REFUZĂ</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Approved
+    if (approved.length === 0) {
+      document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator aprobat.</div>';
+    } else {
+      document.getElementById('approved-users').innerHTML = approved.map(u => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#181d24;border-radius:10px;margin-bottom:8px;border:1px solid #1e2530">
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name}</div>
+            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email} · 🏭 ${u.depot}</div>
+          </div>
+          <button onclick="revokeUser('${u.uid}', '${u.name}')" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 12px;cursor:pointer">REVOCĂ</button>
+        </div>
+      `).join('');
+    }
+  });
+}
+
+async function approveUser(uid, name) {
+  await db.ref('users/' + uid + '/status').set('approved');
+  console.log('Approved:', name);
+}
+
+async function rejectUser(uid, name) {
+  if (confirm(`Refuzi accesul pentru ${name}?`)) {
+    await db.ref('users/' + uid + '/status').set('rejected');
+  }
+}
+
+async function revokeUser(uid, name) {
+  if (confirm(`Revoci accesul pentru ${name}?`)) {
+    await db.ref('users/' + uid + '/status').set('pending');
+  }
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2000;overflow-y:auto;padding:24px">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;letter-spacing:2px;color:#e8ecf0">
+        Stoc<span style="color:#00e5a0">Voce</span> <span style="font-size:14px;color:#6b7a8d;font-weight:400">PANOU ADMIN</span>
+      </div>
+      <button onclick="doLogout()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;cursor:pointer">⎋ IEȘIRE</button>
+    </div>
+
+    <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">⏳ CERERI ÎN AȘTEPTARE</div>
+      <div id="pending-users">
+        <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
+      </div>
+    </div>
+
+    <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">✅ UTILIZATORI APROBAȚI</div>
+      <div id="approved-users">
+        <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
