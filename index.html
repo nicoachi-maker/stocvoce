@@ -625,13 +625,17 @@ function buildRecognition(){
   if(recognition){try{recognition.abort();}catch(e){}}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recognition=new SR();
-  recognition.lang='ro-RO';recognition.continuous=true;recognition.interimResults=true;recognition.maxAlternatives=1;
+  recognition.lang='ro-RO';
+  recognition.continuous=false; // false = mai stabil pe toate dispozitivele
+  recognition.interimResults=true;
+  recognition.maxAlternatives=1;
+
   recognition.onstart=()=>{
-    if(voiceMode==='continuous'||isCommandMode){
-      document.getElementById('audio-bars').classList.add('active');
-      document.getElementById('transcript-display').classList.add('active-listen');
-    }
+    document.getElementById('transcript-display').textContent='...';
+    document.getElementById('audio-bars').classList.add('active');
+    document.getElementById('transcript-display').classList.add('active-listen');
   };
+
   recognition.onresult=(e)=>{
     let interim='',final='';
     for(let i=e.resultIndex;i<e.results.length;i++){
@@ -646,40 +650,84 @@ function buildRecognition(){
       else if(voiceMode==='continuous')handleCommand(t);
     }
   };
+
   recognition.onend=()=>{
     document.getElementById('audio-bars').classList.remove('active');
     document.getElementById('transcript-display').classList.remove('active-listen');
     if(!isRunning)return;
-    scheduleRestart(500);
+    // Restart după ce TTS termină de vorbit
+    const restartDelay = synth.speaking ? 1200 : 400;
+    scheduleRestart(restartDelay);
   };
+
   recognition.onerror=(e)=>{
-    if(e.error==='no-speech'){if(isRunning)scheduleRestart(300);return;}
+    if(e.error==='no-speech'){if(isRunning)scheduleRestart(500);return;}
     if(e.error==='not-allowed'){setFeedback('❌ Microfon blocat!','err');stopEngine();return;}
     if(e.error==='aborted')return;
     if(isRunning)scheduleRestart(800);
   };
-  try{recognition.start();}catch(err){if(isRunning)scheduleRestart(500);}
+
+  try{recognition.start();}catch(err){if(isRunning)scheduleRestart(600);}
 }
+
 function handleWakeMode(transcript,isFinal){
   const norm=normalizeText(transcript);
   if(!isCommandMode){
+    // Detectează wake word
     const hasWake=WAKE_WORDS.some(w=>norm.includes(normalizeText(w)));
     if(hasWake){
-      isCommandMode=true;setMicState('listening');document.getElementById('audio-bars').classList.add('active');
-      let cmd=transcript;WAKE_WORDS.forEach(w=>{cmd=cmd.replace(new RegExp(w,'gi'),'').trim();});
-      if(cmd.length>3&&isFinal){handleCommand(cmd);return;}
-      setFeedback('✅ "STOC" detectat – spuneți comanda!','ok');speak('Da, spune comanda.');
+      isCommandMode=true;
+      setMicState('listening');
+      document.getElementById('audio-bars').classList.add('active');
+      
+      // Extrage comanda dacă e în același enunț
+      let cmd=transcript;
+      WAKE_WORDS.forEach(w=>{cmd=cmd.replace(new RegExp(w,'gi'),'').trim();});
+      
+      if(cmd.length>3){
+        // Comanda e în același enunț cu wake word
+        handleCommand(cmd);
+        return;
+      }
+      
+      // Așteaptă comanda separată
+      setFeedback('✅ Activ – spuneți comanda acum!','ok');
+      speak('Da.');
       clearTimeout(wakeTimeout);
       wakeTimeout=setTimeout(()=>{
-        if(isCommandMode){isCommandMode=false;setMicState('standby');setFeedback('👂 Aștept "STOC" + comandă...','');document.getElementById('audio-bars').classList.remove('active');}
-      },8000);
+        if(isCommandMode){
+          isCommandMode=false;
+          setMicState('standby');
+          setFeedback('👂 Aștept "STOC" + comandă...','');
+          document.getElementById('audio-bars').classList.remove('active');
+        }
+      },6000);
     }
-  } else if(isFinal){clearTimeout(wakeTimeout);handleCommand(transcript);}
+  } else {
+    // Suntem în modul comandă - orice spune e comandă
+    if(transcript.trim().length>2){
+      clearTimeout(wakeTimeout);
+      handleCommand(transcript);
+    }
+  }
 }
+
 function handleCommand(transcript){
   isCommandMode=false;
-  setMicState(voiceMode==='continuous'?'listening':'standby');
-  if(voiceMode==='wake'){setFeedback('👂 Aștept "STOC" + comandă...','');document.getElementById('audio-bars').classList.remove('active');}
+  // Resetează UI după comandă
+  if(voiceMode==='wake'){
+    setMicState('standby');
+    setFeedback('👂 Aștept "STOC" + comandă...','');
+    document.getElementById('audio-bars').classList.remove('active');
+  } else if(voiceMode==='continuous'){
+    setMicState('listening');
+  }
+  // Resetează transcript după 3 secunde
+  setTimeout(()=>{
+    if(isRunning && !isCommandMode){
+      document.getElementById('transcript-display').textContent='...';
+    }
+  },3000);
   processCommand(transcript.trim().toLowerCase());
 }
 function setMicState(state){
