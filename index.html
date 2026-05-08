@@ -2,7 +2,15 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StocVoce">
+<meta name="theme-color" content="#0a0c0f">
+<meta name="description" content="Gestiune depozit cu comenzi vocale">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.svg">
 <title>StocVoce – Gestiune Depozit</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -268,6 +276,9 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <div class="status-pill"><span id="current-user">—</span></div>
     <button class="export-btn" onclick="exportLog()">↓ CSV</button>
     <button class="export-btn" onclick="generatePDF()" style="border-color:#a78bfa;color:#a78bfa">📊 PDF</button>
+    <button id="install-btn" onclick="installApp()" style="display:none;align-items:center;gap:6px;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;cursor:pointer">
+      📱 INSTALEAZĂ
+    </button>
     <button class="export-btn" onclick="doLogout()">⎋ IEȘIRE</button>
   </div>
 </header>
@@ -1973,6 +1984,44 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 
   </div>
 </div>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// PWA Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install button
+  const installBtn = document.getElementById('install-btn');
+  if (installBtn) installBtn.style.display = 'flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  const installBtn = document.getElementById('install-btn');
+  if (installBtn) installBtn.style.display = 'none';
+  deferredPrompt = null;
+});
+
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      console.log('PWA installed');
+    }
+    deferredPrompt = null;
+  });
+}
+</script>
 
 </body>
 </html>
