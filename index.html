@@ -157,6 +157,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -293,6 +294,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <div class="search-bar">
       <input id="stock-search" placeholder="Caută produs..." oninput="renderStock()">
       <button class="add-btn" onclick="openAddModal()">+ Produs</button>
+      <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
     </div>
     <div class="stock-grid" id="stock-grid">
       <div style="color:var(--text-dim);font-size:13px;padding:20px">Conectează-te pentru a vedea stocul...</div>
@@ -894,6 +896,195 @@ async function revokeUser(uid, name) {
   }
 }
 
+
+// ── IMPORT EXCEL ──
+let importedProducts = [];
+
+function openImportModal() {
+  if (!currentUser) { speak('Conectați-vă mai întâi.'); return; }
+  document.getElementById('import-modal').style.display = 'flex';
+  importedProducts = [];
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-error').style.display = 'none';
+  document.getElementById('import-btn').disabled = true;
+  document.getElementById('import-btn').style.opacity = '0.5';
+  document.getElementById('excel-file').value = '';
+}
+
+function closeImportModal() {
+  document.getElementById('import-modal').style.display = 'none';
+}
+
+function downloadTemplate() {
+  const wb = XLSX.utils.book_new();
+  const templateData = [
+    ['Nume', 'Categorie', 'Cantitate', 'Unitate', 'Locatie', 'Stoc_Minim'],
+    ['Șuruburi M6', 'Hardware', 150, 'buc', 'Raft A-1', 20],
+    ['Cafea Jacobs', 'Alimente', 12, 'palet', 'Raft 3', 5],
+    ['Hârtie A4', 'Birou', 200, 'top', 'Raft B-2', 30],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(templateData);
+  // Style header row width
+  ws['!cols'] = [{wch:20},{wch:15},{wch:12},{wch:10},{wch:12},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Produse');
+  XLSX.writeFile(wb, 'template_stocvoce.xlsx');
+}
+
+function handleExcelFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const errEl = document.getElementById('import-error');
+  errEl.style.display = 'none';
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      
+      if (rows.length < 2) {
+        errEl.textContent = 'Fișierul e gol sau nu are date!';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Find header row
+      const header = rows[0].map(h => (h||'').toString().toLowerCase().trim());
+      
+      // Map columns
+      const colMap = {
+        name: header.findIndex(h => h.includes('nume') || h.includes('name') || h.includes('produs')),
+        cat:  header.findIndex(h => h.includes('categ')),
+        qty:  header.findIndex(h => h.includes('cantit') || h.includes('qty') || h.includes('stoc') && !h.includes('min')),
+        unit: header.findIndex(h => h.includes('unit') || h.includes('um') || h.includes('masur')),
+        loc:  header.findIndex(h => h.includes('loc') || h.includes('raft') || h.includes('pozi')),
+        min:  header.findIndex(h => h.includes('min') || h.includes('minim')),
+      };
+
+      if (colMap.name === -1) {
+        errEl.textContent = 'Nu găsesc coloana "Nume"! Verificați că prima linie are antetele corecte.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      importedProducts = [];
+      const dataRows = rows.slice(1);
+      
+      dataRows.forEach((row, i) => {
+        const name = row[colMap.name];
+        if (!name || name.toString().trim() === '') return;
+        
+        importedProducts.push({
+          id: nextId + i,
+          name: name.toString().trim(),
+          cat:  colMap.cat  >= 0 ? (row[colMap.cat]  || 'General').toString().trim() : 'General',
+          qty:  colMap.qty  >= 0 ? (parseInt(row[colMap.qty])  || 0) : 0,
+          unit: colMap.unit >= 0 ? (row[colMap.unit] || 'buc').toString().trim() : 'buc',
+          loc:  colMap.loc  >= 0 ? (row[colMap.loc]  || 'Nedefinit').toString().trim() : 'Nedefinit',
+          min:  colMap.min  >= 0 ? (parseInt(row[colMap.min])  || 5) : 5,
+          sensitive: false,
+          maxQty: Math.max((parseInt(row[colMap.qty]) || 0) * 3, 100)
+        });
+      });
+
+      if (importedProducts.length === 0) {
+        errEl.textContent = 'Nu am găsit produse valide în fișier!';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      // Show preview
+      document.getElementById('import-preview').style.display = 'block';
+      document.getElementById('import-count').textContent = `✅ ${importedProducts.length} produse găsite, gata de import`;
+      
+      const previewHtml = importedProducts.slice(0, 10).map(p => 
+        `<div style="padding:4px 0;border-bottom:1px solid #1e2530">${p.name} · ${p.qty} ${p.unit} · ${p.cat} · ${p.loc}</div>`
+      ).join('') + (importedProducts.length > 10 ? `<div style="color:#6b7a8d;padding:4px 0">... și încă ${importedProducts.length - 10} produse</div>` : '');
+      
+      document.getElementById('preview-table').innerHTML = previewHtml;
+      
+      const btn = document.getElementById('import-btn');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = `IMPORTĂ ${importedProducts.length} PRODUSE →`;
+
+    } catch(err) {
+      errEl.textContent = 'Eroare la citirea fișierului: ' + err.message;
+      errEl.style.display = 'block';
+      console.error(err);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function doImport() {
+  if (!importedProducts.length) return;
+  
+  const btn = document.getElementById('import-btn');
+  btn.disabled = true;
+  btn.textContent = 'Se importă...';
+
+  // Add to existing stock (skip duplicates by name)
+  const existingNames = stock.map(p => normalizeText(p.name.toLowerCase()));
+  let added = 0, skipped = 0;
+
+  importedProducts.forEach(p => {
+    const norm = normalizeText(p.name.toLowerCase());
+    if (existingNames.includes(norm)) {
+      skipped++;
+    } else {
+      stock.push(p);
+      nextId++;
+      added++;
+    }
+  });
+
+  // Save to Firebase
+  saveStockToFirebase();
+  addLog(`Import Excel`, `${added} produse importate, ${skipped} duplicate omise`, 'in');
+  
+  closeImportModal();
+  renderStock();
+  updateStats();
+  
+  speak(`Import finalizat! ${added} produse adăugate.`);
+  setFeedback(`✅ Import reușit: ${added} produse adăugate, ${skipped} duplicate omise.`, 'ok');
+}
+
+// Drag and drop support
+document.addEventListener('DOMContentLoaded', () => {
+  const dropZone = document.getElementById('drop-zone');
+  if (!dropZone) return;
+  
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#00e5a0';
+    dropZone.style.background = 'rgba(0,229,160,0.05)';
+  });
+  
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = '#1e2530';
+    dropZone.style.background = 'transparent';
+  });
+  
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = '#1e2530';
+    dropZone.style.background = 'transparent';
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const input = document.getElementById('excel-file');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      handleExcelFile(input);
+    }
+  });
+});
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -919,6 +1110,40 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
       <div id="approved-users">
         <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- IMPORT EXCEL MODAL -->
+<div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:36px;max-width:520px;width:90%">
+    <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📊 Import Excel</h3>
+    <p style="font-size:13px;color:#6b7a8d;margin-bottom:24px">Încarcă un fișier Excel (.xlsx) cu produsele tale. Coloanele trebuie să fie: <strong style="color:#99a8b8">Nume, Categorie, Cantitate, Unitate, Locatie, Stoc_Minim</strong></p>
+    
+    <!-- Template download -->
+    <button onclick="downloadTemplate()" style="background:var(--surface2);border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:9px 16px;cursor:pointer;text-transform:uppercase;margin-bottom:16px;width:100%">⬇️ DESCARCĂ TEMPLATE EXCEL</button>
+
+    <!-- File upload -->
+    <div id="drop-zone" onclick="document.getElementById('excel-file').click()" style="border:2px dashed #1e2530;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='#1e2530'">
+      <div style="font-size:36px;margin-bottom:10px">📁</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#99a8b8;font-weight:700">Trage fișierul Excel aici</div>
+      <div style="font-size:12px;color:#6b7a8d;margin-top:6px">sau click pentru a selecta</div>
+      <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this)">
+    </div>
+
+    <!-- Preview -->
+    <div id="import-preview" style="display:none;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:10px">PREVIZUALIZARE</div>
+      <div id="preview-table" style="background:#181d24;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-size:12px;font-family:'JetBrains Mono',monospace;color:#99a8b8"></div>
+      <div id="import-count" style="font-size:13px;color:#00e5a0;margin-top:10px;font-weight:600"></div>
+    </div>
+
+    <div id="import-error" style="background:rgba(255,71,87,0.1);border:1px solid #ff4757;border-radius:8px;padding:10px;font-size:13px;color:#ff4757;display:none;margin-bottom:12px"></div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="closeImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doImport()" id="import-btn" disabled style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase;opacity:0.5">IMPORTĂ PRODUSELE →</button>
     </div>
   </div>
 </div>
