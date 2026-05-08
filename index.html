@@ -583,12 +583,37 @@ function saveLogEntryToFirebase(entry) {
 function speak(text) {
   if (!synth) return;
   synth.cancel();
+  // Stop recognition while speaking to avoid feedback
+  if(recognition){try{recognition.abort();}catch(e){} recognition=null;}
+  
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang='ro-RO'; utt.rate=1.05; utt.pitch=1;
+  utt.lang='ro-RO'; utt.rate=1.1; utt.pitch=1;
   const voices=synth.getVoices();
   const ro=voices.find(v=>v.lang.startsWith('ro'));
   if(ro) utt.voice=ro;
-  utt.onend=()=>{if(isRunning&&!isCommandMode)scheduleRestart(400);};
+  
+  utt.onend=()=>{
+    // Restart mic after TTS finishes
+    if(isRunning){
+      clearTimeout(restartTimer);
+      restartTimer=setTimeout(()=>{
+        if(isRunning){
+          buildRecognition();
+          if(voiceMode==='continuous'){
+            setMicState('listening');
+            document.getElementById('audio-bars').classList.add('active');
+          } else if(voiceMode==='wake'){
+            setMicState('standby');
+          }
+        }
+      }, 600);
+    }
+  };
+  
+  utt.onerror=()=>{
+    if(isRunning) scheduleRestart(400);
+  };
+  
   synth.speak(utt);
 }
 
@@ -618,7 +643,15 @@ function stopEngine(){
 function scheduleRestart(delay){
   if(!isRunning)return;
   clearTimeout(restartTimer);
-  restartTimer=setTimeout(()=>{if(isRunning)buildRecognition();},delay);
+  restartTimer=setTimeout(()=>{
+    if(!isRunning)return;
+    // Don't restart if TTS is speaking
+    if(synth && synth.speaking){
+      scheduleRestart(500);
+      return;
+    }
+    buildRecognition();
+  },delay);
 }
 function buildRecognition(){
   if(!isRunning)return;
@@ -714,21 +747,27 @@ function handleWakeMode(transcript,isFinal){
 
 function handleCommand(transcript){
   isCommandMode=false;
-  // Resetează UI după comandă
+  // Stop mic while processing
+  if(recognition){try{recognition.abort();}catch(e){} recognition=null;}
+  document.getElementById('audio-bars').classList.remove('active');
+  
   if(voiceMode==='wake'){
     setMicState('standby');
     setFeedback('👂 Aștept "STOC" + comandă...','');
-    document.getElementById('audio-bars').classList.remove('active');
   } else if(voiceMode==='continuous'){
     setMicState('listening');
+    setFeedback('⏳ Procesez comanda...','');
   }
-  // Resetează transcript după 3 secunde
+  
+  // Reset transcript after 3s
   setTimeout(()=>{
     if(isRunning && !isCommandMode){
       document.getElementById('transcript-display').textContent='...';
     }
-  },3000);
+  }, 3000);
+  
   processCommand(transcript.trim().toLowerCase());
+  // Mic restarts automatically after speak() finishes via utt.onend
 }
 function setMicState(state){
   const btn=document.getElementById('mic-btn');btn.className='';
