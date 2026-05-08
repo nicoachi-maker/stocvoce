@@ -890,7 +890,9 @@
 
     <div class="pin-users" id="pin-users">
       <div class="pin-user active" data-user="Admin" onclick="selectUser(this)">👤 Admin</div>
-      <div class="pin-user" data-user="Operator" onclick="selectUser(this)">👤 Operator</div>
+      <div class="pin-user" data-user="Operator A" onclick="selectUser(this)">🏭 Op. A</div>
+      <div class="pin-user" data-user="Operator B" onclick="selectUser(this)">🏭 Op. B</div>
+      <div class="pin-user" data-user="Operator C" onclick="selectUser(this)">🏭 Op. C</div>
       <div class="pin-user" data-user="Vizualizare" onclick="selectUser(this)">👁 Vizualizare</div>
     </div>
 
@@ -913,7 +915,7 @@
       <button class="pin-btn del" onclick="pinClear()">CLR</button>
       <button class="pin-btn ok" onclick="pinConfirm()">INTRĂ →</button>
     </div>
-    <div style="font-size:11px;color:var(--text-dim);margin-top:14px">PIN demo: 1234 (Admin) · 1111 (Operator) · 2222 (Vizualizare)</div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:14px">Admin: 1234 · Op.A: 1111 · Op.B: 2222 · Op.C: 3333 · Viz: 4444</div>
     <div id="pin-error" style="color:var(--accent2);font-size:13px;margin-top:8px;display:none">❌ PIN incorect. Încearcă din nou.</div>
   </div>
 </div>
@@ -982,9 +984,17 @@
 <header>
   <div class="logo">Stoc<span>Voce</span> <span style="font-size:13px;color:var(--text-dim);font-weight:400;letter-spacing:1px">DEPOZIT</span></div>
   <div class="header-right">
+    <div id="depot-switcher" style="display:none;gap:6px;align-items:center;display:none">
+      <button class="depot-btn active" data-depot="depozit_a" onclick="switchDepot('depozit_a')" style="background:var(--surface);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:JetBrains Mono,monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">DEP A</button>
+      <button class="depot-btn" data-depot="depozit_b" onclick="switchDepot('depozit_b')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text-dim);font-family:JetBrains Mono,monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">DEP B</button>
+      <button class="depot-btn" data-depot="depozit_c" onclick="switchDepot('depozit_c')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text-dim);font-family:JetBrains Mono,monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">DEP C</button>
+    </div>
     <div class="status-pill">
       <div class="dot" id="mic-dot"></div>
       <span id="mic-status">GATA</span>
+    </div>
+    <div class="status-pill">
+      <span id="depot-name" style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--accent)">—</span>
     </div>
     <div class="status-pill" id="fb-pill">
       <div class="dot off" id="fb-dot"></div>
@@ -1102,9 +1112,11 @@ let speechSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition'
 
 const WAKE_WORDS = ['stoc','stock','stocuri','doc'];
 const PINS = {
-  'Admin':       { pin: '1234', role: 'admin' },
-  'Operator':    { pin: '1111', role: 'operator' },
-  'Vizualizare': { pin: '2222', role: 'viewer' }
+  'Admin':       { pin: '1234', role: 'admin',    depot: 'all' },
+  'Operator A':  { pin: '1111', role: 'operator', depot: 'depozit_a' },
+  'Operator B':  { pin: '2222', role: 'operator', depot: 'depozit_b' },
+  'Operator C':  { pin: '3333', role: 'operator', depot: 'depozit_c' },
+  'Vizualizare': { pin: '4444', role: 'viewer',   depot: 'all' }
 };
 
 // ── STOCK DATA ──
@@ -1123,9 +1135,10 @@ let log = JSON.parse(localStorage.getItem('stocvoce_log') || '[]');
 let nextId = Math.max(...stock.map(s => s.id), 0) + 1;
 
 function saveData() {
-  localStorage.setItem('stocvoce_stock', JSON.stringify(stock));
-  localStorage.setItem('stocvoce_log', JSON.stringify(log.slice(0, 200)));
-  if (window.fbReady && window.fbSaveStock) window.fbSaveStock(stock);
+  allStocks[currentDepot] = stock;
+  localStorage.setItem('stocvoce_allstocks', JSON.stringify(allStocks));
+  localStorage.setItem('stocvoce_log_' + currentDepot, JSON.stringify(log.slice(0, 200)));
+  if (window.fbReady && window.fbSaveStock) window.fbSaveStock(allStocks, currentDepot);
 }
 
 // ── PIN ──
@@ -1521,6 +1534,48 @@ document.addEventListener('keydown', e => {
 window.speechSynthesis.onvoiceschanged = () => { synth.getVoices(); };
 updatePinDisplay();
 
+function switchDepot(depotId) {
+  // Save current depot data first
+  allStocks[currentDepot] = stock;
+  saveData();
+
+  // Switch to new depot
+  currentDepot = depotId;
+  stock = allStocks[currentDepot] || JSON.parse(JSON.stringify(DEFAULT_STOCKS[currentDepot]));
+  log = JSON.parse(localStorage.getItem('stocvoce_log_' + currentDepot) || '[]');
+  nextId = Math.max(...stock.map(s => s.id), 0) + 1;
+
+  updateDepotUI();
+  renderStock(); renderLog(); updateStats();
+  speak(`Comutare la ${DEPOTS[currentDepot].name}.`);
+  setFeedback(`Depozit schimbat: ${DEPOTS[currentDepot].name}`, 'ok');
+}
+
+function updateDepotUI() {
+  const depot = DEPOTS[currentDepot];
+  document.getElementById('depot-name').textContent = depot.name;
+  document.getElementById('depot-name').style.color = depot.color;
+  // Update active button
+  document.querySelectorAll('.depot-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.depot === currentDepot);
+  });
+}
+
+// Firebase real-time sync
+window.onFirebaseStock = (remoteStocks) => {
+  if (remoteStocks && typeof remoteStocks === 'object') {
+    allStocks = remoteStocks;
+    stock = allStocks[currentDepot] || stock;
+    localStorage.setItem('stocvoce_allstocks', JSON.stringify(allStocks));
+    renderStock(); updateStats();
+  }
+};
+
+window.onFirebaseLog = (remoteLog) => {
+  log = remoteLog;
+  renderLog();
+};
+
 // Firebase real-time sync
 window.onFirebaseStock = (remoteStock) => {
   const localStr = JSON.stringify(stock);
@@ -1582,9 +1637,9 @@ window.addEventListener('load', function() {
           });
           var db = firebase.database();
 
-          // Salvează stoc în Firebase
-          window.fbSaveStock = function(stockData) {
-            db.ref('stocvoce/stock').set(stockData).catch(function(e){ console.error('FB:', e); });
+          // Salvează stoc în Firebase (toate depozitele)
+          window.fbSaveStock = function(allStocksData, depotId) {
+            db.ref('stocvoce/depozite').set(allStocksData).catch(function(e){ console.error('FB:', e); });
           };
 
           // Salvează log în Firebase  
@@ -1593,9 +1648,9 @@ window.addEventListener('load', function() {
           };
 
           // Ascultă modificări stoc de pe alte dispozitive
-          db.ref('stocvoce/stock').on('value', function(snapshot) {
+          db.ref('stocvoce/depozite').on('value', function(snapshot) {
             var data = snapshot.val();
-            if (data && Array.isArray(data) && typeof window.onFirebaseStock === 'function') {
+            if (data && typeof window.onFirebaseStock === 'function') {
               window.onFirebaseStock(data);
             }
           });
