@@ -309,6 +309,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <input id="stock-search" placeholder="Caută produs..." oninput="renderStock()">
       <button class="add-btn" onclick="openAddModal()">+ Produs</button>
       <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
+      <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
+      <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
       <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
     </div>
     <div class="stock-grid" id="stock-grid">
@@ -812,6 +814,7 @@ function renderStock(){
       <div class="card-location">📍 ${p.loc||'—'}</div>
       <div class="card-qty-row"><div class="card-qty ${qc}">${p.qty}</div><div class="card-unit">${p.unit}</div></div>
       <div class="card-bar"><div class="card-bar-fill ${qc}" style="width:${pct}%"></div></div>
+      <button onclick="openHistoryModal(${p.id})" style="width:100%;margin-top:8px;background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">📋 ISTORIC</button>
     </div>`;
   }).join('');
   
@@ -1787,6 +1790,236 @@ async function dashRevoke(uid, name) {
   setFeedback(`⚠️ Accesul lui ${name} revocat.`, 'warn');
 }
 
+
+// ── ALERT SYSTEM ──
+let alertQueue = [];
+let alertShowing = false;
+const alertSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA=='); // minimal
+
+function triggerAlert(message, type='warn') {
+  alertQueue.push({message, type});
+  if (!alertShowing) showNextAlert();
+}
+
+function showNextAlert() {
+  if (alertQueue.length === 0) { alertShowing = false; return; }
+  alertShowing = true;
+  const {message, type} = alertQueue.shift();
+  const banner = document.getElementById('alert-banner');
+  document.getElementById('alert-text').textContent = message;
+  banner.style.background = type === 'zero' 
+    ? 'linear-gradient(90deg,#ff4757,#ff6b7a)' 
+    : 'linear-gradient(90deg,#ffa502,#ffb732)';
+  banner.style.display = 'flex';
+  // Auto hide after 5 seconds
+  setTimeout(closeAlert, 5000);
+  // Try to play sound
+  try { new Audio('data:audio/wav;base64,UklGRl9vT1dBVkVmbXQgEAAAAQABAGALAADACwAAAgAQAGRhdGE/bw==').play().catch(()=>{}); } catch(e) {}
+}
+
+function closeAlert() {
+  document.getElementById('alert-banner').style.display = 'none';
+  setTimeout(showNextAlert, 500);
+}
+
+// Hook into executeOperation to trigger alerts
+const _origExecute = executeOperation;
+function executeOperation(opType, product, qty, originalText) {
+  _origExecute(opType, product, qty, originalText);
+  // Check after operation
+  if (product.qty === 0) {
+    triggerAlert(`🔴 EPUIZAT: ${product.name} — stoc zero!`, 'zero');
+  } else if (product.qty <= product.min) {
+    triggerAlert(`⚠️ STOC SCĂZUT: ${product.name} — mai sunt doar ${product.qty} ${product.unit}!`, 'warn');
+  }
+}
+
+// ── PRODUCT HISTORY ──
+function openHistoryModal(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  document.getElementById('history-product-name').textContent = p.name + ' · ' + p.qty + ' ' + p.unit + ' curent';
+  
+  // Filter log for this product
+  const productLog = log.filter(e => 
+    e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))
+  );
+  
+  // Stats
+  const totalIn  = productLog.filter(e=>e.type==='in').length;
+  const totalOut = productLog.filter(e=>e.type==='out').length;
+  document.getElementById('history-stats').innerHTML = `
+    <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#00e5a0">${totalIn}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">INTRĂRI</div>
+    </div>
+    <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ff4757">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ff4757">${totalOut}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">IEȘIRI</div>
+    </div>
+    <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#a78bfa">${productLog.length}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">TOTAL OPS</div>
+    </div>`;
+
+  // List
+  if (productLog.length === 0) {
+    document.getElementById('history-list').innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:20px;text-align:center">Nicio operație înregistrată pentru acest produs.</div>';
+  } else {
+    document.getElementById('history-list').innerHTML = productLog.map(e => `
+      <div style="padding:10px;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:10px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b7a8d;flex-shrink:0">${e.time||'—'}</span>
+        <span class="log-badge ${e.type}" style="flex-shrink:0">${e.type==='in'?'IN':'OUT'}</span>
+        <span style="font-size:12px;color:#99a8b8;flex:1">${e.result||e.cmd||'—'}</span>
+        <span style="font-size:11px;color:#6b7a8d;flex-shrink:0">${e.user||'—'}</span>
+      </div>`).join('');
+  }
+  
+  document.getElementById('history-modal').style.display = 'flex';
+}
+
+function closeHistoryModal() {
+  document.getElementById('history-modal').style.display = 'none';
+}
+
+// ── TRANSFER STOC ──
+function openTransferModal() {
+  if (!currentUser) { speak('Conectați-vă mai întâi.'); return; }
+  // Populate product select
+  const sel = document.getElementById('transfer-product');
+  sel.innerHTML = stock.map(p => `<option value="${p.id}">${p.name} (${p.qty} ${p.unit})</option>`).join('');
+  document.getElementById('transfer-qty').value = '';
+  document.getElementById('transfer-dest').value = '';
+  document.getElementById('transfer-error').style.display = 'none';
+  document.getElementById('transfer-modal').style.display = 'flex';
+}
+
+function closeTransferModal() {
+  document.getElementById('transfer-modal').style.display = 'none';
+}
+
+async function doTransfer() {
+  const productId = parseInt(document.getElementById('transfer-product').value);
+  const qty = parseInt(document.getElementById('transfer-qty').value);
+  const destName = document.getElementById('transfer-dest').value.trim();
+  const errEl = document.getElementById('transfer-error');
+  errEl.style.display = 'none';
+
+  const product = stock.find(p => p.id === productId);
+  if (!product) { errEl.textContent='Produs invalid!'; errEl.style.display='block'; return; }
+  if (!qty || qty <= 0) { errEl.textContent='Introduceți cantitatea!'; errEl.style.display='block'; return; }
+  if (!destName) { errEl.textContent='Introduceți depozitul destinație!'; errEl.style.display='block'; return; }
+  if (qty > product.qty) { errEl.textContent=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}`; errEl.style.display='block'; return; }
+
+  // Get destination depot key
+  const destKey = destName.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_');
+  
+  // Check destination exists
+  const destSnap = await db.ref('depozite/' + destKey).once('value');
+  if (!destSnap.exists()) {
+    errEl.textContent = `Depozitul "${destName}" nu există! Verificați numele exact.`;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Deduct from source
+  product.qty -= qty;
+  saveStockToFirebase();
+
+  // Add to destination
+  const destStock = destSnap.val().stock || [];
+  const destArr = Array.isArray(destStock) ? destStock : Object.values(destStock);
+  const existingInDest = destArr.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(product.name.toLowerCase()));
+  
+  if (existingInDest) {
+    existingInDest.qty += qty;
+  } else {
+    destArr.push({ ...product, id: Date.now(), qty });
+  }
+  
+  await db.ref('depozite/' + destKey + '/stock').set(destArr);
+
+  // Log
+  addLog(`Transfer ${qty} ${product.unit} ${product.name} → ${destName}`, 
+         `Transfer reușit: ${qty} ${product.unit} trimis la ${destName}`, 'out');
+
+  closeTransferModal();
+  renderStock(); updateStats();
+  speak(`Transfer reușit! ${qty} ${product.unit} de ${product.name} trimis la ${destName}.`);
+  setFeedback(`✅ Transfer reușit → ${destName}`, 'ok');
+}
+
+// ── QR / BARCODE SCANNER ──
+let qrStream = null;
+let qrInterval = null;
+
+async function openQRModal() {
+  if (!currentUser) { speak('Conectați-vă mai întâi.'); return; }
+  document.getElementById('qr-modal').style.display = 'flex';
+  document.getElementById('qr-result').textContent = 'Pornire cameră...';
+  
+  try {
+    qrStream = await navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: 'environment' } 
+    });
+    const video = document.getElementById('qr-video');
+    video.srcObject = qrStream;
+    document.getElementById('qr-result').textContent = 'Îndreaptă camera spre codul de bare sau QR';
+    
+    // Use BarcodeDetector if available
+    if ('BarcodeDetector' in window) {
+      const detector = new BarcodeDetector({ formats: ['qr_code','ean_13','ean_8','code_128','code_39','upc_a','upc_e'] });
+      qrInterval = setInterval(async () => {
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0) {
+            handleBarcode(barcodes[0].rawValue);
+          }
+        } catch(e) {}
+      }, 500);
+    } else {
+      document.getElementById('qr-result').textContent = '⚠️ Camera pornită. BarcodeDetector nu e suportat pe acest dispozitiv. Introduceți codul manual.';
+    }
+  } catch(err) {
+    document.getElementById('qr-result').textContent = '❌ Nu pot accesa camera. Verificați permisiunile.';
+  }
+}
+
+function closeQRModal() {
+  if (qrStream) { qrStream.getTracks().forEach(t => t.stop()); qrStream = null; }
+  if (qrInterval) { clearInterval(qrInterval); qrInterval = null; }
+  document.getElementById('qr-modal').style.display = 'none';
+}
+
+function handleBarcode(code) {
+  closeQRModal();
+  document.getElementById('qr-result').textContent = code;
+  
+  // Search product by barcode or name
+  const norm = normalizeText(code.toLowerCase());
+  const found = stock.find(p => 
+    (p.barcode && p.barcode === code) ||
+    normalizeText(p.name.toLowerCase()).includes(norm)
+  );
+  
+  if (found) {
+    // Pre-fill manual input
+    document.getElementById('manual-input').value = `adaugă 1 ${found.name}`;
+    document.getElementById('transcript-display').textContent = `📷 Scanat: ${found.name}`;
+    setFeedback(`📷 Produs găsit: ${found.name} (${found.qty} ${found.unit})`, 'ok');
+    speak(`Produs găsit: ${found.name}. Modificați cantitatea și apăsați OK.`);
+  } else {
+    document.getElementById('transcript-display').textContent = `📷 Cod: ${code}`;
+    setFeedback(`📷 Cod scanat: ${code} — produs negăsit în stoc`, 'warn');
+    speak('Produs negăsit. Verificați codul.');
+  }
+}
+
+function manualBarcode() {
+  const code = prompt('Introduceți codul de bare sau QR:');
+  if (code) { closeQRModal(); handleBarcode(code.trim()); }
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -2022,6 +2255,78 @@ function installApp() {
   });
 }
 </script>
+
+
+<!-- ALERT BANNER -->
+<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:4000;padding:12px 20px;background:linear-gradient(90deg,#ff4757,#ff6b7a);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(255,71,87,0.5);animation:slideDown .3s ease">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:22px">🚨</span>
+    <span id="alert-text">ALERTĂ STOC!</span>
+  </div>
+  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:5px 12px;cursor:pointer">✕</button>
+</div>
+@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+
+<!-- PRODUCT HISTORY MODAL -->
+<div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">📋 Istoric Produs</div>
+        <div style="font-size:13px;color:#6b7a8d;margin-top:2px" id="history-product-name">—</div>
+      </div>
+      <button onclick="closeHistoryModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="history-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"></div>
+    <div id="history-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TRANSFER MODAL -->
+<div id="transfer-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:420px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;margin-bottom:6px">🔄 Transfer Stoc</div>
+    <div style="font-size:13px;color:#6b7a8d;margin-bottom:20px">Trimite cantitate către alt depozit</div>
+    
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Produs</div>
+      <select id="transfer-product" class="form-input" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;padding:10px 12px;outline:none;font-size:14px"></select>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Cantitate</div>
+      <input id="transfer-qty" type="number" min="1" placeholder="ex: 50" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none">
+    </div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Depozit Destinație</div>
+      <input id="transfer-dest" placeholder="ex: Depozit București" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#1e2530'">
+      <div style="font-size:11px;color:#6b7a8d;margin-top:5px">⚠️ Depozitul destinație trebuie să existe și operatorul lui va vedea produsul adăugat</div>
+    </div>
+    <div id="transfer-error" style="background:rgba(255,71,87,0.1);border:1px solid #ff4757;border-radius:8px;padding:10px;font-size:13px;color:#ff4757;display:none;margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTransferModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doTransfer()" style="flex:2;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">TRIMITE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR SCANNER MODAL -->
+<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0">📷 SCANEAZĂ COD</div>
+  <div style="position:relative;width:280px;height:280px;border:3px solid #00e5a0;border-radius:16px;overflow:hidden;background:#000">
+    <video id="qr-video" style="width:100%;height:100%;object-fit:cover" playsinline autoplay></video>
+    <!-- Scanner frame -->
+    <div style="position:absolute;inset:0;border:2px solid rgba(0,229,160,0.3);border-radius:14px;pointer-events:none"></div>
+    <div style="position:absolute;top:20px;left:20px;width:30px;height:30px;border-top:3px solid #00e5a0;border-left:3px solid #00e5a0;border-radius:3px 0 0 0"></div>
+    <div style="position:absolute;top:20px;right:20px;width:30px;height:30px;border-top:3px solid #00e5a0;border-right:3px solid #00e5a0;border-radius:0 3px 0 0"></div>
+    <div style="position:absolute;bottom:20px;left:20px;width:30px;height:30px;border-bottom:3px solid #00e5a0;border-left:3px solid #00e5a0;border-radius:0 0 0 3px"></div>
+    <div style="position:absolute;bottom:20px;right:20px;width:30px;height:30px;border-bottom:3px solid #00e5a0;border-right:3px solid #00e5a0;border-radius:0 0 3px 0"></div>
+  </div>
+  <div id="qr-result" style="font-size:13px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;text-align:center;max-width:280px">Îndreaptă camera spre codul de bare sau QR</div>
+  <div style="display:flex;gap:10px">
+    <button onclick="closeQRModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">ANULEAZĂ</button>
+    <button onclick="manualBarcode()" style="background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">✏️ MANUAL</button>
+  </div>
+</div>
 
 </body>
 </html>
