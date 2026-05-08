@@ -445,6 +445,8 @@ async function doLogin() {
 // ── LOGOUT ──
 function doLogout() {
   stopEngine();
+  document.getElementById('secret-dashboard').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'none';
   auth.signOut();
 }
 
@@ -456,12 +458,12 @@ auth.onAuthStateChanged(async (user) => {
     const snap = await db.ref('users/' + user.uid).once('value');
     userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email, status: 'approved' };
 
-    // Check if admin
+    // Check if admin - goes directly to app
     if (user.email === ADMIN_EMAIL) {
       userProfile.status = 'approved';
-      showAdminPanel();
-      return;
-    }
+      userProfile.depot = userProfile.depot || 'Admin';
+      // Fall through to show main app
+    } else {
 
     // Check approval status
     if (userProfile.status === 'pending') {
@@ -482,7 +484,9 @@ auth.onAuthStateChanged(async (user) => {
       return;
     }
 
-    // Approved - show app
+    } // end non-admin check
+
+    // Show main app (both admin and approved operators)
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('current-user').textContent  = userProfile.name;
     document.getElementById('stat-user').textContent     = userProfile.name;
@@ -850,9 +854,12 @@ document.getElementById('manual-input').addEventListener('keydown',e=>{if(e.key=
 
 // ── ADMIN PANEL ──
 function showAdminPanel() {
-  document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
   loadAllUsers();
+}
+
+function closeAdminPanel() {
+  document.getElementById('admin-panel').style.display = 'none';
 }
 
 function loadAllUsers() {
@@ -1652,13 +1659,13 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
 <!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2000;overflow-y:auto;padding:24px">
+<div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2500;overflow-y:auto;padding:24px">
   <div style="max-width:800px;margin:0 auto">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;letter-spacing:2px;color:#e8ecf0">
-        Stoc<span style="color:#00e5a0">Voce</span> <span style="font-size:14px;color:#6b7a8d;font-weight:400">PANOU ADMIN</span>
+        Stoc<span style="color:#00e5a0">Voce</span> <span style="font-size:14px;color:#6b7a8d;font-weight:400">APROBARE UTILIZATORI</span>
       </div>
-      <button onclick="doLogout()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;cursor:pointer">⎋ IEȘIRE</button>
+      <button onclick="closeAdminPanel()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;cursor:pointer">✕ ÎNCHIDE</button>
     </div>
 
     <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px;margin-bottom:20px">
@@ -1773,7 +1780,10 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
         </div>
         <div style="font-size:12px;color:#6b7a8d;margin-top:4px;font-family:'JetBrains Mono',monospace" id="dash-updated">—</div>
       </div>
-      <button onclick="closeDashboard()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">✕ ÎNCHIDE</button>
+      <div style="display:flex;gap:10px">
+        <button onclick="showAdminPanel()" style="background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer">👥 APROBĂRI</button>
+        <button onclick="closeDashboard()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">✕ ÎNCHIDE</button>
+      </div>
     </div>
 
     <!-- Global Stats -->
