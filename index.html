@@ -1642,7 +1642,6 @@ document.addEventListener('keydown', e => {
 });
 
 function filterUsers(status) {
-  // Update filter buttons
   ['all','pending','approved','rejected'].forEach(s => {
     const btn = document.getElementById('filter-'+s);
     if (!btn) return;
@@ -1659,9 +1658,39 @@ function filterUsers(status) {
   renderDashUsers(status);
 }
 
+let currentUserFilter = 'all';
+
+function searchUsers() {
+  renderDashUsers(currentUserFilter);
+}
+
 function renderDashUsers(filter) {
+  currentUserFilter = filter || 'all';
   const users = window.dashUsers || [];
-  const filtered = filter === 'all' ? users : users.filter(u => u.status === filter);
+  const searchVal = (document.getElementById('user-search')||{}).value || '';
+  const searchNorm = searchVal.toLowerCase().trim();
+
+  // Update counts
+  ['all','pending','approved','rejected'].forEach(s => {
+    const countEl = document.getElementById('count-' + s);
+    if (countEl) {
+      const n = s === 'all' ? users.length : users.filter(u => u.status === s).length;
+      countEl.textContent = n > 0 ? `(${n})` : '';
+    }
+  });
+
+  // Filter by status
+  let filtered = currentUserFilter === 'all' ? users : users.filter(u => u.status === currentUserFilter);
+  
+  // Filter by search
+  if (searchNorm) {
+    filtered = filtered.filter(u =>
+      (u.name||'').toLowerCase().includes(searchNorm) ||
+      (u.email||'').toLowerCase().includes(searchNorm) ||
+      (u.depot||'').toLowerCase().includes(searchNorm)
+    );
+  }
+
   const el = document.getElementById('all-users');
   if (!el) return;
 
@@ -1922,13 +1951,21 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 
     <!-- Users list with approve/reject -->
     <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase">👥 UTILIZATORI & APROBARE</div>
-        <div style="display:flex;gap:8px">
-          <button onclick="filterUsers('all')" id="filter-all" style="background:rgba(0,229,160,0.15);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">TOȚI</button>
-          <button onclick="filterUsers('pending')" id="filter-pending" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">AȘTEPTARE</button>
-          <button onclick="filterUsers('approved')" id="filter-approved" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">APROBAȚI</button>
-          <button onclick="filterUsers('rejected')" id="filter-rejected" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;cursor:pointer;letter-spacing:1px">REFUZAȚI</button>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:14px">👥 UTILIZATORI & APROBARE</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <!-- Search -->
+        <div style="flex:1;min-width:200px;position:relative">
+          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#6b7a8d;font-size:14px">🔍</span>
+          <input id="user-search" oninput="searchUsers()" placeholder="Caută după nume, email sau depozit..." 
+            style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:13px;padding:9px 12px 9px 34px;outline:none;transition:border-color .2s"
+            onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
+        </div>
+        <!-- Filter buttons -->
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="filterUsers('all')" id="filter-all" style="background:rgba(0,229,160,0.15);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">TOȚI <span id="count-all"></span></button>
+          <button onclick="filterUsers('pending')" id="filter-pending" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">AȘTEPTARE <span id="count-pending" style="color:#ffa502"></span></button>
+          <button onclick="filterUsers('approved')" id="filter-approved" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">APROBAȚI <span id="count-approved" style="color:#00e5a0"></span></button>
+          <button onclick="filterUsers('rejected')" id="filter-rejected" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">REFUZAȚI <span id="count-rejected" style="color:#ff4757"></span></button>
         </div>
       </div>
       <div id="all-users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px"></div>
