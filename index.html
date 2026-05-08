@@ -10,7 +10,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
- 
+
 /* ── AUTH SCREEN ── */
 #auth-screen{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;display:flex;align-items:center;justify-content:center}
 .auth-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center}
@@ -35,7 +35,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .auth-success{background:rgba(0,229,160,0.1);border:1px solid var(--accent);border-radius:8px;padding:10px;font-size:13px;color:var(--accent);display:none}
 .auth-success.show{display:block}
 .auth-divider{font-size:12px;color:var(--text-dim);margin:4px 0}
- 
+
 /* ── HEADER ── */
 header{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:rgba(10,12,15,0.9);backdrop-filter:blur(12px);flex-wrap:wrap;gap:8px}
 .logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;letter-spacing:2px;text-transform:uppercase}.logo span{color:var(--accent)}
@@ -46,7 +46,7 @@ header{position:relative;z-index:10;display:flex;align-items:center;justify-cont
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
 .export-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-dim);font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;cursor:pointer;transition:all .15s}
 .export-btn:hover{border-color:var(--accent);color:var(--accent)}
- 
+
 /* ── MAIN ── */
 main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto 1fr;height:calc(100vh - 57px)}
 .voice-zone{grid-column:1/2;grid-row:1/2;padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;background:var(--surface);flex-wrap:wrap}
@@ -152,7 +152,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 .stat-val.accent{color:var(--accent)}.stat-val.warn{color:var(--warn)}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 @media(max-width:900px){main{grid-template-columns:1fr;grid-template-rows:auto 1fr auto}.sidebar{grid-column:1;grid-row:3;height:280px;border-left:none;border-top:1px solid var(--border)}.footer-bar{right:0}}
- 
+
 /* Loading spinner */
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -162,18 +162,18 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
- 
+
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">Stoc<span>Voce</span></div>
     <div class="auth-sub">Sistem de gestiune depozit cu voce</div>
- 
+
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="showTab('login')">INTRĂ</button>
       <button class="auth-tab" onclick="showTab('register')">CONT NOU</button>
     </div>
- 
+
     <!-- LOGIN -->
     <div id="tab-login" class="auth-form">
       <div class="auth-field">
@@ -187,7 +187,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <div class="auth-error" id="login-error"></div>
       <button class="auth-btn" onclick="doLogin()" id="login-btn">INTRĂ →</button>
     </div>
- 
+
     <!-- REGISTER -->
     <div id="tab-register" class="auth-form" style="display:none">
       <div class="auth-field">
@@ -214,13 +214,13 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <div class="auth-success" id="reg-success"></div>
       <button class="auth-btn" onclick="doRegister()" id="reg-btn">CREEAZĂ CONT →</button>
     </div>
- 
+
     <div style="margin-top:16px">
       <div class="spinner" id="auth-spinner" style="display:none"></div>
     </div>
   </div>
 </div>
- 
+
 <!-- CONFIRM MODAL -->
 <div id="confirm-modal">
   <div class="confirm-box">
@@ -233,7 +233,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     </div>
   </div>
 </div>
- 
+
 <!-- ADD MODAL -->
 <div id="add-modal">
   <div class="add-box">
@@ -257,10 +257,10 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     </div>
   </div>
 </div>
- 
+
 <!-- HEADER -->
 <header>
-  <div class="logo">Stoc<span>Voce</span></div>
+  <div class="logo" id="logo-btn" onclick="logoClick()" style="cursor:pointer;user-select:none">Stoc<span>Voce</span></div>
   <div class="header-right">
     <div class="status-pill"><div class="dot" id="mic-dot"></div><span id="mic-status">GATA</span></div>
     <div class="status-pill" style="color:var(--accent)" id="depot-pill">—</div>
@@ -271,7 +271,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <button class="export-btn" onclick="doLogout()">⎋ IEȘIRE</button>
   </div>
 </header>
- 
+
 <main>
   <div class="voice-zone">
     <button id="mic-btn" onclick="toggleMainMic()">🎤</button>
@@ -291,7 +291,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button id="manual-btn" onclick="processManual()">OK ▶</button>
     </div>
   </div>
- 
+
   <div class="stock-area">
     <div class="section-title" id="depot-title">Stocuri Depozit</div>
     <div class="search-bar">
@@ -304,7 +304,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <div style="color:var(--text-dim);font-size:13px;padding:20px">Conectează-te pentru a vedea stocul...</div>
     </div>
   </div>
- 
+
   <div class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-title">📋 Istoric</div>
@@ -313,19 +313,19 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <div id="log-list"></div>
   </div>
 </main>
- 
+
 <div class="footer-bar">
   <div class="stat-item"><span class="stat-label">PRODUSE:</span><span class="stat-val accent" id="stat-total">0</span></div>
   <div class="stat-item"><span class="stat-label">CRITIC:</span><span class="stat-val warn" id="stat-low">0</span></div>
   <div class="stat-item"><span class="stat-label">AZI:</span><span class="stat-val" id="stat-ops">0</span></div>
   <div class="stat-item" style="margin-left:auto"><span class="stat-label">USER:</span><span class="stat-val" id="stat-user">—</span></div>
 </div>
- 
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
- 
+
 <script>
 // ── FIREBASE INIT ──
 firebase.initializeApp({
@@ -339,10 +339,10 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const db   = firebase.database();
- 
+
 // ── ADMIN ──
 const ADMIN_EMAIL = 'now_lord@yahoo.com';
- 
+
 // ── STATE ──
 let currentUser = null;
 let userProfile = null;
@@ -359,7 +359,7 @@ let wakeTimeout  = null;
 let synth = window.speechSynthesis;
 let speechSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
 const WAKE_WORDS = ['stoc','stock','stocuri','doc'];
- 
+
 // ── AUTH TABS ──
 function showTab(tab) {
   document.getElementById('tab-login').style.display    = tab==='login'    ? 'flex' : 'none';
@@ -369,7 +369,7 @@ function showTab(tab) {
   document.getElementById('reg-error').classList.remove('show');
   document.getElementById('reg-success').classList.remove('show');
 }
- 
+
 // ── REGISTER ──
 async function doRegister() {
   const name  = document.getElementById('reg-name').value.trim();
@@ -379,18 +379,18 @@ async function doRegister() {
   const pass2 = document.getElementById('reg-pass2').value;
   const errEl = document.getElementById('reg-error');
   const sucEl = document.getElementById('reg-success');
- 
+
   errEl.classList.remove('show'); sucEl.classList.remove('show');
- 
+
   if (!name)  { errEl.textContent='Introduceți numele!'; errEl.classList.add('show'); return; }
   if (!depot) { errEl.textContent='Introduceți numele depozitului!'; errEl.classList.add('show'); return; }
   if (!email) { errEl.textContent='Introduceți email-ul!'; errEl.classList.add('show'); return; }
   if (pass.length < 6) { errEl.textContent='Parola trebuie să aibă minim 6 caractere!'; errEl.classList.add('show'); return; }
   if (pass !== pass2) { errEl.textContent='Parolele nu coincid!'; errEl.classList.add('show'); return; }
- 
+
   document.getElementById('auth-spinner').style.display='block';
   document.getElementById('reg-btn').disabled=true;
- 
+
   try {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({ displayName: name });
@@ -416,19 +416,19 @@ async function doRegister() {
   document.getElementById('auth-spinner').style.display='none';
   document.getElementById('reg-btn').disabled=false;
 }
- 
+
 // ── LOGIN ──
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
   errEl.classList.remove('show');
- 
+
   if (!email || !pass) { errEl.textContent='Completați email și parola!'; errEl.classList.add('show'); return; }
- 
+
   document.getElementById('auth-spinner').style.display='block';
   document.getElementById('login-btn').disabled=true;
- 
+
   try {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(e) {
@@ -441,13 +441,13 @@ async function doLogin() {
     document.getElementById('login-btn').disabled=false;
   }
 }
- 
+
 // ── LOGOUT ──
 function doLogout() {
   stopEngine();
   auth.signOut();
 }
- 
+
 // ── AUTH STATE CHANGE ──
 auth.onAuthStateChanged(async (user) => {
   if (user) {
@@ -455,14 +455,14 @@ auth.onAuthStateChanged(async (user) => {
     // Load profile
     const snap = await db.ref('users/' + user.uid).once('value');
     userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email, status: 'approved' };
- 
+
     // Check if admin
     if (user.email === ADMIN_EMAIL) {
       userProfile.status = 'approved';
       showAdminPanel();
       return;
     }
- 
+
     // Check approval status
     if (userProfile.status === 'pending') {
       document.getElementById('auth-screen').style.display = 'flex';
@@ -472,7 +472,7 @@ auth.onAuthStateChanged(async (user) => {
       await auth.signOut();
       return;
     }
- 
+
     if (userProfile.status === 'rejected') {
       document.getElementById('auth-screen').style.display = 'flex';
       document.getElementById('login-error').textContent = '❌ Accesul tău a fost refuzat. Contactați administratorul.';
@@ -481,7 +481,7 @@ auth.onAuthStateChanged(async (user) => {
       await auth.signOut();
       return;
     }
- 
+
     // Approved - show app
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('current-user').textContent  = userProfile.name;
@@ -491,10 +491,10 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById('fb-status').textContent     = '🔥 LIVE';
     document.getElementById('fb-dot').style.cssText      = 'background:var(--accent);box-shadow:0 0 6px var(--accent)';
     document.getElementById('fb-dot').className          = 'dot';
- 
+
     loadStockFromFirebase();
     loadLogFromFirebase();
- 
+
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     setFeedback(`✅ ${userProfile.depot} – gata de comenzi!`, 'ok');
   } else {
@@ -509,14 +509,14 @@ auth.onAuthStateChanged(async (user) => {
     renderLog();
   }
 });
- 
+
 // ── FIREBASE STOCK ──
 function getDepotKey() {
   if (!userProfile) return null;
   // Convert depot name to safe Firebase key
   return userProfile.depot.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_');
 }
- 
+
 function loadStockFromFirebase() {
   const key = getDepotKey();
   if (!key) return;
@@ -534,7 +534,7 @@ function loadStockFromFirebase() {
     updateStats();
   });
 }
- 
+
 function loadLogFromFirebase() {
   const key = getDepotKey();
   if (!key) return;
@@ -549,19 +549,19 @@ function loadLogFromFirebase() {
     updateStats();
   });
 }
- 
+
 function saveStockToFirebase() {
   const key = getDepotKey();
   if (!key) return;
   db.ref('depozite/' + key + '/stock').set(stock).catch(e=>console.error('FB stock:',e));
 }
- 
+
 function saveLogEntryToFirebase(entry) {
   const key = getDepotKey();
   if (!key) return;
   db.ref('depozite/' + key + '/log').push(entry).catch(e=>console.error('FB log:',e));
 }
- 
+
 // ── SPEECH ──
 function speak(text) {
   if (!synth) return;
@@ -574,7 +574,7 @@ function speak(text) {
   utt.onend=()=>{if(isRunning&&!isCommandMode)scheduleRestart(400);};
   synth.speak(utt);
 }
- 
+
 // ── VOICE ENGINE ──
 function setMode(mode) {
   voiceMode=mode;
@@ -675,7 +675,7 @@ function setMicState(state){
     case 'error':btn.classList.add('error');btn.textContent='❌';document.getElementById('mic-status').textContent='EROARE';break;
   }
 }
- 
+
 // ── COMMANDS ──
 function processManual(){
   const val=document.getElementById('manual-input').value.trim();
@@ -752,7 +752,7 @@ function confirmAction(yes){
   else{setFeedback('Anulat.','warn');speak('Operație anulată.');if(pendingAction)addLog(pendingAction.text,'Anulat','warn');}
   pendingAction=null;
 }
- 
+
 // ── LOG ──
 function addLog(cmd,result,type){
   const now=new Date();
@@ -775,7 +775,7 @@ function exportLog(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`stocvoce_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
 }
- 
+
 // ── RENDER ──
 function renderStock(){
   const search=normalizeText(document.getElementById('stock-search').value.toLowerCase());
@@ -840,21 +840,21 @@ function setFeedback(msg,type){
   const el=document.getElementById('feedback-display');
   el.textContent=msg;el.id='feedback-display';el.className=type||'';
 }
- 
+
 // ── KEYBOARD ──
 document.addEventListener('keydown',e=>{
   if(e.code==='Space'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();toggleMainMic();}
   if(e.key==='Escape'){document.getElementById('confirm-modal').classList.remove('show');document.getElementById('add-modal').classList.remove('show');}
 });
 document.getElementById('manual-input').addEventListener('keydown',e=>{if(e.key==='Enter')processManual();});
- 
+
 // ── ADMIN PANEL ──
 function showAdminPanel() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
   loadAllUsers();
 }
- 
+
 function loadAllUsers() {
   db.ref('users').on('value', (snap) => {
     const data = snap.val();
@@ -863,12 +863,12 @@ function loadAllUsers() {
       document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator.</div>';
       return;
     }
- 
+
     const users = Object.entries(data).map(([uid, u]) => ({ uid, ...u }));
     const pending  = users.filter(u => u.status === 'pending');
     const approved = users.filter(u => u.status === 'approved');
     const rejected = users.filter(u => u.status === 'rejected');
- 
+
     // Pending
     if (pending.length === 0) {
       document.getElementById('pending-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Nicio cerere în așteptare. 🎉</div>';
@@ -887,7 +887,7 @@ function loadAllUsers() {
         </div>
       `).join('');
     }
- 
+
     // Approved
     if (approved.length === 0) {
       document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator aprobat.</div>';
@@ -904,28 +904,28 @@ function loadAllUsers() {
     }
   });
 }
- 
+
 async function approveUser(uid, name) {
   await db.ref('users/' + uid + '/status').set('approved');
   console.log('Approved:', name);
 }
- 
+
 async function rejectUser(uid, name) {
   if (confirm(`Refuzi accesul pentru ${name}?`)) {
     await db.ref('users/' + uid + '/status').set('rejected');
   }
 }
- 
+
 async function revokeUser(uid, name) {
   if (confirm(`Revoci accesul pentru ${name}?`)) {
     await db.ref('users/' + uid + '/status').set('pending');
   }
 }
- 
- 
+
+
 // ── IMPORT EXCEL ──
 let importedProducts = [];
- 
+
 function openImportModal() {
   if (!currentUser) { speak('Conectați-vă mai întâi.'); return; }
   document.getElementById('import-modal').style.display = 'flex';
@@ -936,11 +936,11 @@ function openImportModal() {
   document.getElementById('import-btn').style.opacity = '0.5';
   document.getElementById('excel-file').value = '';
 }
- 
+
 function closeImportModal() {
   document.getElementById('import-modal').style.display = 'none';
 }
- 
+
 function downloadTemplate() {
   const wb = XLSX.utils.book_new();
   const templateData = [
@@ -955,7 +955,7 @@ function downloadTemplate() {
   XLSX.utils.book_append_sheet(wb, ws, 'Produse');
   XLSX.writeFile(wb, 'template_stocvoce.xlsx');
 }
- 
+
 function handleExcelFile(input) {
   const file = input.files[0];
   if (!file) return;
@@ -976,7 +976,7 @@ function handleExcelFile(input) {
         errEl.style.display = 'block';
         return;
       }
- 
+
       // Find header row
       const header = rows[0].map(h => (h||'').toString().toLowerCase().trim());
       
@@ -989,13 +989,13 @@ function handleExcelFile(input) {
         loc:  header.findIndex(h => h.includes('loc') || h.includes('raft') || h.includes('pozi')),
         min:  header.findIndex(h => h.includes('min') || h.includes('minim')),
       };
- 
+
       if (colMap.name === -1) {
         errEl.textContent = 'Nu găsesc coloana "Nume"! Verificați că prima linie are antetele corecte.';
         errEl.style.display = 'block';
         return;
       }
- 
+
       importedProducts = [];
       const dataRows = rows.slice(1);
       
@@ -1015,13 +1015,13 @@ function handleExcelFile(input) {
           maxQty: Math.max((parseInt(row[colMap.qty]) || 0) * 3, 100)
         });
       });
- 
+
       if (importedProducts.length === 0) {
         errEl.textContent = 'Nu am găsit produse valide în fișier!';
         errEl.style.display = 'block';
         return;
       }
- 
+
       // Show preview
       document.getElementById('import-preview').style.display = 'block';
       document.getElementById('import-count').textContent = `✅ ${importedProducts.length} produse găsite, gata de import`;
@@ -1036,7 +1036,7 @@ function handleExcelFile(input) {
       btn.disabled = false;
       btn.style.opacity = '1';
       btn.textContent = `IMPORTĂ ${importedProducts.length} PRODUSE →`;
- 
+
     } catch(err) {
       errEl.textContent = 'Eroare la citirea fișierului: ' + err.message;
       errEl.style.display = 'block';
@@ -1045,18 +1045,18 @@ function handleExcelFile(input) {
   };
   reader.readAsArrayBuffer(file);
 }
- 
+
 async function doImport() {
   if (!importedProducts.length) return;
   
   const btn = document.getElementById('import-btn');
   btn.disabled = true;
   btn.textContent = 'Se importă...';
- 
+
   // Add to existing stock (skip duplicates by name)
   const existingNames = stock.map(p => normalizeText(p.name.toLowerCase()));
   let added = 0, skipped = 0;
- 
+
   importedProducts.forEach(p => {
     const norm = normalizeText(p.name.toLowerCase());
     if (existingNames.includes(norm)) {
@@ -1067,7 +1067,7 @@ async function doImport() {
       added++;
     }
   });
- 
+
   // Save to Firebase
   saveStockToFirebase();
   addLog(`Import Excel`, `${added} produse importate, ${skipped} duplicate omise`, 'in');
@@ -1079,7 +1079,7 @@ async function doImport() {
   speak(`Import finalizat! ${added} produse adăugate.`);
   setFeedback(`✅ Import reușit: ${added} produse adăugate, ${skipped} duplicate omise.`, 'ok');
 }
- 
+
 // Drag and drop support
 document.addEventListener('DOMContentLoaded', () => {
   const dropZone = document.getElementById('drop-zone');
@@ -1110,8 +1110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
- 
- 
+
+
 // ── EDIT / DELETE PRODUCT ──
 function openEditModal(productId) {
   const p = stock.find(s => s.id === productId);
@@ -1126,20 +1126,20 @@ function openEditModal(productId) {
   document.getElementById('edit-sensitive').checked = p.sensitive || false;
   document.getElementById('edit-modal').style.display = 'flex';
 }
- 
+
 function closeEditModal() {
   document.getElementById('edit-modal').style.display = 'none';
 }
- 
+
 function saveEdit() {
   const id = parseInt(document.getElementById('edit-id').value);
   const p = stock.find(s => s.id === id);
   if (!p) return;
- 
+
   const oldName = p.name;
   const oldQty = p.qty;
   const newQty = parseInt(document.getElementById('edit-qty').value) || 0;
- 
+
   p.name      = document.getElementById('edit-name').value.trim() || p.name;
   p.cat       = document.getElementById('edit-cat').value.trim() || p.cat;
   p.qty       = newQty;
@@ -1148,18 +1148,18 @@ function saveEdit() {
   p.min       = parseInt(document.getElementById('edit-min').value) || p.min;
   p.sensitive = document.getElementById('edit-sensitive').checked;
   p.maxQty    = Math.max(p.maxQty || 100, newQty * 2);
- 
+
   saveStockToFirebase();
   closeEditModal();
   renderStock();
   updateStats();
- 
+
   const qtyChange = newQty !== oldQty ? ` (cantitate: ${oldQty}→${newQty})` : '';
   addLog(`Editat: ${p.name}`, `Produs modificat${qtyChange}`, 'in');
   speak(`Produs ${p.name} actualizat.`);
   setFeedback(`✅ ${p.name} actualizat cu succes!`, 'ok');
 }
- 
+
 function deleteProduct(productId, productName) {
   if (!confirm(`Ștergi produsul "${productName}" din stoc? Această acțiune nu poate fi anulată!`)) return;
   
@@ -1175,8 +1175,8 @@ function deleteProduct(productId, productName) {
   speak(`Produs ${productName} șters din stoc.`);
   setFeedback(`🗑️ ${productName} șters din stoc.`, 'warn');
 }
- 
- 
+
+
 // ── GENERATE PDF REPORT ──
 async function generatePDF() {
   if (!currentUser || !userProfile) { speak('Conectați-vă mai întâi.'); return; }
@@ -1192,7 +1192,7 @@ async function generatePDF() {
     const dateStr = now.toLocaleDateString('ro-RO', {day:'2-digit',month:'long',year:'numeric'});
     const timeStr = now.toLocaleTimeString('ro-RO', {hour:'2-digit',minute:'2-digit'});
     const depotName = userProfile.depot || 'Depozit';
- 
+
     // ── HEADER ──
     // Dark header bar
     doc.setFillColor(10, 12, 15);
@@ -1201,7 +1201,7 @@ async function generatePDF() {
     // Accent line
     doc.setFillColor(0, 229, 160);
     doc.rect(0, 36, pageW, 1.5, 'F');
- 
+
     // Logo text
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(22);
@@ -1209,27 +1209,27 @@ async function generatePDF() {
     doc.text('STOC', 14, 23);
     doc.setTextColor(0, 229, 160);
     doc.text('VOCE', 35, 23);
- 
+
     // Depot name
     doc.setFontSize(11);
     doc.setTextColor(107, 122, 141);
     doc.setFont('helvetica', 'normal');
     doc.text(depotName.toUpperCase(), 14, 31);
- 
+
     // Date/time on right
     doc.setFontSize(9);
     doc.setTextColor(153, 168, 184);
     doc.text(`Raport generat: ${dateStr}, ${timeStr}`, pageW - 14, 23, { align: 'right' });
     doc.text(`Operator: ${userProfile.name}`, pageW - 14, 30, { align: 'right' });
- 
+
     let yPos = 46;
- 
+
     // ── SUMMARY STATS ──
     const totalProducts = stock.length;
     const lowStock = stock.filter(p => p.qty <= p.min && p.qty > 0).length;
     const zeroStock = stock.filter(p => p.qty === 0).length;
     const okStock = totalProducts - lowStock - zeroStock;
- 
+
     // Stats boxes
     const boxW = (pageW - 28 - 9) / 4;
     const statsData = [
@@ -1238,7 +1238,7 @@ async function generatePDF() {
       { label: 'STOC SCĂZUT', value: lowStock, color: [255, 165, 2] },
       { label: 'EPUIZAT', value: zeroStock, color: [255, 71, 87] },
     ];
- 
+
     statsData.forEach((stat, i) => {
       const x = 14 + i * (boxW + 3);
       doc.setFillColor(17, 20, 24);
@@ -1260,16 +1260,16 @@ async function generatePDF() {
       doc.setTextColor(107, 122, 141);
       doc.text(stat.label, x + boxW/2, yPos + 17, { align: 'center' });
     });
- 
+
     yPos += 28;
- 
+
     // ── MINI BAR CHART ──
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.setTextColor(153, 168, 184);
     doc.text('SITUAȚIE STOC PE CATEGORII', 14, yPos);
     yPos += 6;
- 
+
     // Group by category
     const cats = {};
     stock.forEach(p => {
@@ -1278,25 +1278,25 @@ async function generatePDF() {
       if (p.qty === 0) cats[p.cat].zero++;
       else if (p.qty <= p.min) cats[p.cat].low++;
     });
- 
+
     const catEntries = Object.entries(cats).slice(0, 6);
     const chartH = 28;
     const chartW = pageW - 28;
     const barMaxH = 18;
     const barW = Math.min(18, (chartW / catEntries.length) - 4);
- 
+
     // Chart background
     doc.setFillColor(17, 20, 24);
     doc.roundedRect(14, yPos, chartW, chartH + 10, 2, 2, 'F');
     doc.setDrawColor(30, 37, 48);
     doc.roundedRect(14, yPos, chartW, chartH + 10, 2, 2, 'S');
- 
+
     catEntries.forEach(([cat, data], i) => {
       const x = 14 + (i + 0.5) * (chartW / catEntries.length);
       const barH = Math.max(2, (data.total / Math.max(...catEntries.map(([,d])=>d.total))) * barMaxH);
       const barX = x - barW/2;
       const barY = yPos + chartH - barH + 2;
- 
+
       // Color based on status
       const zeroRatio = data.zero / data.total;
       const lowRatio = data.low / data.total;
@@ -1318,21 +1318,21 @@ async function generatePDF() {
       doc.setFontSize(7);
       doc.text(data.total.toString(), x, barY - 1, { align: 'center' });
     });
- 
+
     yPos += chartH + 18;
- 
+
     // ── STOCK TABLE ──
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.setTextColor(153, 168, 184);
     doc.text('INVENTAR COMPLET', 14, yPos);
     yPos += 4;
- 
+
     const stockRows = stock.map(p => {
       const status = p.qty === 0 ? 'EPUIZAT' : p.qty <= p.min ? 'SCĂZUT' : 'OK';
       return [p.name, p.cat || '—', p.qty.toString(), p.unit, p.loc || '—', p.min.toString(), status];
     });
- 
+
     doc.autoTable({
       startY: yPos,
       head: [['Produs', 'Categorie', 'Cantitate', 'UM', 'Locație', 'Min.', 'Status']],
@@ -1381,7 +1381,7 @@ async function generatePDF() {
       alternateRowStyles: { fillColor: [24, 29, 36] },
       margin: { left: 14, right: 14 },
     });
- 
+
     // ── HISTORY TABLE ──
     if (log.length > 0) {
       doc.addPage();
@@ -1401,19 +1401,19 @@ async function generatePDF() {
       doc.setTextColor(107, 122, 141);
       doc.setFont('helvetica', 'normal');
       doc.text('ISTORIC OPERAȚII', 14, 31);
- 
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(153, 168, 184);
       doc.text('ISTORIC COMENZI VOCALE', 14, 50);
- 
+
       const logRows = log.slice(0, 50).map(e => [
         e.time || '—',
         (e.cmd || '—').substring(0, 35),
         e.type === 'in' ? 'INTRARE' : e.type === 'out' ? 'IEȘIRE' : e.type === 'err' ? 'EROARE' : e.type.toUpperCase(),
         (e.user || '—').substring(0, 20),
       ]);
- 
+
       doc.autoTable({
         startY: 54,
         head: [['Data/Ora', 'Comandă', 'Tip', 'Operator']],
@@ -1443,7 +1443,7 @@ async function generatePDF() {
         margin: { left: 14, right: 14 },
       });
     }
- 
+
     // ── FOOTER on all pages ──
     const totalPages = doc.internal.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
@@ -1457,24 +1457,200 @@ async function generatePDF() {
       doc.setTextColor(107, 122, 141);
       doc.text(`StocVoce · ${depotName} · Pagina ${i} din ${totalPages}`, pageW/2, pageH - 5, { align: 'center' });
     }
- 
+
     // Save PDF
     const fileName = `StocVoce_${depotName.replace(/\s+/g,'_')}_${now.toISOString().slice(0,10)}.pdf`;
     doc.save(fileName);
     
     speak('Raport PDF generat cu succes.');
     setFeedback(`✅ PDF generat: ${fileName}`, 'ok');
- 
+
   } catch(err) {
     console.error('PDF error:', err);
     setFeedback('❌ Eroare la generarea PDF. Verificați consola.', 'err');
     speak('Eroare la generarea raportului.');
   }
 }
- 
+
+
+// ── SECRET DASHBOARD ──
+let logoClickCount = 0;
+let logoClickTimer = null;
+const ADMIN_EMAIL_DASH = 'now_lord@yahoo.com';
+
+function logoClick() {
+  logoClickCount++;
+  clearTimeout(logoClickTimer);
+  
+  if (logoClickCount >= 5) {
+    logoClickCount = 0;
+    openSecretDashboard();
+  } else {
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+  }
+}
+
+function openSecretDashboard() {
+  if (!currentUser || currentUser.email !== ADMIN_EMAIL_DASH) {
+    // Silent fail - non-admins get nothing
+    return;
+  }
+  document.getElementById('secret-dashboard').style.display = 'block';
+  document.getElementById('dash-updated').textContent = 'Actualizat: ' + new Date().toLocaleString('ro-RO');
+  loadDashboardData();
+}
+
+function closeDashboard() {
+  document.getElementById('secret-dashboard').style.display = 'none';
+}
+
+async function loadDashboardData() {
+  try {
+    // Load all depots stock
+    const depotsSnap = await db.ref('depozite').once('value');
+    const depotsData = depotsSnap.val() || {};
+    
+    // Load all users
+    const usersSnap = await db.ref('users').once('value');
+    const usersData = usersSnap.val() || {};
+
+    // Process data
+    const depotKeys = Object.keys(depotsData);
+    const approvedUsers = Object.values(usersData).filter(u => u.status === 'approved');
+    
+    let totalLow = 0, totalZero = 0, totalProducts = 0;
+    const depotStats = [];
+
+    depotKeys.forEach(key => {
+      const depotStock = depotsData[key].stock || [];
+      const stockArr = Array.isArray(depotStock) ? depotStock : Object.values(depotStock);
+      const low  = stockArr.filter(p => p.qty > 0 && p.qty <= p.min).length;
+      const zero = stockArr.filter(p => p.qty === 0).length;
+      totalLow  += low;
+      totalZero += zero;
+      totalProducts += stockArr.length;
+      
+      // Find depot name from users
+      const depotUser = Object.values(usersData).find(u => {
+        const k = (u.depot||'').toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_');
+        return k === key;
+      });
+      const depotName = depotUser ? depotUser.depot : key.replace(/_/g,' ');
+      
+      depotStats.push({ key, name: depotName, stock: stockArr, low, zero, total: stockArr.length });
+    });
+
+    // Update global stats
+    document.getElementById('gs-depots').textContent = depotStats.length || '0';
+    document.getElementById('gs-users').textContent  = approvedUsers.length || '0';
+    document.getElementById('gs-low').textContent   = totalLow;
+    document.getElementById('gs-zero').textContent  = totalZero;
+
+    // Bar chart per depot
+    const maxProducts = Math.max(...depotStats.map(d => d.total), 1);
+    const chartEl = document.getElementById('chart-depots');
+    const labelsEl = document.getElementById('chart-labels');
+    
+    chartEl.innerHTML = depotStats.map(d => {
+      const h = Math.max(8, Math.round((d.total / maxProducts) * 110));
+      const color = d.zero > 0 ? '#ff4757' : d.low > 0 ? '#ffa502' : '#00e5a0';
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:11px;color:#e8ecf0;font-family:'Barlow Condensed',sans-serif;font-weight:700">${d.total}</div>
+        <div style="width:100%;height:${h}px;background:${color};border-radius:4px 4px 0 0;opacity:0.85;transition:opacity .2s" title="${d.name}: ${d.total} produse"></div>
+      </div>`;
+    }).join('');
+    
+    labelsEl.innerHTML = depotStats.map(d => {
+      const shortName = d.name.length > 12 ? d.name.substring(0,12)+'.' : d.name;
+      return `<div style="flex:1;text-align:center;font-size:10px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${shortName}</div>`;
+    }).join('');
+
+    // Status chart
+    const okCount   = totalProducts - totalLow - totalZero;
+    const statusData = [
+      { label: 'Stoc OK',      count: okCount,      color: '#00e5a0', pct: totalProducts ? Math.round(okCount/totalProducts*100) : 0 },
+      { label: 'Stoc Scăzut', count: totalLow,      color: '#ffa502', pct: totalProducts ? Math.round(totalLow/totalProducts*100) : 0 },
+      { label: 'Epuizat',     count: totalZero,     color: '#ff4757', pct: totalProducts ? Math.round(totalZero/totalProducts*100) : 0 },
+    ];
+    document.getElementById('status-chart').innerHTML = statusData.map(s => `
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="font-size:12px;color:#99a8b8">${s.label}</span>
+          <span style="font-size:12px;color:${s.color};font-weight:600">${s.count} (${s.pct}%)</span>
+        </div>
+        <div style="height:8px;background:#1e2530;border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${s.pct}%;background:${s.color};border-radius:4px;transition:width .6s ease"></div>
+        </div>
+      </div>
+    `).join('');
+
+    // All depots cards
+    document.getElementById('all-depots').innerHTML = depotStats.length === 0 
+      ? '<div style="color:#6b7a8d;font-size:13px">Niciun depozit înregistrat.</div>'
+      : depotStats.map(d => `
+        <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:18px;border-left:3px solid ${d.zero>0?'#ff4757':d.low>0?'#ffa502':'#00e5a0'}">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:12px">${d.name}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${d.total}</div>
+              <div style="font-size:10px;color:#6b7a8d">PRODUSE</div>
+            </div>
+            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#ffa502">${d.low}</div>
+              <div style="font-size:10px;color:#6b7a8d">SCĂZUT</div>
+            </div>
+            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#ff4757">${d.zero}</div>
+              <div style="font-size:10px;color:#6b7a8d">EPUIZAT</div>
+            </div>
+          </div>
+          <div style="max-height:140px;overflow-y:auto">
+            ${d.stock.slice(0,8).map(p => {
+              const isZero = p.qty===0, isLow = p.qty<=p.min;
+              const col = isZero?'#ff4757':isLow?'#ffa502':'#99a8b8';
+              return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2530;font-size:12px">
+                <span style="color:#99a8b8">${p.name}</span>
+                <span style="color:${col};font-weight:600;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>
+              </div>`;
+            }).join('')}
+            ${d.stock.length > 8 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px 0">... și încă ${d.stock.length-8} produse</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+    // All users
+    const allUsers = Object.entries(usersData).map(([uid,u]) => ({uid,...u}));
+    document.getElementById('all-users').innerHTML = allUsers.length === 0
+      ? '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator.</div>'
+      : allUsers.map(u => {
+          const statusColor = u.status==='approved'?'#00e5a0':u.status==='pending'?'#ffa502':'#ff4757';
+          const statusText  = u.status==='approved'?'ACTIV':u.status==='pending'?'AȘTEPTARE':'REFUZAT';
+          return `<div style="background:#111418;border:1px solid #1e2530;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">👤</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name||'—'}</div>
+              <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||'—'}</div>
+              <div style="font-size:11px;color:#00e5a0;margin-top:2px">🏭 ${u.depot||'—'}</div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3);border:1px solid ${statusColor};border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:${statusColor};flex-shrink:0">${statusText}</div>
+          </div>`;
+        }).join('');
+
+  } catch(err) {
+    console.error('Dashboard error:', err);
+  }
+}
+
+// Close dashboard on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('secret-dashboard').style.display !== 'none') {
+    closeDashboard();
+  }
+});
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
- 
+
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2000;overflow-y:auto;padding:24px">
   <div style="max-width:800px;margin:0 auto">
@@ -1484,14 +1660,14 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
       </div>
       <button onclick="doLogout()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;cursor:pointer">⎋ IEȘIRE</button>
     </div>
- 
+
     <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px;margin-bottom:20px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">⏳ CERERI ÎN AȘTEPTARE</div>
       <div id="pending-users">
         <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
       </div>
     </div>
- 
+
     <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">✅ UTILIZATORI APROBAȚI</div>
       <div id="approved-users">
@@ -1500,8 +1676,8 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
     </div>
   </div>
 </div>
- 
- 
+
+
 <!-- IMPORT EXCEL MODAL -->
 <div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
   <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:36px;max-width:520px;width:90%">
@@ -1510,7 +1686,7 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
     
     <!-- Template download -->
     <button onclick="downloadTemplate()" style="background:var(--surface2);border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:9px 16px;cursor:pointer;text-transform:uppercase;margin-bottom:16px;width:100%">⬇️ DESCARCĂ TEMPLATE EXCEL</button>
- 
+
     <!-- File upload -->
     <div id="drop-zone" onclick="document.getElementById('excel-file').click()" style="border:2px dashed #1e2530;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='#1e2530'">
       <div style="font-size:36px;margin-bottom:10px">📁</div>
@@ -1518,24 +1694,24 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
       <div style="font-size:12px;color:#6b7a8d;margin-top:6px">sau click pentru a selecta</div>
       <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this)">
     </div>
- 
+
     <!-- Preview -->
     <div id="import-preview" style="display:none;margin-bottom:16px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:10px">PREVIZUALIZARE</div>
       <div id="preview-table" style="background:#181d24;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-size:12px;font-family:'JetBrains Mono',monospace;color:#99a8b8"></div>
       <div id="import-count" style="font-size:13px;color:#00e5a0;margin-top:10px;font-weight:600"></div>
     </div>
- 
+
     <div id="import-error" style="background:rgba(255,71,87,0.1);border:1px solid #ff4757;border-radius:8px;padding:10px;font-size:13px;color:#ff4757;display:none;margin-bottom:12px"></div>
- 
+
     <div style="display:flex;gap:10px">
       <button onclick="closeImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
       <button onclick="doImport()" id="import-btn" disabled style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase;opacity:0.5">IMPORTĂ PRODUSELE →</button>
     </div>
   </div>
 </div>
- 
- 
+
+
 <!-- EDIT PRODUCT MODAL -->
 <div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
   <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:32px;max-width:400px;width:90%">
@@ -1582,6 +1758,74 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
     </div>
   </div>
 </div>
- 
+
+
+<!-- SECRET ADMIN DASHBOARD -->
+<div id="secret-dashboard" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:3000;overflow-y:auto">
+  <div style="max-width:1100px;margin:0 auto;padding:28px 20px">
+    
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;border-bottom:1px solid #1e2530;padding-bottom:20px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;letter-spacing:3px;color:#e8ecf0">
+          Stoc<span style="color:#00e5a0">Voce</span> 
+          <span style="font-size:14px;color:#6b7a8d;font-weight:400;letter-spacing:1px">DASHBOARD GLOBAL</span>
+        </div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:4px;font-family:'JetBrains Mono',monospace" id="dash-updated">—</div>
+      </div>
+      <button onclick="closeDashboard()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">✕ ÎNCHIDE</button>
+    </div>
+
+    <!-- Global Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px" id="global-stats">
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #00e5a0">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#00e5a0" id="gs-depots">—</div>
+        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Depozite Active</div>
+      </div>
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #a78bfa">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#a78bfa" id="gs-users">—</div>
+        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Utilizatori Activi</div>
+      </div>
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #ffa502">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#ffa502" id="gs-low">—</div>
+        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Stocuri Critice</div>
+      </div>
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #ff4757">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#ff4757" id="gs-zero">—</div>
+        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Stocuri Epuizate</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px">
+      <!-- Bar chart per depot -->
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:18px">📊 PRODUSE PE DEPOZIT</div>
+        <div id="chart-depots" style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 8px"></div>
+        <div id="chart-labels" style="display:flex;gap:8px;margin-top:8px;padding:0 8px"></div>
+      </div>
+      
+      <!-- Status pie/donut -->
+      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:18px">🔴 STATUS STOC GLOBAL</div>
+        <div id="status-chart" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+
+    <!-- Depots grid -->
+    <div style="margin-bottom:28px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">🏭 TOATE DEPOZITELE</div>
+      <div id="all-depots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+    </div>
+
+    <!-- Users list -->
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">👥 UTILIZATORI</div>
+      <div id="all-users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px"></div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
