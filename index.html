@@ -851,8 +851,10 @@ function executeOperation(opType,product,qty,originalText){
   // Trigger alerts
   if(product.qty===0){
     setTimeout(()=>triggerAlert(`🔴 EPUIZAT: ${product.name} — stoc zero!`,'zero'),300);
+    checkAndAlertTelegram(product, opType);
   } else if(product.qty<=product.min){
     setTimeout(()=>triggerAlert(`⚠️ STOC SCĂZUT: ${product.name} — mai sunt doar ${product.qty} ${product.unit}!`,'warn'),300);
+    checkAndAlertTelegram(product, opType);
   }
   renderStock();updateStats();
 }
@@ -2101,6 +2103,54 @@ function handleBarcode(code) {
 function manualBarcode() {
   const code = prompt('Introduceți codul de bare sau QR:');
   if (code) { closeQRModal(); handleBarcode(code.trim()); }
+}
+
+
+// ── TELEGRAM NOTIFICATIONS ──
+const TELEGRAM_BOT_TOKEN = '8787571242:AAH-uLAT7sT74QXWsnJNAHvAoQCMNBE4wAs';
+const TELEGRAM_CHAT_ID = '8281556256';
+
+async function sendTelegramAlert(message) {
+  try {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+  } catch(e) {
+    console.error('Telegram error:', e);
+  }
+}
+
+// Send Telegram when stock is low or zero
+function checkAndAlertTelegram(product, opType) {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const operator = userProfile ? userProfile.name : 'Operator';
+  const now = new Date().toLocaleString('ro-RO');
+  
+  if (product.qty === 0) {
+    const msg = `🔴 <b>STOC EPUIZAT!</b>\n\n` +
+      `📦 Produs: <b>${product.name}</b>\n` +
+      `🏭 Depozit: ${depot}\n` +
+      `👤 Operator: ${operator}\n` +
+      `🕐 Data: ${now}\n\n` +
+      `⚠️ Reaprovizionare urgentă necesară!`;
+    sendTelegramAlert(msg);
+  } else if (product.qty <= product.min) {
+    const msg = `⚠️ <b>STOC SCĂZUT!</b>\n\n` +
+      `📦 Produs: <b>${product.name}</b>\n` +
+      `📊 Cantitate rămasă: <b>${product.qty} ${product.unit}</b>\n` +
+      `📉 Stoc minim: ${product.min} ${product.unit}\n` +
+      `🏭 Depozit: ${depot}\n` +
+      `👤 Operator: ${operator}\n` +
+      `🕐 Data: ${now}`;
+    sendTelegramAlert(msg);
+  }
 }
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
