@@ -613,6 +613,7 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById('fb-dot').style.cssText      = 'background:var(--accent);box-shadow:0 0 6px var(--accent)';
     document.getElementById('fb-dot').className          = 'dot';
 
+    window.fbReady = true;
     loadStockFromFirebase();
     loadLogFromFirebase();
 
@@ -1042,7 +1043,13 @@ function processCommand(text){
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
   if(opType==='out'){
     if(product.qty<qty){const msg=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}.`;setFeedback(`❌ ${msg}`,'err');speak(msg);addLog(text,msg,'err');const c=document.getElementById(`card-${product.id}`);if(c){c.classList.add('flash-out');setTimeout(()=>c.classList.remove('flash-out'),600);}return;}
-    if(product.sensitive||qty>50){pendingAction={opType,product,qty,text,clientName};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
+    if(product.sensitive||qty>50){pendingAction={opType,product,qty,text,clientName:clientName};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
+  }
+  // Approval check for large quantities
+  const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+  if(opType==='out' && typeof APPROVAL_THRESHOLD !== 'undefined' && qty >= APPROVAL_THRESHOLD && !isAdmin) {
+    requestApproval(opType, product, qty, text, clientName);
+    return;
   }
   executeOperation(opType,product,qty,text,clientName);
 }
@@ -1065,7 +1072,7 @@ function executeOperation(opType,product,qty,originalText,clientName){
     };
     clients.push(clientEntry);
     localStorage.setItem('sv_clients', JSON.stringify(clients));
-    if(window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
+    if(window.fbReady===true) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
     // Auto generate bon if client has name
     setTimeout(()=>{
       try {
@@ -1104,7 +1111,7 @@ function executeOperation(opType,product,qty,originalText,clientName){
 }
 function confirmAction(yes){
   document.getElementById('confirm-modal').classList.remove('show');
-  if(yes&&pendingAction){const{opType,product,qty,text}=pendingAction;executeOperation(opType,product,qty,text,clientName);}
+  if(yes&&pendingAction){const{opType,product,qty,text,clientName:pClientName}=pendingAction;executeOperation(opType,product,qty,text,pClientName);}
   else{setFeedback('Anulat.','warn');speak('Operație anulată.');if(pendingAction)addLog(pendingAction.text,'Anulat','warn');}
   pendingAction=null;
 }
@@ -1183,23 +1190,7 @@ function renderStock(){
 }
 function openAddModal(){if(!currentUser){speak('Conectați-vă mai întâi.');return;}document.getElementById('add-modal').classList.add('show');}
 function closeAddModal(){document.getElementById('add-modal').classList.remove('show');}
-function addProduct(){
-  const name=document.getElementById('new-name').value.trim();
-  if(!name){alert('Introduceți numele!');return;}
-  const cat=document.getElementById('new-cat').value.trim();
-  const qty=parseInt(document.getElementById('new-qty').value)||0;
-  const unit=document.getElementById('new-unit').value.trim()||'buc';
-  const loc=document.getElementById('new-loc').value.trim()||'Nedefinit';
-  const min=parseInt(document.getElementById('new-min').value)||5;
-  const sensitive=document.getElementById('new-sensitive').checked;
-  const maxQty=Math.max(qty*3,100);
-  stock.push({id:nextId++,name,cat:cat||'General',qty,unit,loc,min,sensitive,maxQty});
-  saveStockToFirebase();closeAddModal();renderStock();updateStats();
-  addLog(`Adăugat: ${name}`,`Stoc inițial ${qty} ${unit}`,'in');
-  speak(`Produs ${name} adăugat.`);
-  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note','new-supplier','new-supplier-contact','new-price-buy','new-price-sell','new-sku','new-warranty','new-expiry','new-lead-time','new-moq','new-weight'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('new-sensitive').checked=false;
-}
+
 function updateStats(){
   document.getElementById('stat-total').textContent=stock.length;
   document.getElementById('stat-low').textContent=stock.filter(p=>p.qty<=p.min).length;
@@ -3047,7 +3038,7 @@ function addDelivery() {
   });
   
   localStorage.setItem('sv_deliveries', JSON.stringify(deliveries));
-  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
+  if(window.fbReady===true) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
   
   ['del-product','del-qty','del-supplier','del-date'].forEach(id=>document.getElementById(id).value='');
   renderDeliveries();
@@ -3058,7 +3049,7 @@ function markDeliveryReceived(index) {
   deliveries[index].status = 'received';
   deliveries[index].received_at = new Date().toISOString();
   localStorage.setItem('sv_deliveries', JSON.stringify(deliveries));
-  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
+  if(window.fbReady===true) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
   
   // Auto add to stock
   const d = deliveries[index];
@@ -3112,7 +3103,7 @@ function addClient() {
   });
   
   localStorage.setItem('sv_clients', JSON.stringify(clients));
-  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
+  if(window.fbReady===true) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
   
   ['cli-name','cli-contact','cli-product','cli-qty'].forEach(id=>document.getElementById(id).value='');
   renderClients();
@@ -3330,7 +3321,7 @@ function addRezervare() {
   
   rezervari.push({ client, product_id: productId, product_name: p.name, unit: p.unit, qty, date, status: 'active', created: new Date().toISOString(), user: userProfile?userProfile.name:'—' });
   localStorage.setItem('sv_rezervari', JSON.stringify(rezervari));
-  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
+  if(window.fbReady===true) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
   
   ['rez-client','rez-qty'].forEach(id=>document.getElementById(id).value='');
   renderRezervari();
@@ -3351,7 +3342,7 @@ function completeRezervare(index) {
   r.status = 'completed';
   r.completed_at = new Date().toISOString();
   localStorage.setItem('sv_rezervari', JSON.stringify(rezervari));
-  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
+  if(window.fbReady===true) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
   
   addLog(`Rezervare ridicată: ${r.client}`, `${r.product_name}: ${r.qty} ${r.unit}`, 'out', r.client);
   renderRezervari();
@@ -3814,7 +3805,7 @@ function addBatch(productId, batchData) {
     user: userProfile ? userProfile.name : '—'
   });
   localStorage.setItem('sv_batches', JSON.stringify(batches));
-  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/batches').set(batches);
+  if(window.fbReady===true) db.ref('depozite/'+getDepotKey()+'/batches').set(batches);
 }
 
 function getBatchInfo(productId) {
@@ -4021,7 +4012,7 @@ function requestApproval(opType, product, qty, text, clientName) {
   pendingApprovals.push(approvalReq);
   
   // Save to Firebase for supervisor to see
-  if(window.fbReady) {
+  if(window.fbReady===true) {
     db.ref('depozite/'+getDepotKey()+'/approvals/'+approvalReq.id).set(approvalReq);
   }
   
