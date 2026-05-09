@@ -392,26 +392,66 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 
   <div class="stock-area">
     <div class="section-title" id="depot-title">Stocuri Depozit</div>
-    <div class="search-bar">
-      <input id="stock-search" placeholder="Caută produs..." oninput="renderStock()">
-      <button class="add-btn" onclick="openAddModal()">+ Produs</button>
-      <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
-      <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
-      <button class="add-btn" onclick="openInventarModal()" style="border-color:#00e5a0;color:#00e5a0">🔁 Inventar</button>
-      <button class="add-btn" onclick="openComandaModal()" style="border-color:#ffa502;color:#ffa502">📋 Comandă</button>
-      <button class="add-btn" onclick="openRezervariModal()" style="border-color:#a78bfa;color:#a78bfa">⏰ Rezervări</button>
-      <button class="add-btn" onclick="openEticheteModal()" style="border-color:#00e5a0;color:#00e5a0">🏷️ Etichete</button>
-      <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
-      <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
-      <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
-      <button class="add-btn" onclick="openChartsModal()" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
-      <button class="add-btn" onclick="openRaportLunarModal()" style="border-color:#ffa502;color:#ffa502">📈 Rapoarte</button>
-      <button class="add-btn" onclick="openBonReturModal()" style="border-color:#ff4757;color:#ff4757">🔄 Retur</button>
-      <button class="add-btn" onclick="openGlobalStockModal()" style="border-color:#00e5a0;color:#00e5a0">🌐 Global</button>
-      <button class="add-btn" onclick="openComparatieDep()" style="border-color:#a78bfa;color:#a78bfa">📊 Compară</button>
-      <button class="add-btn" onclick="showConsolidatedStock()" style="border-color:#00e5a0;color:#00e5a0">🔢 Total</button>
-      <button class="add-btn" onclick="openCategoriesModal()" style="border-color:#6b7a8d;color:#6b7a8d">🏷️ Categ.</button>
-      <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
+    <div style="border:none;background:transparent;padding:0">
+      <!-- Search row -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <input id="stock-search" placeholder="Caută produs..." oninput="renderStock()" style="flex:1">
+        <button class="add-btn" onclick="toggleArchivedView()" style="border-color:#6b7a8d;color:#6b7a8d;font-size:11px">📦 ARHIVATE</button>
+        <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
+      </div>
+      
+      <!-- Tab buttons -->
+      <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
+        <button onclick="showToolbarTab('stoc')" id="tab-stoc" class="add-btn" style="border-color:#00e5a0;color:#00e5a0;font-size:11px;padding:5px 10px">📦 STOC</button>
+        <button onclick="showToolbarTab('rapoarte')" id="tab-rapoarte" class="add-btn" style="border-color:#6b7a8d;color:#6b7a8d;font-size:11px;padding:5px 10px">📊 RAPOARTE</button>
+        <button onclick="showToolbarTab('clienti')" id="tab-clienti" class="add-btn" style="border-color:#6b7a8d;color:#6b7a8d;font-size:11px;padding:5px 10px">👥 CLIENȚI</button>
+        <button onclick="showToolbarTab('depozit')" id="tab-depozit" class="add-btn" style="border-color:#6b7a8d;color:#6b7a8d;font-size:11px;padding:5px 10px">🏭 DEPOZIT</button>
+        <button onclick="showToolbarTab('global')" id="tab-global" class="add-btn" style="border-color:#6b7a8d;color:#6b7a8d;font-size:11px;padding:5px 10px">🌐 GLOBAL</button>
+      </div>
+      
+      <!-- Tab: STOC -->
+      <div id="toolbar-stoc" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="add-btn" onclick="openAddModal()">+ Produs</button>
+        <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
+        <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
+        <button class="add-btn" onclick="openInventarModal()" style="border-color:#00e5a0;color:#00e5a0">🔁 Inventar</button>
+        <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
+        <button class="add-btn" onclick="openEticheteModal()" style="border-color:#00e5a0;color:#00e5a0">🏷️ Etichete</button>
+        <button class="add-btn" onclick="openCategoriesModal()" style="border-color:#6b7a8d;color:#6b7a8d">🏷️ Categ.</button>
+        <button class="add-btn" onclick="calcAutoMinStock()" style="border-color:#00e5a0;color:#00e5a0">🤖 Auto Min</button>
+      </div>
+      
+      <!-- Tab: RAPOARTE -->
+      <div id="toolbar-rapoarte" style="display:none;gap:6px;flex-wrap:wrap">
+        <button class="add-btn" onclick="openRaportLunarModal()" style="border-color:#ffa502;color:#ffa502">📈 Raport Lunar</button>
+        <button class="add-btn" onclick="showTop10()" style="border-color:#ffa502;color:#ffa502">🏆 Top 10</button>
+        <button class="add-btn" onclick="showStagnant(30)" style="border-color:#6b7a8d;color:#6b7a8d">💤 Stagnante</button>
+        <button class="add-btn" onclick="showOperatorReport()" style="border-color:#a78bfa;color:#a78bfa">👤 Operatori</button>
+        <button class="add-btn" onclick="exportFullExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Excel</button>
+        <button class="add-btn" onclick="openChartsModal()" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
+      </div>
+      
+      <!-- Tab: CLIENȚI -->
+      <div id="toolbar-clienti" style="display:none;gap:6px;flex-wrap:wrap">
+        <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
+        <button class="add-btn" onclick="openRezervariModal()" style="border-color:#a78bfa;color:#a78bfa">⏰ Rezervări</button>
+        <button class="add-btn" onclick="openBonReturModal()" style="border-color:#ff4757;color:#ff4757">🔄 Bon Retur</button>
+        <button class="add-btn" onclick="openComandaModal()" style="border-color:#ffa502;color:#ffa502">📋 Comandă</button>
+      </div>
+      
+      <!-- Tab: DEPOZIT -->
+      <div id="toolbar-depozit" style="display:none;gap:6px;flex-wrap:wrap">
+        <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
+        <button class="add-btn" onclick="openCalendarModal()" style="border-color:#ffa502;color:#ffa502">📅 Calendar</button>
+        <button class="add-btn" onclick="doAutoBackup()" style="border-color:#6b7a8d;color:#6b7a8d">💾 Backup</button>
+      </div>
+      
+      <!-- Tab: GLOBAL -->
+      <div id="toolbar-global" style="display:none;gap:6px;flex-wrap:wrap">
+        <button class="add-btn" onclick="openGlobalStockModal()" style="border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
+        <button class="add-btn" onclick="openComparatieDep()" style="border-color:#a78bfa;color:#a78bfa">📊 Compară Depozite</button>
+        <button class="add-btn" onclick="showConsolidatedStock()" style="border-color:#00e5a0;color:#00e5a0">🔢 Stoc Consolidat</button>
+      </div>
     </div>
     <div class="stock-grid" id="stock-grid">
       <div style="color:var(--text-dim);font-size:13px;padding:20px">Conectează-te pentru a vedea stocul...</div>
@@ -5154,6 +5194,21 @@ async function showConsolidatedStock() {
   }
 }
 function closeConsolidatModal() { document.getElementById('consolidat-modal').style.display='none'; }
+
+
+// ── TOOLBAR TABS ──
+function showToolbarTab(tab) {
+  const tabs = ['stoc','rapoarte','clienti','depozit','global'];
+  tabs.forEach(t => {
+    const el = document.getElementById('toolbar-' + t);
+    const btn = document.getElementById('tab-' + t);
+    if (el) el.style.display = t === tab ? 'flex' : 'none';
+    if (btn) {
+      btn.style.borderColor = t === tab ? '#00e5a0' : '#6b7a8d';
+      btn.style.color = t === tab ? '#00e5a0' : '#6b7a8d';
+    }
+  });
+}
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
