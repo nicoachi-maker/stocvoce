@@ -6348,7 +6348,7 @@ async function aiNameFromImage(imageBase64) {
           role: "user",
           content: [
             { type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageBase64 } },
-            { type: 'text', text: 'Identifică produsul din imagine. Răspunde DOAR cu JSON: {"name":"...","cat":"..."}' }
+            { type: 'text', text: 'Identifică produsul din imagine. Răspunde cu JSON: name si cat.' }
           ]
         }]
       })
@@ -6467,7 +6467,7 @@ function exportToGoogleSheets() {
   const rows = [['Nume','Categorie','Cantitate','UM','Locatie','Stoc Min','Furnizor','Pret']];
   stock.forEach(p => rows.push([p.name,p.cat||'',p.qty,p.unit,p.loc||'',p.min,p.supplier||'',p.price_buy||'']));
   
-  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const csv = rows.map(r => r.map(c => String(c).replace(/,/g,'').replace(/\n/g,'')).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   
@@ -6529,7 +6529,7 @@ async function importFromInvoicePDF(file) {
             role: "user",
             content: [
               { type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } },
-              { type: "text", text: "Extrage produsele din această factură. Răspunde DOAR cu JSON valid: [{"name":"...","qty":0,"unit":"buc","price":0}]. Fără text extra." }
+              { type: 'text', text: 'Extrage produsele din această factură. Răspunde DOAR cu JSON valid: [{name,qty,unit,price}]. Fără text extra.' }
             ]
           }]
         })
