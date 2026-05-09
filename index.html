@@ -1101,7 +1101,7 @@ function processCommand(text){
   }
   // Approval check for large quantities
   const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
-  if(opType==='out' && typeof APPROVAL_THRESHOLD !== 'undefined' && qty >= APPROVAL_THRESHOLD && !isAdmin) {
+  if(opType==='out' && qty >= (currentApprovalThreshold || 50) && !isAdmin) {
     requestApproval(opType, product, qty, text, clientName);
     return;
   }
@@ -1175,6 +1175,11 @@ function executeOperation(opType,product,qty,originalText,clientName){
     checkAndAlertTelegram(product, opType);
   }
   renderStock();updateStats();
+  playCommandSound();
+  if (appSettings && appSettings.browser_notif) {
+    if (product.qty === 0) sendBrowserNotification('🔴 Stoc Epuizat!', product.name + ' — stoc zero!');
+    else if (product.qty <= product.min) sendBrowserNotification('⚠️ Stoc Scăzut!', product.name + ' — ' + product.qty + ' ' + product.unit);
+  }
 }
 function confirmAction(yes){
   document.getElementById('confirm-modal').classList.remove('show');
@@ -4219,7 +4224,7 @@ function showDayDeliveries(dateStr) {
 }
 
 // ── APROBARE IEȘIRI ──
-const APPROVAL_THRESHOLD = 50; // qty above this needs approval
+// APPROVAL_THRESHOLD is now dynamic - see currentApprovalThreshold in settings // qty above this needs approval
 let pendingApprovals = [];
 
 function requestApproval(opType, product, qty, text, clientName) {
@@ -5210,6 +5215,183 @@ function showToolbarTab(tab) {
   });
 }
 
+
+// ── EXTENDED SETTINGS ──
+let appSettings = JSON.parse(localStorage.getItem('sv_app_settings') || '{}');
+let currentApprovalThreshold = appSettings.approval_threshold || 50;
+
+function applyAppSettings() {
+  // Theme
+  setTheme(appSettings.theme || 'dark', false);
+  // Font
+  setFontSize(appSettings.font_size || 'normal', false);
+  // Grid
+  setGridSize(appSettings.grid_size || 'normal', false);
+  // Approval threshold
+  currentApprovalThreshold = appSettings.approval_threshold || 50;
+  
+  // Request browser notifications
+  if (appSettings.browser_notif && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+  
+  // Auto CSV export at midnight
+  if (appSettings.auto_csv) {
+    setInterval(() => {
+      const now = new Date();
+      if (now.getHours() === 0 && now.getMinutes() === 0 && currentUser) {
+        exportLog();
+      }
+    }, 60000);
+  }
+}
+
+function setTheme(theme, save=true) {
+  const themes = {
+    dark:  { '--bg':'#0a0c0f','--surface':'#111418','--surface2':'#181d24','--border':'#1e2530','--text':'#e8ecf0','--text-dim':'#6b7a8d','--accent':'#00e5a0' },
+    light: { '--bg':'#f0f2f5','--surface':'#ffffff','--surface2':'#f5f7fa','--border':'#dde1e7','--text':'#1a1d23','--text-dim':'#6b7897','--accent':'#00c87a' },
+    blue:  { '--bg':'#050a18','--surface':'#0a1628','--surface2':'#0f1f3d','--border':'#1a2d50','--text':'#e8f0ff','--text-dim':'#6b8abd','--accent':'#4d9fff' }
+  };
+  const t = themes[theme] || themes.dark;
+  Object.entries(t).forEach(([k,v]) => document.documentElement.style.setProperty(k, v));
+  
+  ['dark','light','blue'].forEach(th => {
+    const btn = document.getElementById('theme-'+th);
+    if (btn) {
+      btn.style.background = th===theme?'rgba(0,229,160,0.15)':'#111418';
+      btn.style.border = th===theme?'2px solid #00e5a0':'1px solid #1e2530';
+      btn.style.color = th===theme?'#00e5a0':'#6b7a8d';
+    }
+  });
+  
+  if (save) { appSettings.theme = theme; saveAppSettings(); }
+}
+
+function setFontSize(size, save=true) {
+  const sizes = { small: '13px', normal: '15px', large: '17px' };
+  document.documentElement.style.setProperty('--font-base', sizes[size] || '15px');
+  document.body.style.fontSize = sizes[size] || '15px';
+  
+  ['small','normal','large'].forEach(s => {
+    const btn = document.getElementById('font-'+s);
+    if (btn) {
+      btn.style.background = s===size?'rgba(0,229,160,0.15)':'#111418';
+      btn.style.border = s===size?'2px solid #00e5a0':'1px solid #1e2530';
+      btn.style.color = s===size?'#00e5a0':'#6b7a8d';
+    }
+  });
+  
+  if (save) { appSettings.font_size = size; saveAppSettings(); }
+}
+
+function setGridSize(size, save=true) {
+  const grid = document.getElementById('stock-grid');
+  if (grid) {
+    const cols = { small:'repeat(auto-fill,minmax(150px,1fr))', normal:'repeat(auto-fill,minmax(200px,1fr))', large:'repeat(auto-fill,minmax(280px,1fr))' };
+    grid.style.gridTemplateColumns = cols[size] || cols.normal;
+  }
+  
+  ['small','normal','large'].forEach(s => {
+    const btn = document.getElementById('grid-'+s);
+    if (btn) {
+      btn.style.background = s===size?'rgba(0,229,160,0.15)':'#111418';
+      btn.style.border = s===size?'2px solid #00e5a0':'1px solid #1e2530';
+      btn.style.color = s===size?'#00e5a0':'#6b7a8d';
+    }
+  });
+  
+  if (save) { appSettings.grid_size = size; saveAppSettings(); }
+}
+
+function setApprovalThreshold(val) {
+  currentApprovalThreshold = val;
+  appSettings.approval_threshold = val;
+  
+  [20,50,100,999].forEach(v => {
+    const btn = document.getElementById('thresh-'+v);
+    if (btn) {
+      btn.style.background = v===val?'rgba(0,229,160,0.15)':'#111418';
+      btn.style.border = v===val?'2px solid #00e5a0':'1px solid #1e2530';
+      btn.style.color = v===val?'#00e5a0':'#6b7a8d';
+    }
+  });
+  
+  saveAppSettings();
+}
+
+function saveAppSettings() {
+  localStorage.setItem('sv_app_settings', JSON.stringify(appSettings));
+}
+
+function sendBrowserNotification(title, body) {
+  if (!appSettings.browser_notif) return;
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body, icon: 'icon-192.svg' });
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission().then(p => {
+      if (p === 'granted') new Notification(title, { body, icon: 'icon-192.svg' });
+    });
+  }
+}
+
+function playCommandSound() {
+  if (!appSettings.sound) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.2);
+  } catch(e) {}
+}
+
+// Load settings in openSettingsModal
+const _origOpenSettings = openSettingsModal;
+function openSettingsModal() {
+  _origOpenSettings();
+  // Load extra settings
+  document.getElementById('settings-sound').checked = appSettings.sound || false;
+  document.getElementById('settings-voice-confirm').checked = appSettings.voice_confirm !== false;
+  document.getElementById('settings-browser-notif').checked = appSettings.browser_notif || false;
+  document.getElementById('settings-auto-csv').checked = appSettings.auto_csv || false;
+  document.getElementById('settings-demo-mode').checked = appSettings.demo_mode || false;
+  
+  // Update button states
+  setTheme(appSettings.theme || 'dark', false);
+  setFontSize(appSettings.font_size || 'normal', false);
+  setGridSize(appSettings.grid_size || 'normal', false);
+  setApprovalThreshold(appSettings.approval_threshold || 50);
+}
+
+// Save extra settings
+const _origSaveSettings = saveSettings;
+async function saveSettings() {
+  await _origSaveSettings();
+  appSettings.sound = document.getElementById('settings-sound').checked;
+  appSettings.voice_confirm = document.getElementById('settings-voice-confirm').checked;
+  appSettings.browser_notif = document.getElementById('settings-browser-notif').checked;
+  appSettings.auto_csv = document.getElementById('settings-auto-csv').checked;
+  appSettings.demo_mode = document.getElementById('settings-demo-mode').checked;
+  saveAppSettings();
+  applyAppSettings();
+  
+  if (appSettings.browser_notif) {
+    Notification.requestPermission();
+  }
+}
+
+// Apply settings on page load
+document.addEventListener('DOMContentLoaded', () => {
+  appSettings = JSON.parse(localStorage.getItem('sv_app_settings') || '{}');
+  applyAppSettings();
+});
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -5594,6 +5776,94 @@ function installApp() {
         <input type="checkbox" id="settings-alert-zero" checked style="width:16px;height:16px;cursor:pointer">
         <span style="font-size:13px;color:#99a8b8">🔴 Alertă stoc epuizat</span>
       </label>
+    </div>
+
+
+    <!-- TEMA -->
+    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">🎨 Temă aplicație</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <button onclick="setTheme('dark')" id="theme-dark" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+        <button onclick="setTheme('light')" id="theme-light" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+        <button onclick="setTheme('blue')" id="theme-blue" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+      </div>
+    </div>
+
+    <!-- FONT SIZE -->
+    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">🔤 Dimensiune font</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <button onclick="setFontSize('small')" id="font-small" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px">A MIC</button>
+        <button onclick="setFontSize('normal')" id="font-normal" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">A NORMAL</button>
+        <button onclick="setFontSize('large')" id="font-large" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px">A MARE</button>
+      </div>
+    </div>
+
+    <!-- GRID SIZE -->
+    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">📱 Afișare produse</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <button onclick="setGridSize('small')" id="grid-small" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px">▦ MIC</button>
+        <button onclick="setGridSize('normal')" id="grid-normal" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">▤ NORMAL</button>
+        <button onclick="setGridSize('large')" id="grid-large" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">▣ MARE</button>
+      </div>
+    </div>
+
+    <!-- TOGGLE SETTINGS -->
+    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:12px">🔧 Opțiuni avansate</div>
+      
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">🔊 Sunet la comenzi vocale</div>
+          <div style="font-size:11px;color:#6b7a8d">Bip de confirmare după fiecare comandă</div>
+        </div>
+        <input type="checkbox" id="settings-sound" style="width:18px;height:18px;cursor:pointer">
+      </label>
+      
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">🎙️ Confirmare vocală după comandă</div>
+          <div style="font-size:11px;color:#6b7a8d">Aplicația citește rezultatul cu voce</div>
+        </div>
+        <input type="checkbox" id="settings-voice-confirm" style="width:18px;height:18px;cursor:pointer">
+      </label>
+      
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">🔔 Notificări browser</div>
+          <div style="font-size:11px;color:#6b7a8d">Popup în browser la alertele de stoc</div>
+        </div>
+        <input type="checkbox" id="settings-browser-notif" style="width:18px;height:18px;cursor:pointer">
+      </label>
+
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">📊 Export CSV automat zilnic</div>
+          <div style="font-size:11px;color:#6b7a8d">Descarcă automat CSV la miezul nopții</div>
+        </div>
+        <input type="checkbox" id="settings-auto-csv" style="width:18px;height:18px;cursor:pointer">
+      </label>
+
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">🧪 Mod demonstrativ</div>
+          <div style="font-size:11px;color:#6b7a8d">Fără salvare în Firebase (test local)</div>
+        </div>
+        <input type="checkbox" id="settings-demo-mode" style="width:18px;height:18px;cursor:pointer">
+      </label>
+    </div>
+
+    <!-- APPROVAL THRESHOLD -->
+    <div style="margin-bottom:20px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:8px">🤝 Prag aprobare ieșiri</div>
+      <div style="font-size:11px;color:#6b7a8d;margin-bottom:10px">Cantități mai mari necesită aprobare supervisor</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <button onclick="setApprovalThreshold(20)" id="thresh-20" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">20</button>
+        <button onclick="setApprovalThreshold(50)" id="thresh-50" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:8px;cursor:pointer;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:12px">50</button>
+        <button onclick="setApprovalThreshold(100)" id="thresh-100" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">100</button>
+        <button onclick="setApprovalThreshold(999)" id="thresh-999" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">OFF</button>
+      </div>
     </div>
 
     <div style="display:flex;gap:10px">
