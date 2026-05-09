@@ -912,15 +912,35 @@ function parseQuantity(text){
   for(const[w,v]of Object.entries(nw))if(text.includes(w))return v;
   return null;
 }
+function extractClientName(text, norm) {
+  // Patterns: "George a luat", "Maria a ridicat", "Firma X a preluat"
+  const clientPatterns = [
+    /^([a-zA-ZăâîșțĂÂÎȘȚ\s]+?)\s+a\s+(luat|ridicat|preluat|primit)/i,
+    /^([a-zA-ZăâîșțĂÂÎȘȚ\s]+?)\s+(a luat|a ridicat|a preluat)/i,
+  ];
+  for (const pattern of clientPatterns) {
+    const match = text.match(pattern);
+    if (match && match[1] && match[1].trim().length > 1) {
+      return match[1].trim();
+    }
+  }
+  return null;
+}
+
 function processCommand(text){
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   const norm=normalizeText(text);
   const inKW=['adauga','adaugă','pune','bag','intra','intră','primire','receptie','intrare','plus'];
-  const outKW=['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire'];
+  const outKW=['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat'];
   const listKW=['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'];
+  
+  // Detect client name in command
+  const clientName = extractClientName(text, norm);
+  
   let opType=null;
   if(inKW.some(k=>norm.includes(normalizeText(k))))opType='in';
   else if(outKW.some(k=>norm.includes(normalizeText(k))))opType='out';
+  else if(clientName)opType='out'; // "George a luat" = always OUT
   else if(listKW.some(k=>norm.includes(normalizeText(k))))opType='list';
   if(opType==='list'){
     const p=findProduct(text.split(/\s+/));
@@ -935,21 +955,39 @@ function processCommand(text){
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
   if(opType==='out'){
     if(product.qty<qty){const msg=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}.`;setFeedback(`❌ ${msg}`,'err');speak(msg);addLog(text,msg,'err');const c=document.getElementById(`card-${product.id}`);if(c){c.classList.add('flash-out');setTimeout(()=>c.classList.remove('flash-out'),600);}return;}
-    if(product.sensitive||qty>50){pendingAction={opType,product,qty,text};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
+    if(product.sensitive||qty>50){pendingAction={opType,product,qty,text,clientName};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
   }
-  executeOperation(opType,product,qty,text);
+  executeOperation(opType,product,qty,text,clientName);
 }
-function executeOperation(opType,product,qty,originalText){
+function executeOperation(opType,product,qty,originalText,clientName){
   const oldQty=product.qty;
   if(opType==='in')product.qty+=qty;else product.qty-=qty;
   saveStockToFirebase();
-  let msg=`OK! ${opType==='in'?'Adăugat':'Scos'} ${qty} ${product.unit} ${product.name}. Stoc: ${product.qty} ${product.unit}.`;
+  
+  // Register client if name provided
+  if(clientName && opType==='out'){
+    const clientEntry = {
+      name: clientName,
+      contact: '—',
+      product: product.name,
+      qty: `${qty} ${product.unit}`,
+      user: userProfile ? userProfile.name : '—',
+      time: new Date().toLocaleString('ro-RO'),
+      depot: userProfile ? userProfile.depot : '—'
+    };
+    clients.push(clientEntry);
+    localStorage.setItem('sv_clients', JSON.stringify(clients));
+    if(window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
+  }
+  
+  const clientMsg = clientName ? ` → Client: ${clientName}` : '';
+  let msg=`OK! ${opType==='in'?'Adăugat':'Scos'} ${qty} ${product.unit} ${product.name}${clientMsg}. Stoc: ${product.qty} ${product.unit}.`;
   let fc='ok';
   if(product.qty===0){msg+=` 🔴 EPUIZAT!`;fc='err';speak(`${product.name} stoc epuizat!`);}
   else if(product.qty<=product.min){msg+=` ⚠️ Stoc scăzut!`;fc='warn';speak(`Au mai rămas ${product.qty} ${product.unit}. Stoc scăzut!`);}
   else{speak(`OK. Au mai rămas ${product.qty} ${product.unit} de ${product.name}.`);}
   setFeedback(msg,fc);
-  addLog(originalText,`${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`,opType==='in'?'in':'out');
+  addLog(originalText,`${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}${clientName?' → '+clientName:''}`,opType==='in'?'in':'out',clientName);
   const card=document.getElementById(`card-${product.id}`);
   if(card){const f=opType==='in'?'flash-in':(product.qty<=product.min?'flash-warn':'flash-out');card.classList.add(f);setTimeout(()=>card.classList.remove(f),600);}
   // Trigger alerts
@@ -964,16 +1002,22 @@ function executeOperation(opType,product,qty,originalText){
 }
 function confirmAction(yes){
   document.getElementById('confirm-modal').classList.remove('show');
-  if(yes&&pendingAction){const{opType,product,qty,text}=pendingAction;executeOperation(opType,product,qty,text);}
+  if(yes&&pendingAction){const{opType,product,qty,text}=pendingAction;executeOperation(opType,product,qty,text,clientName);}
   else{setFeedback('Anulat.','warn');speak('Operație anulată.');if(pendingAction)addLog(pendingAction.text,'Anulat','warn');}
   pendingAction=null;
 }
 
 // ── LOG ──
-function addLog(cmd,result,type){
+function addLog(cmd,result,type,clientName){
   const now=new Date();
   const timeStr=now.toLocaleString('ro-RO',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const entry={time:timeStr,cmd,result,type,user:userProfile?userProfile.name:currentUser.email,depot:userProfile?userProfile.depot:'',ts:now.toISOString()};
+  const entry={
+    time:timeStr,cmd,result,type,
+    user:userProfile?userProfile.name:currentUser.email,
+    depot:userProfile?userProfile.depot:'',
+    client:clientName||null,
+    ts:now.toISOString()
+  };
   log.unshift(entry);
   saveLogEntryToFirebase(entry);
   renderLog();updateStats();
@@ -983,7 +1027,7 @@ function renderLog(){
   const filtered=log.filter(e=>!search||e.cmd.toLowerCase().includes(search)||e.result.toLowerCase().includes(search));
   const el=document.getElementById('log-list');
   if(!filtered.length){el.innerHTML='<div style="padding:18px 14px;color:var(--text-dim);font-size:12px;text-align:center">Nicio intrare</div>';return;}
-  el.innerHTML=filtered.slice(0,80).map(e=>`<div class="log-entry"><div class="log-time">${e.time}</div><div class="log-cmd">"${e.cmd}"</div><div class="log-result ${e.type}"><span class="log-badge ${e.type}">${e.type.toUpperCase()}</span> ${e.result}</div><div class="log-user">👤 ${e.user||'—'}</div></div>`).join('');
+  el.innerHTML=filtered.slice(0,80).map(e=>`<div class="log-entry"><div class="log-time">${e.time}</div><div class="log-cmd">"${e.cmd}"</div><div class="log-result ${e.type}"><span class="log-badge ${e.type}">${e.type.toUpperCase()}</span> ${e.result}</div>${e.client?`<div style="font-size:11px;color:#a78bfa;margin-top:2px;font-family:'JetBrains Mono',monospace">👥 Client: ${e.client}</div>`:''}<div class="log-user">👤 ${e.user||'—'}</div></div>`).join('');
 }
 function exportLog(){
   const csv=['Timp,Comandă,Rezultat,Tip,Utilizator,Depozit'].concat(log.map(e=>`"${e.time}","${(e.cmd||'').replace(/"/g,'""')}","${(e.result||'').replace(/"/g,'""')}","${e.type}","${e.user||''}","${e.depot||''}"`)).join('\n');
@@ -1844,6 +1888,21 @@ async function loadDashboardData() {
         </div>
       `).join('');
 
+    // Load all clients from all depots
+    const allClientsEl = document.getElementById('dash-clients-list');
+    let allDashClients = [];
+    for (const key of depotKeys) {
+      const depotSnap = await db.ref('depozite/' + key + '/clients').once('value');
+      const depotClients = depotSnap.val();
+      if (depotClients && Array.isArray(depotClients)) {
+        allDashClients = allDashClients.concat(depotClients);
+      }
+    }
+    // Sort by time desc
+    allDashClients.sort((a,b) => new Date(b.ts||b.time||0) - new Date(a.ts||a.time||0));
+    window.dashClients = allDashClients;
+    renderDashClients(allDashClients);
+
     // All users - store globally for filtering
     window.dashUsers = Object.entries(usersData).map(([uid,u]) => ({uid,...u}));
     renderDashUsers('all');
@@ -1851,6 +1910,51 @@ async function loadDashboardData() {
   } catch(err) {
     console.error('Dashboard error:', err);
   }
+}
+
+function renderDashClients(clientsList) {
+  const el = document.getElementById('dash-clients-list');
+  if (!el) return;
+  if (!clientsList || clientsList.length === 0) {
+    el.innerHTML = '<div style="padding:20px;color:#6b7a8d;font-size:13px;text-align:center">Nicio ieșire client înregistrată.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr style="background:#181d24;border-bottom:1px solid #1e2530">
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">ORA</th>
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">CLIENT</th>
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">PRODUS</th>
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">CANT.</th>
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">DEPOZIT</th>
+          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">OPERATOR</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${clientsList.slice(0,50).map(c => `
+          <tr style="border-bottom:1px solid #1e253050" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">
+            <td style="padding:9px 14px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px">${c.time||'—'}</td>
+            <td style="padding:9px 14px;color:#e8ecf0;font-weight:600">${c.name||'—'}</td>
+            <td style="padding:9px 14px;color:#99a8b8">${c.product||'—'}</td>
+            <td style="padding:9px 14px;color:#00e5a0;font-family:'JetBrains Mono',monospace">${c.qty||'—'}</td>
+            <td style="padding:9px 14px;color:#a78bfa">${c.depot||c.user||'—'}</td>
+            <td style="padding:9px 14px;color:#6b7a8d">${c.user||'—'}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    ${clientsList.length > 50 ? `<div style="padding:10px;text-align:center;color:#6b7a8d;font-size:12px">... și încă ${clientsList.length-50} înregistrări</div>` : ''}`;
+}
+
+function filterDashClients() {
+  const search = (document.getElementById('dash-client-search').value || '').toLowerCase();
+  const filtered = search 
+    ? (window.dashClients||[]).filter(c => 
+        (c.name||'').toLowerCase().includes(search) || 
+        (c.product||'').toLowerCase().includes(search) ||
+        (c.depot||'').toLowerCase().includes(search))
+    : (window.dashClients||[]);
+  renderDashClients(filtered);
 }
 
 // Close dashboard on Escape
@@ -3097,6 +3201,17 @@ window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
     <div style="margin-bottom:28px">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">🏭 TOATE DEPOZITELE</div>
       <div id="all-depots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
+    </div>
+
+    <!-- Clients section -->
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase">👥 IEȘIRI CLIENȚI — TOATE DEPOZITELE</div>
+        <input id="dash-client-search" oninput="filterDashClients()" placeholder="Caută client..." style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:12px;padding:6px 12px;outline:none;width:200px" onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
+      </div>
+      <div id="dash-clients-list" style="background:#111418;border:1px solid #1e2530;border-radius:14px;overflow:hidden;max-height:320px;overflow-y:auto">
+        <div style="padding:20px;color:#6b7a8d;font-size:13px;text-align:center">Se încarcă...</div>
+      </div>
     </div>
 
     <!-- Users list with approve/reject -->
