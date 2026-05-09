@@ -962,23 +962,34 @@ function parseQuantity(text){
   return null;
 }
 function extractClientName(text, norm) {
-  // Patterns: "George a luat", "Soria a luat", "Firma X a preluat", "Ion a ridicat"
-  const clientPatterns = [
-    /^([\wăâîșțĂÂÎȘȚ][\wăâîșțĂÂÎȘȚ\s]{1,30}?)\s+a\s+(luat|ridicat|preluat|primit|cumparat|cumpărat|achizitionat|achizitionat|luat|scos|retras)/i,
-    /^([\wăâîșțĂÂÎȘȚ][\wăâîșțĂÂÎȘȚ\s]{1,30}?)\s+(a luat|a ridicat|a preluat|a primit|a cumparat|a scos)/i,
+  // Simple approach: split by "a luat", "a ridicat" etc and take left part as client name
+  const actionPhrases = [
+    ' a luat ', ' a ridicat ', ' a preluat ', ' a primit ', 
+    ' a cumparat ', ' a cumpărat ', ' a scos ', ' a retras '
   ];
-  for (const pattern of clientPatterns) {
-    try {
-      const match = text.match(pattern);
-      if (match && match[1]) {
-        const name = match[1].trim();
-        // Make sure it's not a command keyword
-        const keywords = ['adauga','scoate','pune','stoc','stock','cat','câte','verifica'];
-        if (name.length > 1 && !keywords.some(k => normalizeText(name.toLowerCase()).includes(k))) {
-          return name;
-        }
+  
+  const lowerText = ' ' + text.toLowerCase() + ' ';
+  const normLower = ' ' + normalizeText(text.toLowerCase()) + ' ';
+  
+  for (const phrase of actionPhrases) {
+    const normPhrase = normalizeText(phrase);
+    let idx = normLower.indexOf(normPhrase);
+    if (idx < 0) idx = lowerText.indexOf(phrase);
+    
+    if (idx > 0) {
+      // Everything before the action phrase is the client name
+      let clientName = text.substring(0, idx).trim();
+      // Remove wake word if present
+      clientName = clientName.replace(/^stoc\s+/i, '').replace(/^stock\s+/i, '').trim();
+      
+      const badWords = ['adauga','scoate','pune','bag','intra','stoc','stock','cat','verifica'];
+      const normClient = normalizeText(clientName.toLowerCase());
+      
+      if (clientName.length > 1 && clientName.length < 40 && 
+          !badWords.some(w => normClient.includes(w))) {
+        return clientName;
       }
-    } catch(e) {}
+    }
   }
   return null;
 }
