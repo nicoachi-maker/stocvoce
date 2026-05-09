@@ -207,6 +207,13 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <input class="auth-input" id="reg-depot" placeholder="ex: Depozit Cluj, Depozit București...">
       </div>
       <div class="auth-field">
+        <label class="auth-label">Rolul tău</label>
+        <select class="auth-input" id="reg-role" style="cursor:pointer">
+          <option value="operator">👷 Operator</option>
+          <option value="depot_admin">👔 Administrator Depozit</option>
+        </select>
+      </div>
+      <div class="auth-field">
         <label class="auth-label">Email</label>
         <input class="auth-input" id="reg-email" type="email" placeholder="ion@depozit.ro">
       </div>
@@ -216,10 +223,23 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       </div>
       <div class="auth-field">
         <label class="auth-label">Confirmă parola</label>
-        <input class="auth-input" id="reg-pass2" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()">
+        <input class="auth-input" id="reg-pass2" type="password" placeholder="••••••••">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Telegram Chat ID (opțional)</label>
+        <input class="auth-input" id="reg-telegram" placeholder="ex: 123456789" onkeydown="if(event.key==='Enter')doRegister()">
+        <div style="font-size:11px;color:#6b7a8d;margin-top:4px">
+          Deschide <strong style="color:#00e5a0">@stocvoce_alert_bot</strong> pe Telegram → /start → copiază ID-ul
+        </div>
       </div>
       <div class="auth-error" id="reg-error"></div>
       <div class="auth-success" id="reg-success"></div>
+      <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);border-radius:8px;padding:10px;font-size:12px;color:#a78bfa;margin-bottom:8px">
+        📱 <b>Cum obții Telegram Chat ID:</b><br>
+        1. Deschide Telegram → caută <b>@userinfobot</b><br>
+        2. Click <b>Start</b><br>
+        3. Îți răspunde automat cu ID-ul tău (ex: 123456789)
+      </div>
       <button class="auth-btn" onclick="doRegister()" id="reg-btn">CREEAZĂ CONT →</button>
     </div>
 
@@ -408,11 +428,15 @@ async function doRegister() {
     const cred = await auth.createUserWithEmailAndPassword(email, pass);
     await cred.user.updateProfile({ displayName: name });
     // Save profile to DB
+    const telegramId = document.getElementById('reg-telegram').value.trim();
+    const role = document.getElementById('reg-role').value;
     await db.ref('users/' + cred.user.uid).set({
       name: name,
       depot: depot,
       email: email,
       status: 'pending',
+      role: role,
+      telegram_id: telegramId || null,
       createdAt: firebase.database.ServerValue.TIMESTAMP
     });
     // Sign out immediately - wait for approval
@@ -2118,14 +2142,14 @@ function manualBarcode() {
 const TELEGRAM_BOT_TOKEN = '8787571242:AAH-uLAT7sT74QXWsnJNAHvAoQCMNBE4wAs';
 const TELEGRAM_CHAT_ID = '8281556256';
 
-async function sendTelegramAlert(message) {
+async function sendTelegramAlert(message, chatId) {
   try {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
+        chat_id: chatId,
         text: message,
         parse_mode: 'HTML'
       })
@@ -2136,28 +2160,45 @@ async function sendTelegramAlert(message) {
 }
 
 // Send Telegram when stock is low or zero
-function checkAndAlertTelegram(product, opType) {
+async function checkAndAlertTelegram(product, opType) {
   const depot = userProfile ? userProfile.depot : 'Depozit';
   const operator = userProfile ? userProfile.name : 'Operator';
   const now = new Date().toLocaleString('ro-RO');
   
+  let msg = '';
   if (product.qty === 0) {
-    const msg = `🔴 <b>STOC EPUIZAT!</b>\n\n` +
+    msg = `🔴 <b>STOC EPUIZAT!</b>\n\n` +
       `📦 Produs: <b>${product.name}</b>\n` +
       `🏭 Depozit: ${depot}\n` +
       `👤 Operator: ${operator}\n` +
       `🕐 Data: ${now}\n\n` +
       `⚠️ Reaprovizionare urgentă necesară!`;
-    sendTelegramAlert(msg);
   } else if (product.qty <= product.min) {
-    const msg = `⚠️ <b>STOC SCĂZUT!</b>\n\n` +
+    msg = `⚠️ <b>STOC SCĂZUT!</b>\n\n` +
       `📦 Produs: <b>${product.name}</b>\n` +
       `📊 Cantitate rămasă: <b>${product.qty} ${product.unit}</b>\n` +
       `📉 Stoc minim: ${product.min} ${product.unit}\n` +
       `🏭 Depozit: ${depot}\n` +
       `👤 Operator: ${operator}\n` +
       `🕐 Data: ${now}`;
-    sendTelegramAlert(msg);
+  }
+  
+  if (!msg) return;
+
+  // Send to all approved users of same depot (not app creator)
+  try {
+    const usersSnap = await db.ref('users').once('value');
+    const users = usersSnap.val() || {};
+    Object.values(users).forEach(u => {
+      if (u.status === 'approved' && 
+          u.telegram_id && 
+          u.depot === depot &&
+          u.email !== ADMIN_EMAIL) {
+        sendTelegramAlert(msg, u.telegram_id);
+      }
+    });
+  } catch(e) {
+    console.error('Error Telegram:', e);
   }
 }
 
