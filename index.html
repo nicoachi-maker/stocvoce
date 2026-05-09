@@ -299,6 +299,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <button id="install-btn" onclick="installApp()" style="display:none;align-items:center;gap:6px;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;cursor:pointer">
       📱 INSTALEAZĂ
     </button>
+    <button class="export-btn" onclick="openSettingsModal()" style="border-color:#a78bfa;color:#a78bfa">⚙️ SETĂRI</button>
     <button class="export-btn" onclick="doLogout()">⎋ IEȘIRE</button>
   </div>
 </header>
@@ -537,6 +538,7 @@ auth.onAuthStateChanged(async (user) => {
     loadLogFromFirebase();
 
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
+    initUserSettings();
     setFeedback(`✅ ${userProfile.depot} – gata de comenzi!`, 'ok');
   } else {
     currentUser = null;
@@ -2165,15 +2167,19 @@ async function checkAndAlertTelegram(product, opType) {
   const operator = userProfile ? userProfile.name : 'Operator';
   const now = new Date().toLocaleString('ro-RO');
   
+  // Check user alert settings
+  const alertLow = !userSettings || userSettings.alert_low !== false;
+  const alertZero = !userSettings || userSettings.alert_zero !== false;
+  
   let msg = '';
-  if (product.qty === 0) {
+  if (product.qty === 0 && alertZero) {
     msg = `🔴 <b>STOC EPUIZAT!</b>\n\n` +
       `📦 Produs: <b>${product.name}</b>\n` +
       `🏭 Depozit: ${depot}\n` +
       `👤 Operator: ${operator}\n` +
       `🕐 Data: ${now}\n\n` +
       `⚠️ Reaprovizionare urgentă necesară!`;
-  } else if (product.qty <= product.min) {
+  } else if (product.qty <= product.min && alertLow) {
     msg = `⚠️ <b>STOC SCĂZUT!</b>\n\n` +
       `📦 Produs: <b>${product.name}</b>\n` +
       `📊 Cantitate rămasă: <b>${product.qty} ${product.unit}</b>\n` +
@@ -2200,6 +2206,166 @@ async function checkAndAlertTelegram(product, opType) {
   } catch(e) {
     console.error('Error Telegram:', e);
   }
+}
+
+
+// ── SETTINGS ──
+let reportInterval = null;
+let userSettings = {};
+
+function openSettingsModal() {
+  if (!currentUser) return;
+  // Load current settings
+  db.ref('users/' + currentUser.uid + '/settings').once('value').then(snap => {
+    const s = snap.val() || {};
+    userSettings = s;
+    document.getElementById('settings-telegram').value = userProfile.telegram_id || '';
+    const enabled = s.report_enabled || false;
+    document.getElementById('settings-report-enabled').checked = enabled;
+    document.getElementById('settings-report-hour').value = s.report_hour || 8;
+    document.getElementById('settings-alert-low').checked = s.alert_low !== false;
+    document.getElementById('settings-alert-zero').checked = s.alert_zero !== false;
+    toggleReportTime();
+    updateToggleUI(enabled);
+  });
+  document.getElementById('settings-modal').style.display = 'flex';
+}
+
+function closeSettingsModal() {
+  document.getElementById('settings-modal').style.display = 'none';
+}
+
+function toggleReportTime() {
+  const enabled = document.getElementById('settings-report-enabled').checked;
+  document.getElementById('report-time-section').style.display = enabled ? 'block' : 'none';
+  updateToggleUI(enabled);
+}
+
+function updateToggleUI(enabled) {
+  const span = document.getElementById('toggle-span');
+  const dot = document.getElementById('toggle-dot');
+  if (span) span.style.background = enabled ? '#00e5a0' : '#1e2530';
+  if (dot) { dot.style.background = enabled ? '#000' : '#6b7a8d'; dot.style.left = enabled ? '23px' : '3px'; }
+}
+
+async function saveSettings() {
+  if (!currentUser) return;
+  const telegramId = document.getElementById('settings-telegram').value.trim();
+  const reportEnabled = document.getElementById('settings-report-enabled').checked;
+  const reportHour = parseInt(document.getElementById('settings-report-hour').value);
+  const alertLow = document.getElementById('settings-alert-low').checked;
+  const alertZero = document.getElementById('settings-alert-zero').checked;
+
+  // Save to Firebase
+  await db.ref('users/' + currentUser.uid).update({
+    telegram_id: telegramId || null,
+    settings: {
+      report_enabled: reportEnabled,
+      report_hour: reportHour,
+      alert_low: alertLow,
+      alert_zero: alertZero
+    }
+  });
+
+  // Update local profile
+  userProfile.telegram_id = telegramId || null;
+  userProfile.settings = { report_enabled: reportEnabled, report_hour: reportHour, alert_low: alertLow, alert_zero: alertZero };
+  userSettings = userProfile.settings;
+
+  // Setup daily report
+  setupDailyReport();
+
+  closeSettingsModal();
+  setFeedback('✅ Setări salvate cu succes!', 'ok');
+  speak('Setări salvate.');
+}
+
+function setupDailyReport() {
+  if (reportInterval) clearInterval(reportInterval);
+  if (!userSettings.report_enabled || !userProfile.telegram_id) return;
+
+  // Check every minute if it's report time
+  reportInterval = setInterval(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    const min = now.getMinutes();
+    if (hour === (userSettings.report_hour || 8) && min === 0) {
+      sendDailyReport();
+    }
+  }, 60000);
+}
+
+async function sendDailyReport() {
+  if (!userProfile || !userProfile.telegram_id) return;
+  const depot = userProfile.depot || 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO', {day:'2-digit',month:'2-digit',year:'numeric'});
+  
+  const total = stock.length;
+  const lowItems = stock.filter(p => p.qty > 0 && p.qty <= p.min);
+  const zeroItems = stock.filter(p => p.qty === 0);
+  const okItems = total - lowItems.length - zeroItems.length;
+
+  let msg = `📊 <b>RAPORT ZILNIC</b> — ${now}
+`;
+  msg += `🏭 <b>${depot}</b>
+
+`;
+  msg += `✅ Stoc OK: <b>${okItems}</b> produse
+`;
+  msg += `⚠️ Stoc scăzut: <b>${lowItems.length}</b> produse
+`;
+  msg += `🔴 Epuizat: <b>${zeroItems.length}</b> produse
+`;
+  msg += `📦 Total: <b>${total}</b> produse
+`;
+
+  if (lowItems.length > 0) {
+    msg += `
+⚠️ <b>STOCURI SCĂZUTE:</b>
+`;
+    lowItems.slice(0,5).forEach(p => {
+      msg += `• ${p.name}: ${p.qty} ${p.unit} (min: ${p.min})
+`;
+    });
+    if (lowItems.length > 5) msg += `... și încă ${lowItems.length-5} produse
+`;
+  }
+
+  if (zeroItems.length > 0) {
+    msg += `
+🔴 <b>EPUIZATE:</b>
+`;
+    zeroItems.slice(0,5).forEach(p => {
+      msg += `• ${p.name}
+`;
+    });
+  }
+
+  msg += `
+👤 ${userProfile.name}`;
+
+  // Send to all operators of this depot with telegram
+  try {
+    const usersSnap = await db.ref('users').once('value');
+    const users = usersSnap.val() || {};
+    let sent = false;
+    Object.values(users).forEach(u => {
+      if (u.status === 'approved' && u.telegram_id && u.depot === depot && u.email !== ADMIN_EMAIL) {
+        sendTelegramAlert(msg, u.telegram_id);
+        sent = true;
+      }
+    });
+    if (sent) console.log('Daily report sent!');
+  } catch(e) {
+    console.error('Daily report error:', e);
+  }
+}
+
+// Init daily report on login
+function initUserSettings() {
+  if (!userProfile) return;
+  userSettings = userProfile.settings || {};
+  setupDailyReport();
 }
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
@@ -2507,6 +2673,73 @@ function installApp() {
   <div style="display:flex;gap:10px">
     <button onclick="closeQRModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">ANULEAZĂ</button>
     <button onclick="manualBarcode()" style="background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">✏️ MANUAL</button>
+  </div>
+</div>
+
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:32px;max-width:420px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:6px">⚙️ Setări Cont</div>
+    <div style="font-size:13px;color:#6b7a8d;margin-bottom:24px">Personalizează notificările tale</div>
+
+    <!-- Telegram ID -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Telegram Chat ID</div>
+      <input id="settings-telegram" placeholder="ex: 123456789" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
+      <div style="font-size:11px;color:#6b7a8d;margin-top:4px">Caută <strong style="color:#a78bfa">@userinfobot</strong> pe Telegram → Start → copiază ID-ul</div>
+    </div>
+
+    <!-- Daily report toggle -->
+    <div style="margin-bottom:18px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:14px;color:#e8ecf0;font-weight:600">📅 Raport zilnic</div>
+          <div style="font-size:11px;color:#6b7a8d;margin-top:2px">Situația stocului pe Telegram</div>
+        </div>
+        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+          <input type="checkbox" id="settings-report-enabled" style="opacity:0;width:0;height:0" onchange="toggleReportTime()">
+          <span id="toggle-span" style="position:absolute;inset:0;background:#1e2530;border-radius:24px;transition:.3s;cursor:pointer"></span>
+          <span id="toggle-dot" style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:#6b7a8d;border-radius:50%;transition:.3s"></span>
+        </label>
+      </div>
+      <div id="report-time-section" style="display:none">
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Ora raportului</div>
+        <select id="settings-report-hour" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer">
+          <option value="6">06:00</option>
+          <option value="7">07:00</option>
+          <option value="8" selected>08:00</option>
+          <option value="9">09:00</option>
+          <option value="10">10:00</option>
+          <option value="12">12:00</option>
+          <option value="14">14:00</option>
+          <option value="16">16:00</option>
+          <option value="17">17:00</option>
+          <option value="18">18:00</option>
+          <option value="20">20:00</option>
+          <option value="22">22:00</option>
+        </select>
+        <div style="font-size:11px;color:#6b7a8d;margin-top:6px">⚠️ Aplicația trebuie să fie deschisă la ora raportului</div>
+      </div>
+    </div>
+
+    <!-- Alert settings -->
+    <div style="margin-bottom:20px;background:#181d24;border-radius:10px;padding:14px">
+      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:8px">🔔 Alerte automate</div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px">
+        <input type="checkbox" id="settings-alert-low" checked style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:13px;color:#99a8b8">⚠️ Alertă stoc scăzut</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" id="settings-alert-zero" checked style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:13px;color:#99a8b8">🔴 Alertă stoc epuizat</span>
+      </label>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="closeSettingsModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="saveSettings()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
   </div>
 </div>
 
