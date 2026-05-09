@@ -405,6 +405,12 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
       <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
       <button class="add-btn" onclick="openChartsModal()" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
+      <button class="add-btn" onclick="openRaportLunarModal()" style="border-color:#ffa502;color:#ffa502">📈 Rapoarte</button>
+      <button class="add-btn" onclick="openBonReturModal()" style="border-color:#ff4757;color:#ff4757">🔄 Retur</button>
+      <button class="add-btn" onclick="openGlobalStockModal()" style="border-color:#00e5a0;color:#00e5a0">🌐 Global</button>
+      <button class="add-btn" onclick="openComparatieDep()" style="border-color:#a78bfa;color:#a78bfa">📊 Compară</button>
+      <button class="add-btn" onclick="showConsolidatedStock()" style="border-color:#00e5a0;color:#00e5a0">🔢 Total</button>
+      <button class="add-btn" onclick="openCategoriesModal()" style="border-color:#6b7a8d;color:#6b7a8d">🏷️ Categ.</button>
       <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
     </div>
     <div class="stock-grid" id="stock-grid">
@@ -1089,6 +1095,19 @@ function executeOperation(opType,product,qty,originalText,clientName){
         }
       } catch(e) { console.error('Bon error:', e); }
     }, 800);
+  }
+  
+  // Check suspicious movement
+  checkSuspiciousMovement(product, qty, opType, userProfile ? userProfile.name : '—');
+  
+  // Suggest auto transfer if zero
+  if (product.qty === 0 && opType === 'out') {
+    setTimeout(() => suggestAutoTransfer(product), 1000);
+  }
+  
+  // Auto notify supplier if below min
+  if (product.qty <= product.min && product.supplier_contact) {
+    setTimeout(() => autoNotifySupplier(product), 1500);
   }
   
   // Audit trail
@@ -3489,6 +3508,123 @@ function printEtichete() {
   </div>
 </div>
 
+
+<!-- CATEGORII MODAL -->
+<div id="categories-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:440px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Categorii</div>
+      <button onclick="closeCategoriesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="cat-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RAPORT LUNAR MODAL -->
+<div id="raport-lunar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📊 Raport Lunar</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="exportFullExcel()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer">📊 EXCEL</button>
+        <button onclick="closeRaportLunarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button onclick="showTop10()" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🏆 TOP 10</button>
+      <button onclick="showStagnant(30)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 30 ZILE</button>
+      <button onclick="showStagnant(60)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 60 ZILE</button>
+      <button onclick="showOperatorReport()" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">👤 OPERATORI</button>
+      <button onclick="calcAutoMinStock()" style="background:#181d24;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🤖 AUTO MIN</button>
+    </div>
+    <div id="raport-lunar-content"></div>
+  </div>
+</div>
+
+<!-- STAGNANT MODAL -->
+<div id="stagnant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
+      <button onclick="document.getElementById('stagnant-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="stagnant-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- OPERATOR REPORT MODAL -->
+<div id="operator-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#a78bfa;text-transform:uppercase">👤 Raport Operatori</div>
+      <button onclick="document.getElementById('operator-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-report-content"></div>
+  </div>
+</div>
+
+<!-- CLIENT PROFILE MODAL -->
+<div id="client-profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 Profil Client</div>
+        <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px" id="client-profile-name">—</div>
+      </div>
+      <button onclick="closeClientProfileModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="client-profile-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BON RETUR MODAL -->
+<div id="bon-retur-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase;margin-bottom:20px">🔄 Bon de Retur</div>
+    <input id="retur-client" placeholder="Nume client" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
+    <select id="retur-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="retur-qty" type="number" placeholder="Cantitate returnată" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
+    <input id="retur-reason" placeholder="Motiv retur" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:16px">
+    <div style="display:flex;gap:10px">
+      <button onclick="closeBonReturModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doRetur()" style="flex:2;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">GENEREAZĂ BON →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL STOCK MODAL -->
+<div id="global-stock-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:900px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Global — Toate Depozitele</div>
+      <button onclick="closeGlobalStockModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="global-stock-content"></div>
+  </div>
+</div>
+
+<!-- COMPARAȚIE DEPOZITE MODAL -->
+<div id="comparatie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Comparație Depozite</div>
+      <button onclick="closeComparatieDep()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="comparatie-content"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDAT MODAL -->
+<div id="consolidat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔢 Stoc Consolidat Global</div>
+      <button onclick="closeConsolidatModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidat-content" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+</div>
+
 </body></html>`);
   printWindow.document.close();
   setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
@@ -4183,6 +4319,842 @@ function extractClientNameML(text) {
   return null;
 }
 
+
+// ══════════════════════════════════════════
+// CATEGORIA 1: GESTIUNE STOC AVANSATĂ
+// ══════════════════════════════════════════
+
+// 1. STOC MINIM AUTOMAT
+function calcAutoMinStock() {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today - 30*24*3600*1000);
+  
+  stock.forEach(p => {
+    const productLog = log.filter(e => {
+      if (!e.ts || e.type !== 'out') return false;
+      return new Date(e.ts) >= thirtyDaysAgo && 
+             e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()));
+    });
+    
+    // Extract quantities from log results
+    let totalOut = 0;
+    productLog.forEach(e => {
+      const match = e.result && e.result.match(/(\d+)→(\d+)/);
+      if (match) totalOut += parseInt(match[1]) - parseInt(match[2]);
+    });
+    
+    if (totalOut > 0) {
+      const dailyAvg = totalOut / 30;
+      const autoMin = Math.ceil(dailyAvg * 7); // 7 days safety stock
+      if (autoMin > p.min) {
+        p.min = autoMin;
+        p.auto_min = true;
+      }
+    }
+  });
+  
+  saveStockToFirebase();
+  renderStock();
+  setFeedback('✅ Stoc minim recalculat automat pentru toate produsele!', 'ok');
+  speak('Stoc minim actualizat automat.');
+}
+
+// 2. DUPLICARE PRODUS
+function duplicateProduct(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  
+  const newP = { 
+    ...JSON.parse(JSON.stringify(p)),
+    id: nextId++,
+    name: p.name + ' (copie)',
+    qty: 0,
+    notes: [],
+    note_preview: '',
+    photo_url: null,
+    created: new Date().toISOString()
+  };
+  
+  stock.push(newP);
+  saveStockToFirebase();
+  renderStock();
+  updateStats();
+  setFeedback(`✅ Produs duplicat: ${newP.name}`, 'ok');
+  speak('Produs duplicat cu succes.');
+}
+
+// 3. MERGE PRODUSE
+let mergeStep = 0, mergeSource = null;
+
+function startMerge(productId) {
+  if (!mergeSource) {
+    mergeSource = productId;
+    setFeedback('✅ Primul produs selectat. Acum click pe al doilea produs de combinat.', 'ok');
+    // Highlight selected card
+    document.querySelectorAll('.stock-card').forEach(c => c.style.opacity = '0.5');
+    const sel = document.getElementById('card-' + productId);
+    if (sel) { sel.style.opacity = '1'; sel.style.border = '2px solid #a78bfa'; }
+    return;
+  }
+  
+  if (mergeSource === productId) {
+    mergeSource = null;
+    document.querySelectorAll('.stock-card').forEach(c => { c.style.opacity = '1'; c.style.border = ''; });
+    setFeedback('⚠️ Selectați un alt produs pentru combinare.', 'warn');
+    return;
+  }
+  
+  const p1 = stock.find(s => s.id === mergeSource);
+  const p2 = stock.find(s => s.id === productId);
+  
+  if (!confirm(`Combini "${p1.name}" (${p1.qty}) cu "${p2.name}" (${p2.qty})? "${p2.name}" va fi șters!`)) {
+    mergeSource = null;
+    document.querySelectorAll('.stock-card').forEach(c => { c.style.opacity = '1'; c.style.border = ''; });
+    return;
+  }
+  
+  p1.qty += p2.qty;
+  if (p2.notes) p1.notes = [...(p1.notes||[]), ...p2.notes];
+  stock = stock.filter(s => s.id !== p2.id);
+  
+  mergeSource = null;
+  document.querySelectorAll('.stock-card').forEach(c => { c.style.opacity = '1'; c.style.border = ''; });
+  
+  saveStockToFirebase();
+  renderStock();
+  updateStats();
+  addLog(`Merge: ${p1.name} + ${p2.name}`, `Produse combinate. Stoc nou: ${p1.qty} ${p1.unit}`, 'in');
+  setFeedback(`✅ Produse combinate! ${p1.name}: ${p1.qty} ${p1.unit}`, 'ok');
+  speak('Produse combinate cu succes.');
+}
+
+// 4. ARHIVARE PRODUSE
+function toggleArchive(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.archived = !p.archived;
+  saveStockToFirebase();
+  renderStock();
+  setFeedback(`${p.archived ? '📦 Arhivat' : '✅ Dezarhivat'}: ${p.name}`, 'ok');
+}
+
+let showArchived = false;
+function toggleArchivedView() {
+  showArchived = !showArchived;
+  renderStock();
+  setFeedback(showArchived ? '📦 Afișez și produsele arhivate' : '✅ Afișez doar produsele active', 'ok');
+}
+
+// Override renderStock to filter archived
+const _origRenderStock = renderStock;
+
+// 5. CATEGORII CUSTOM
+let customCategories = JSON.parse(localStorage.getItem('sv_categories') || '[]');
+
+function openCategoriesModal() {
+  renderCategoriesModal();
+  document.getElementById('categories-modal').style.display = 'flex';
+}
+function closeCategoriesModal() {
+  document.getElementById('categories-modal').style.display = 'none';
+}
+
+function renderCategoriesModal() {
+  const allCats = [...new Set(stock.map(p => p.cat || 'General'))];
+  const savedColors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
+  
+  const el = document.getElementById('cat-list');
+  if (!el) return;
+  el.innerHTML = allCats.map(cat => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px">
+      <input type="color" value="${savedColors[cat]||'#00e5a0'}" 
+        onchange="setCatColor('${cat}', this.value)"
+        style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;background:none">
+      <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${cat}</span>
+      <span style="font-size:12px;color:#6b7a8d">${stock.filter(p=>p.cat===cat).length} produse</span>
+    </div>`).join('');
+}
+
+function setCatColor(cat, color) {
+  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
+  colors[cat] = color;
+  localStorage.setItem('sv_cat_colors', JSON.stringify(colors));
+  renderStock();
+}
+
+function getCatColor(cat) {
+  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
+  return colors[cat] || null;
+}
+
+
+// ══════════════════════════════════════════
+// CATEGORIA 2: RAPOARTE & ANALIZĂ
+// ══════════════════════════════════════════
+
+// 6. RAPORT CONSUM LUNAR
+function openRaportLunarModal() {
+  document.getElementById('raport-lunar-modal').style.display = 'flex';
+  renderRaportLunar();
+}
+function closeRaportLunarModal() {
+  document.getElementById('raport-lunar-modal').style.display = 'none';
+}
+
+function renderRaportLunar() {
+  const el = document.getElementById('raport-lunar-content');
+  if (!el) return;
+  
+  const today = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    months.push({ label: d.toLocaleDateString('ro-RO', {month:'short', year:'numeric'}), month: d.getMonth(), year: d.getFullYear() });
+  }
+  
+  // Top 5 products by movement
+  const productMovement = stock.map(p => {
+    const moves = log.filter(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    return { ...p, moves: moves.length };
+  }).sort((a,b) => b.moves - a.moves).slice(0, 5);
+  
+  el.innerHTML = `
+    <div style="margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:12px">TOP 5 PRODUSE DUPĂ MIȘCĂRI</div>
+      ${productMovement.map((p,i) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:${i===0?'#ffa502':i===1?'#6b7a8d':i===2?'#a78bfa':'#1e2530'};width:30px">${i+1}</div>
+          <div style="flex:1">
+            <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
+            <div style="font-size:12px;color:#6b7a8d">${p.moves} operații totale</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#00e5a0">${p.qty}</div>
+            <div style="font-size:10px;color:#6b7a8d">${p.unit} stoc curent</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// 7. TOP 10 PRODUSE
+function showTop10() {
+  const sorted = [...stock].sort((a,b) => {
+    const aLog = log.filter(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(a.name.toLowerCase()))).length;
+    const bLog = log.filter(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(b.name.toLowerCase()))).length;
+    return bLog - aLog;
+  }).slice(0, 10);
+  
+  let msg = '🏆 TOP 10 PRODUSE:\n\n';
+  sorted.forEach((p, i) => {
+    const ops = log.filter(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))).length;
+    msg += `${i+1}. ${p.name} — ${ops} operații, stoc: ${p.qty} ${p.unit}\n`;
+  });
+  alert(msg);
+}
+
+// 8. PRODUSE STAGNANTE
+function showStagnant(days) {
+  const cutoff = new Date(Date.now() - days*24*3600*1000);
+  const stagnant = stock.filter(p => {
+    const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && 
+      e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    return !lastMove;
+  });
+  
+  if (!stagnant.length) {
+    setFeedback(`✅ Niciun produs stagnant în ultimele ${days} zile!`, 'ok');
+    return;
+  }
+  
+  const el = document.getElementById('stagnant-list');
+  if (el) {
+    el.innerHTML = stagnant.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">
+        <div>
+          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
+          <div style="font-size:12px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
+        </div>
+        <div style="font-size:12px;color:#ffa502">+${days} zile fără mișcare</div>
+      </div>`).join('');
+    document.getElementById('stagnant-modal').style.display = 'flex';
+  }
+}
+
+// 9. RAPORT PER OPERATOR
+function showOperatorReport() {
+  const operators = {};
+  log.forEach(e => {
+    const user = e.user || '—';
+    if (!operators[user]) operators[user] = { in: 0, out: 0, err: 0, total: 0 };
+    operators[user][e.type] = (operators[user][e.type] || 0) + 1;
+    operators[user].total++;
+  });
+  
+  const el = document.getElementById('operator-report-content');
+  if (!el) return;
+  
+  el.innerHTML = Object.entries(operators).sort((a,b) => b[1].total - a[1].total).map(([user, stats]) => `
+    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #00e5a0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:8px">👤 ${user}</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:#00e5a0">${stats.in||0}</div>
+          <div style="font-size:10px;color:#6b7a8d">INTRĂRI</div>
+        </div>
+        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:#ff4757">${stats.out||0}</div>
+          <div style="font-size:10px;color:#6b7a8d">IEȘIRI</div>
+        </div>
+        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:#ffa502">${stats.err||0}</div>
+          <div style="font-size:10px;color:#6b7a8d">ERORI</div>
+        </div>
+        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
+          <div style="font-size:20px;font-weight:900;color:#a78bfa">${stats.total}</div>
+          <div style="font-size:10px;color:#6b7a8d">TOTAL</div>
+        </div>
+      </div>
+    </div>`).join('');
+  
+  document.getElementById('operator-report-modal').style.display = 'flex';
+}
+
+// 10. EXPORT EXCEL COMPLET
+function exportFullExcel() {
+  try {
+    const wb = XLSX.utils.book_new();
+    
+    // Stock sheet
+    const stockData = [
+      ['Nume','Categorie','Cantitate','UM','Locatie','Stoc Min','Furnizor','Contact','Pret Achizitie','Pret Vanzare','SKU','Garantie','Expirare','Timp Livrare','MOQ','Greutate','Status']
+    ];
+    stock.forEach(p => {
+      const status = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
+      stockData.push([p.name,p.cat||'',p.qty,p.unit,p.loc||'',p.min,p.supplier||'',p.supplier_contact||'',p.price_buy||'',p.price_sell||'',p.sku||'',p.warranty||'',p.expiry||'',p.lead_time||'',p.moq||'',p.weight||'',status]);
+    });
+    const ws1 = XLSX.utils.aoa_to_sheet(stockData);
+    ws1['!cols'] = Array(17).fill({wch:15});
+    XLSX.utils.book_append_sheet(wb, ws1, 'Stoc');
+    
+    // History sheet
+    const histData = [['Data','Comanda','Rezultat','Tip','Operator','Client','Depozit']];
+    log.slice(0,500).forEach(e => {
+      histData.push([e.time||'',e.cmd||'',e.result||'',e.type||'',e.user||'',e.client||'',e.depot||'']);
+    });
+    const ws2 = XLSX.utils.aoa_to_sheet(histData);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Istoric');
+    
+    // Clients sheet
+    const cliData = [['Nume Client','Contact','Produs','Cantitate','Operator','Data','Depozit']];
+    clients.forEach(c => {
+      cliData.push([c.name||'',c.contact||'',c.product||'',c.qty||'',c.user||'',c.time||'',c.depot||'']);
+    });
+    const ws3 = XLSX.utils.aoa_to_sheet(cliData);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Clienti');
+    
+    const depot = userProfile ? userProfile.depot.replace(/\s+/g,'_') : 'Depozit';
+    const date = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `StocVoce_${depot}_${date}.xlsx`);
+    
+    setFeedback('✅ Export Excel complet generat!', 'ok');
+    speak('Export Excel generat cu succes.');
+  } catch(e) {
+    console.error('Excel export error:', e);
+    setFeedback('❌ Eroare la export Excel.', 'err');
+  }
+}
+
+
+// ══════════════════════════════════════════
+// CATEGORIA 3: CLIENȚI & VÂNZĂRI
+// ══════════════════════════════════════════
+
+// 11. PROFIL CLIENT
+function openClientProfile(clientName) {
+  const clientHistory = clients.filter(c => 
+    normalizeText(c.name.toLowerCase()) === normalizeText(clientName.toLowerCase())
+  );
+  
+  const totalQty = clientHistory.reduce((sum, c) => sum + (parseInt(c.qty) || 0), 0);
+  const totalValue = clientHistory.reduce((sum, c) => sum + (c.price_sell ? parseInt(c.qty) * c.price_sell : 0), 0);
+  const lastVisit = clientHistory[clientHistory.length - 1];
+  
+  const el = document.getElementById('client-profile-content');
+  if (!el) return;
+  
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
+        <div style="font-size:24px;font-weight:900;color:#a78bfa;font-family:'Barlow Condensed',sans-serif">${clientHistory.length}</div>
+        <div style="font-size:10px;color:#6b7a8d">VIZITE</div>
+      </div>
+      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
+        <div style="font-size:24px;font-weight:900;color:#00e5a0;font-family:'Barlow Condensed',sans-serif">${totalQty}</div>
+        <div style="font-size:10px;color:#6b7a8d">TOTAL UNITĂȚI</div>
+      </div>
+      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ffa502">
+        <div style="font-size:24px;font-weight:900;color:#ffa502;font-family:'Barlow Condensed',sans-serif">${totalValue > 0 ? totalValue + ' RON' : '—'}</div>
+        <div style="font-size:10px;color:#6b7a8d">VALOARE TOTALĂ</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ISTORIC COMPLET</div>
+    ${clientHistory.reverse().map(c => `
+      <div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">
+        <div>
+          <div style="font-weight:600;color:#e8ecf0">${c.product}</div>
+          <div style="font-size:11px;color:#6b7a8d">${c.time} · ${c.user}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="color:#00e5a0;font-weight:700">${c.qty}</div>
+          ${c.price_sell ? `<div style="font-size:11px;color:#ffa502">${parseInt(c.qty)*c.price_sell} RON</div>` : ''}
+        </div>
+      </div>`).join('')}`;
+  
+  document.getElementById('client-profile-name').textContent = clientName;
+  document.getElementById('client-profile-modal').style.display = 'flex';
+}
+function closeClientProfileModal() { document.getElementById('client-profile-modal').style.display='none'; }
+
+// 12. CLIENT RECURENT - detect automatically
+function getRecurringClients() {
+  const clientCount = {};
+  clients.forEach(c => {
+    const name = c.name.toLowerCase().trim();
+    clientCount[name] = (clientCount[name] || 0) + 1;
+  });
+  return Object.entries(clientCount)
+    .filter(([,count]) => count >= 3)
+    .sort((a,b) => b[1] - a[1])
+    .map(([name, count]) => ({ name, count }));
+}
+
+// 13. LIMITĂ CREDIT CLIENT
+let clientLimits = JSON.parse(localStorage.getItem('sv_client_limits') || '{}');
+
+function setClientLimit(clientName, limit) {
+  clientLimits[normalizeText(clientName.toLowerCase())] = parseInt(limit);
+  localStorage.setItem('sv_client_limits', JSON.stringify(clientLimits));
+  setFeedback(`✅ Limită setată pentru ${clientName}: ${limit} unități`, 'ok');
+}
+
+function checkClientLimit(clientName, qty) {
+  const key = normalizeText(clientName.toLowerCase());
+  const limit = clientLimits[key];
+  if (!limit) return true;
+  
+  const taken = clients
+    .filter(c => normalizeText(c.name.toLowerCase()) === key)
+    .reduce((sum, c) => sum + (parseInt(c.qty) || 0), 0);
+  
+  if (taken + qty > limit) {
+    setFeedback(`❌ ${clientName} a depășit limita! Luat: ${taken}, Limită: ${limit}`, 'err');
+    speak(`Atenție! ${clientName} a depășit limita de ${limit} unități!`);
+    return false;
+  }
+  return true;
+}
+
+// 14. LISTĂ NEAGRĂ CLIENȚI
+let blacklist = JSON.parse(localStorage.getItem('sv_blacklist') || '[]');
+
+function addToBlacklist(clientName, reason) {
+  const entry = { name: clientName, reason: reason || 'Nedefinit', date: new Date().toLocaleDateString('ro-RO'), addedBy: userProfile ? userProfile.name : '—' };
+  blacklist.push(entry);
+  localStorage.setItem('sv_blacklist', JSON.stringify(blacklist));
+  if(window.fbReady===true) db.ref('depozite/'+getDepotKey()+'/blacklist').set(blacklist);
+  setFeedback(`🚫 ${clientName} adăugat pe lista neagră!`, 'warn');
+}
+
+function isBlacklisted(clientName) {
+  return blacklist.some(b => normalizeText(b.name.toLowerCase()) === normalizeText(clientName.toLowerCase()));
+}
+
+function removeFromBlacklist(clientName) {
+  blacklist = blacklist.filter(b => normalizeText(b.name.toLowerCase()) !== normalizeText(clientName.toLowerCase()));
+  localStorage.setItem('sv_blacklist', JSON.stringify(blacklist));
+  if(window.fbReady===true) db.ref('depozite/'+getDepotKey()+'/blacklist').set(blacklist);
+  setFeedback(`✅ ${clientName} eliminat de pe lista neagră!`, 'ok');
+}
+
+// 15. BON DE RETUR
+async function generateBonRetur(clientName, items) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const bonNr = 'RETUR-' + now.getTime().toString().slice(-6);
+
+  doc.setFillColor(255, 71, 87);
+  doc.rect(0,0,210,40,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(20);
+  doc.setTextColor(255,255,255);
+  doc.text('BON DE RETUR', 14, 22);
+  doc.setFontSize(10);
+  doc.setTextColor(255,200,200);
+  doc.text(`${bonNr} · ${now.toLocaleString('ro-RO')}`, 14, 30);
+  doc.text(depot, 14, 37);
+
+  doc.setFontSize(12);
+  doc.setTextColor(153,168,184);
+  doc.text('CLIENT:', 14, 55);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(232,236,240);
+  doc.text(clientName, 40, 55);
+
+  doc.autoTable({
+    startY: 65,
+    head: [['Nr.','Produs','Cantitate Returnată','UM','Motiv']],
+    body: items.map((item, i) => [i+1, item.name, item.qty, item.unit, item.reason||'—']),
+    styles:{fontSize:10,textColor:[153,168,184],fillColor:[17,20,24],lineColor:[30,37,48]},
+    headStyles:{fillColor:[255,71,87],textColor:[255,255,255],fontStyle:'bold'},
+    margin:{left:14,right:14}
+  });
+
+  // Add returned items to stock
+  items.forEach(item => {
+    const p = findProduct(item.name.split(' '));
+    if (p) {
+      p.qty += parseInt(item.qty) || 0;
+      addLog(`Retur: ${clientName}`, `${item.name}: +${item.qty} ${item.unit} returnate`, 'in', clientName);
+    }
+  });
+  saveStockToFirebase();
+  renderStock();
+  updateStats();
+
+  doc.save(`${bonNr}_${clientName.replace(/\s+/g,'_')}.pdf`);
+  setFeedback(`✅ Bon retur ${bonNr} generat! Stocul a fost actualizat.`, 'ok');
+  speak(`Bon de retur generat pentru ${clientName}. Stocul a fost actualizat.`);
+}
+
+function openBonReturModal() {
+  const sel = document.getElementById('retur-product');
+  if (sel) sel.innerHTML = stock.map(p => `<option value="${p.id}">${p.name} (${p.qty} ${p.unit})</option>`).join('');
+  document.getElementById('bon-retur-modal').style.display = 'flex';
+}
+function closeBonReturModal() { document.getElementById('bon-retur-modal').style.display='none'; }
+function doRetur() {
+  const client = document.getElementById('retur-client').value.trim();
+  const productId = parseInt(document.getElementById('retur-product').value);
+  const qty = parseInt(document.getElementById('retur-qty').value);
+  const reason = document.getElementById('retur-reason').value.trim();
+  if (!client || !qty) { alert('Completați clientul și cantitatea!'); return; }
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  generateBonRetur(client, [{name:p.name, qty, unit:p.unit, reason}]);
+  closeBonReturModal();
+}
+
+
+// ══════════════════════════════════════════
+// CATEGORIA 4: NOTIFICĂRI & AUTOMATIZĂRI
+// ══════════════════════════════════════════
+
+// 16. NOTIFICARE REAPROVIZIONARE AUTOMATĂ FURNIZOR
+async function autoNotifySupplier(product) {
+  if (!product.supplier_contact || !userProfile) return;
+  const depot = userProfile.depot;
+  const needed = Math.max(product.moq || product.min*3, product.min*3 - product.qty);
+  
+  // Send Telegram to operator
+  if (userProfile.telegram_id) {
+    const msg = `🔔 <b>REAPROVIZIONARE AUTOMATĂ</b>\n\n` +
+      `📦 Produs: <b>${product.name}</b>\n` +
+      `📊 Stoc curent: ${product.qty} ${product.unit}\n` +
+      `📦 De comandat: <b>${needed} ${product.unit}</b>\n` +
+      `🏭 Furnizor: ${product.supplier || '—'}\n` +
+      `📞 Contact: ${product.supplier_contact}\n\n` +
+      `Contactați furnizorul pentru reaprovizionare!`;
+    await sendTelegramAlert(msg, userProfile.telegram_id);
+    setFeedback(`📱 Notificare trimisă pentru ${product.name}!`, 'ok');
+  }
+}
+
+// 17. PROGRAMARE INVENTAR
+let inventarSchedule = JSON.parse(localStorage.getItem('sv_inventar_schedule') || 'null');
+
+function scheduleInventar(dayOfMonth, hour) {
+  inventarSchedule = { day: dayOfMonth, hour: hour, active: true };
+  localStorage.setItem('sv_inventar_schedule', JSON.stringify(inventarSchedule));
+  setFeedback(`✅ Inventar programat pentru ziua ${dayOfMonth} a lunii, ora ${hour}:00`, 'ok');
+  speak(`Inventar programat pentru ziua ${dayOfMonth} la ora ${hour}.`);
+}
+
+function checkInventarSchedule() {
+  if (!inventarSchedule || !inventarSchedule.active) return;
+  const now = new Date();
+  if (now.getDate() === inventarSchedule.day && now.getHours() === inventarSchedule.hour && now.getMinutes() === 0) {
+    triggerAlert('📋 REMINDER: Este ziua inventarului lunar! Accesați Inventar Periodic.', 'warn');
+    if (userProfile && userProfile.telegram_id) {
+      sendTelegramAlert(`📋 <b>REMINDER INVENTAR LUNAR</b>\n🏭 ${userProfile.depot}\nAstăzi este ziua inventarului!`, userProfile.telegram_id);
+    }
+  }
+}
+setInterval(checkInventarSchedule, 60000);
+
+// 18. ALERTĂ MIȘCARE SUSPECTĂ
+const SUSPICIOUS_THRESHOLD = 100; // qty above this triggers alert
+
+function checkSuspiciousMovement(product, qty, opType, operator) {
+  if (opType !== 'out' || qty < SUSPICIOUS_THRESHOLD) return;
+  
+  const alert_msg = `🚨 MIȘCARE SUSPECTĂ detectată!\n📦 ${product.name}: ${qty} ${product.unit} scoase\n👤 Operator: ${operator}`;
+  triggerAlert(`🚨 MIȘCARE SUSPECTĂ: ${product.name} — ${qty} ${product.unit} scoase de ${operator}!`, 'zero');
+  
+  // Notify admin via Telegram
+  sendTelegramAlert(
+    `🚨 <b>ALERTĂ MIȘCARE SUSPECTĂ!</b>\n\n` +
+    `📦 Produs: <b>${product.name}</b>\n` +
+    `📊 Cantitate: <b>${qty} ${product.unit}</b>\n` +
+    `👤 Operator: ${operator}\n` +
+    `🏭 ${userProfile ? userProfile.depot : '—'}\n` +
+    `🕐 ${new Date().toLocaleString('ro-RO')}`,
+    TELEGRAM_CHAT_ID
+  );
+}
+
+// 19. BACKUP AUTOMAT
+async function doAutoBackup() {
+  try {
+    const depot = userProfile ? userProfile.depot : 'unknown';
+    const backupData = {
+      stock, clients, deliveries, rezervari,
+      timestamp: new Date().toISOString(),
+      depot, operator: userProfile ? userProfile.name : '—'
+    };
+    
+    const key = 'depozite/' + getDepotKey() + '/backups/' + new Date().toISOString().slice(0,10);
+    await db.ref(key).set(backupData);
+    
+    console.log('Auto backup done:', new Date().toLocaleString('ro-RO'));
+    localStorage.setItem('sv_last_backup', new Date().toISOString());
+  } catch(e) {
+    console.error('Backup error:', e);
+  }
+}
+
+// Auto backup every night at 2am
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 2 && now.getMinutes() === 0 && currentUser) {
+    doAutoBackup();
+  }
+}, 60000);
+
+// 20. SINCRONIZARE OFFLINE
+let offlineQueue = JSON.parse(localStorage.getItem('sv_offline_queue') || '[]');
+let isOnline = navigator.onLine;
+
+window.addEventListener('online', async () => {
+  isOnline = true;
+  setFeedback('✅ Conexiune restabilită! Se sincronizează...', 'ok');
+  await syncOfflineQueue();
+});
+
+window.addEventListener('offline', () => {
+  isOnline = false;
+  setFeedback('⚠️ Fără internet — operațiile se salvează local!', 'warn');
+  triggerAlert('⚠️ OFFLINE — operațiile se salvează local și se vor sincroniza când revine internetul!', 'warn');
+});
+
+function queueOfflineOperation(type, data) {
+  offlineQueue.push({ type, data, ts: new Date().toISOString() });
+  localStorage.setItem('sv_offline_queue', JSON.stringify(offlineQueue));
+}
+
+async function syncOfflineQueue() {
+  if (!offlineQueue.length || !currentUser) return;
+  let synced = 0;
+  for (const op of offlineQueue) {
+    try {
+      if (op.type === 'stock') await db.ref('depozite/' + getDepotKey() + '/stock').set(op.data);
+      else if (op.type === 'log') await db.ref('depozite/' + getDepotKey() + '/log').push(op.data);
+      synced++;
+    } catch(e) { console.error('Sync error:', e); }
+  }
+  offlineQueue = [];
+  localStorage.setItem('sv_offline_queue', JSON.stringify(offlineQueue));
+  setFeedback(`✅ Sincronizate ${synced} operații offline!`, 'ok');
+}
+
+
+// ══════════════════════════════════════════
+// CATEGORIA 5: MULTI-DEPOZIT
+// ══════════════════════════════════════════
+
+// 21. VEDERE GLOBALĂ STOC
+async function openGlobalStockModal() {
+  document.getElementById('global-stock-modal').style.display = 'flex';
+  const el = document.getElementById('global-stock-content');
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:20px">Se încarcă...</div>';
+  
+  try {
+    const snap = await db.ref('depozite').once('value');
+    const data = snap.val() || {};
+    const usersSnap = await db.ref('users').once('value');
+    const users = usersSnap.val() || {};
+    
+    let html = '';
+    Object.entries(data).forEach(([key, depot]) => {
+      const depotStock = depot.stock ? (Array.isArray(depot.stock) ? depot.stock : Object.values(depot.stock)) : [];
+      const depotUser = Object.values(users).find(u => u.depot && normalizeText(u.depot.toLowerCase().replace(/\s+/g,'_')) === key);
+      const depotName = depotUser ? depotUser.depot : key.replace(/_/g,' ');
+      
+      html += `<div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:14px;border-left:3px solid #00e5a0">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:10px">🏭 ${depotName} <span style="font-size:13px;color:#6b7a8d;font-weight:400">(${depotStock.length} produse)</span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+          ${depotStock.slice(0,6).map(p => `
+            <div style="background:#111418;border-radius:8px;padding:10px;border-left:2px solid ${p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#00e5a0'}">
+              <div style="font-size:13px;font-weight:600;color:#e8ecf0;margin-bottom:4px">${p.name}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;color:${p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#00e5a0'}">${p.qty} <span style="font-size:11px">${p.unit}</span></div>
+            </div>`).join('')}
+          ${depotStock.length > 6 ? `<div style="background:#111418;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;color:#6b7a8d;font-size:12px">+${depotStock.length-6} mai multe</div>` : ''}
+        </div>
+      </div>`;
+    });
+    
+    el.innerHTML = html || '<div style="color:#6b7a8d;text-align:center;padding:20px">Niciun depozit găsit.</div>';
+  } catch(e) {
+    el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la încărcarea datelor.</div>';
+  }
+}
+function closeGlobalStockModal() { document.getElementById('global-stock-modal').style.display='none'; }
+
+// 22. TRANSFER AUTOMAT (propune când stoc e 0)
+async function suggestAutoTransfer(product) {
+  if (product.qty > 0) return;
+  
+  try {
+    const snap = await db.ref('depozite').once('value');
+    const data = snap.val() || {};
+    const currentKey = getDepotKey();
+    
+    let bestSource = null, maxQty = 0;
+    Object.entries(data).forEach(([key, depot]) => {
+      if (key === currentKey) return;
+      const depotStock = depot.stock ? (Array.isArray(depot.stock) ? depot.stock : Object.values(depot.stock)) : [];
+      const match = depotStock.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(product.name.toLowerCase()));
+      if (match && match.qty > maxQty) { maxQty = match.qty; bestSource = { key, depot, qty: match.qty }; }
+    });
+    
+    if (bestSource && maxQty > 0) {
+      const usersSnap = await db.ref('users').once('value');
+      const users = usersSnap.val() || {};
+      const sourceUser = Object.values(users).find(u => u.depot && normalizeText(u.depot.toLowerCase().replace(/\s+/g,'_')) === bestSource.key);
+      const sourceName = sourceUser ? sourceUser.depot : bestSource.key;
+      
+      triggerAlert(`💡 SUGESTIE: ${product.name} este epuizat! ${sourceName} are ${maxQty} ${product.unit} disponibile.`, 'warn');
+    }
+  } catch(e) { console.error('Auto transfer check error:', e); }
+}
+
+// 23. COMPARAȚIE DEPOZITE
+async function openComparatieDep() {
+  document.getElementById('comparatie-modal').style.display = 'flex';
+  const el = document.getElementById('comparatie-content');
+  
+  try {
+    const snap = await db.ref('depozite').once('value');
+    const data = snap.val() || {};
+    const usersSnap = await db.ref('users').once('value');
+    const users = usersSnap.val() || {};
+    
+    const depotStats = Object.entries(data).map(([key, depot]) => {
+      const ds = depot.stock ? (Array.isArray(depot.stock) ? depot.stock : Object.values(depot.stock)) : [];
+      const du = Object.values(users).find(u => u.depot && normalizeText(u.depot.toLowerCase().replace(/\s+/g,'_')) === key);
+      return {
+        name: du ? du.depot : key,
+        total: ds.length,
+        low: ds.filter(p => p.qty>0 && p.qty<=p.min).length,
+        zero: ds.filter(p => p.qty===0).length,
+        value: ds.reduce((sum,p) => sum + (p.price_buy ? p.qty*p.price_buy : 0), 0).toFixed(0)
+      };
+    });
+    
+    el.innerHTML = `
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:#181d24">
+            <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px">DEPOZIT</th>
+            <th style="padding:10px 14px;text-align:center;color:#00e5a0;font-size:11px">TOTAL</th>
+            <th style="padding:10px 14px;text-align:center;color:#ffa502;font-size:11px">SCĂZUT</th>
+            <th style="padding:10px 14px;text-align:center;color:#ff4757;font-size:11px">EPUIZAT</th>
+            <th style="padding:10px 14px;text-align:center;color:#a78bfa;font-size:11px">VALOARE</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${depotStats.map(d => `
+            <tr style="border-bottom:1px solid #1e2530">
+              <td style="padding:10px 14px;color:#e8ecf0;font-weight:600">🏭 ${d.name}</td>
+              <td style="padding:10px 14px;text-align:center;color:#00e5a0;font-weight:700">${d.total}</td>
+              <td style="padding:10px 14px;text-align:center;color:#ffa502;font-weight:700">${d.low}</td>
+              <td style="padding:10px 14px;text-align:center;color:#ff4757;font-weight:700">${d.zero}</td>
+              <td style="padding:10px 14px;text-align:center;color:#a78bfa;font-weight:700">${d.value} RON</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la încărcarea datelor.</div>';
+  }
+}
+function closeComparatieDep() { document.getElementById('comparatie-modal').style.display='none'; }
+
+// 24. DEPOZIT VIRTUAL (tranzit)
+let virtualDepot = JSON.parse(localStorage.getItem('sv_virtual_depot') || '[]');
+
+function addToVirtualDepot(productName, qty, unit, from, to) {
+  virtualDepot.push({
+    product: productName, qty, unit,
+    from, to,
+    date: new Date().toLocaleDateString('ro-RO'),
+    status: 'in_transit',
+    addedBy: userProfile ? userProfile.name : '—'
+  });
+  localStorage.setItem('sv_virtual_depot', JSON.stringify(virtualDepot));
+  if(window.fbReady===true) db.ref('virtual_depot').push({ product:productName, qty, unit, from, to, date:new Date().toISOString() });
+  setFeedback(`🚛 ${productName} în tranzit: ${from} → ${to}`, 'ok');
+}
+
+// 25. CONSOLIDARE STOC GLOBAL
+async function showConsolidatedStock() {
+  const el = document.getElementById('consolidat-content');
+  if (!el) return;
+  
+  try {
+    const snap = await db.ref('depozite').once('value');
+    const data = snap.val() || {};
+    
+    const consolidated = {};
+    Object.values(data).forEach(depot => {
+      const ds = depot.stock ? (Array.isArray(depot.stock) ? depot.stock : Object.values(depot.stock)) : [];
+      ds.forEach(p => {
+        const key = normalizeText(p.name.toLowerCase());
+        if (!consolidated[key]) consolidated[key] = { name: p.name, unit: p.unit, total: 0, depots: [] };
+        consolidated[key].total += p.qty;
+        consolidated[key].depots.push(p.qty);
+      });
+    });
+    
+    const sorted = Object.values(consolidated).sort((a,b) => b.total - a.total);
+    
+    el.innerHTML = sorted.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1e2530" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">
+        <div style="color:#e8ecf0;font-weight:600">${p.name}</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:11px;color:#6b7a8d">${p.depots.length} depozite</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;color:#00e5a0">${p.total} <span style="font-size:11px">${p.unit}</span></div>
+        </div>
+      </div>`).join('');
+    
+    document.getElementById('consolidat-modal').style.display = 'flex';
+  } catch(e) {
+    console.error('Consolidare error:', e);
+  }
+}
+function closeConsolidatModal() { document.getElementById('consolidat-modal').style.display='none'; }
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -4779,6 +5751,123 @@ function installApp() {
     <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#6b7a8d">
       <span>🟢 Recepționat</span><span>🟡 Așteptat</span><span style="border:1px solid #00e5a0;border-radius:4px;padding:1px 6px;color:#00e5a0">Azi</span>
     </div>
+  </div>
+</div>
+
+
+<!-- CATEGORII MODAL -->
+<div id="categories-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:440px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Categorii</div>
+      <button onclick="closeCategoriesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="cat-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RAPORT LUNAR MODAL -->
+<div id="raport-lunar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📊 Raport Lunar</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="exportFullExcel()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer">📊 EXCEL</button>
+        <button onclick="closeRaportLunarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button onclick="showTop10()" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🏆 TOP 10</button>
+      <button onclick="showStagnant(30)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 30 ZILE</button>
+      <button onclick="showStagnant(60)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 60 ZILE</button>
+      <button onclick="showOperatorReport()" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">👤 OPERATORI</button>
+      <button onclick="calcAutoMinStock()" style="background:#181d24;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🤖 AUTO MIN</button>
+    </div>
+    <div id="raport-lunar-content"></div>
+  </div>
+</div>
+
+<!-- STAGNANT MODAL -->
+<div id="stagnant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
+      <button onclick="document.getElementById('stagnant-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="stagnant-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- OPERATOR REPORT MODAL -->
+<div id="operator-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#a78bfa;text-transform:uppercase">👤 Raport Operatori</div>
+      <button onclick="document.getElementById('operator-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-report-content"></div>
+  </div>
+</div>
+
+<!-- CLIENT PROFILE MODAL -->
+<div id="client-profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 Profil Client</div>
+        <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px" id="client-profile-name">—</div>
+      </div>
+      <button onclick="closeClientProfileModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="client-profile-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BON RETUR MODAL -->
+<div id="bon-retur-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase;margin-bottom:20px">🔄 Bon de Retur</div>
+    <input id="retur-client" placeholder="Nume client" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
+    <select id="retur-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="retur-qty" type="number" placeholder="Cantitate returnată" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
+    <input id="retur-reason" placeholder="Motiv retur" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:16px">
+    <div style="display:flex;gap:10px">
+      <button onclick="closeBonReturModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doRetur()" style="flex:2;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">GENEREAZĂ BON →</button>
+    </div>
+  </div>
+</div>
+
+<!-- GLOBAL STOCK MODAL -->
+<div id="global-stock-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:900px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Global — Toate Depozitele</div>
+      <button onclick="closeGlobalStockModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="global-stock-content"></div>
+  </div>
+</div>
+
+<!-- COMPARAȚIE DEPOZITE MODAL -->
+<div id="comparatie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Comparație Depozite</div>
+      <button onclick="closeComparatieDep()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="comparatie-content"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDAT MODAL -->
+<div id="consolidat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔢 Stoc Consolidat Global</div>
+      <button onclick="closeConsolidatModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidat-content" style="max-height:500px;overflow-y:auto"></div>
   </div>
 </div>
 
