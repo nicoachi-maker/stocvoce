@@ -364,7 +364,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
     <button id="install-btn" onclick="installApp()" style="display:none;align-items:center;gap:6px;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 10px;cursor:pointer">
       📱 INSTALEAZĂ
     </button>
-    <button class="export-btn" onclick="openSettingsModal()" style="border-color:#a78bfa;color:#a78bfa">⚙️ SETĂRI</button>
+    <button class="export-btn" onclick="openLangModal()" style="border-color:#00e5a0;color:#00e5a0" id="lang-btn">🌍</button>
+    <button class="export-btn" onclick="openSettingsModal()" style="border-color:#a78bfa;color:#a78bfa" id="settings-btn">⚙️ SETĂRI</button>
     <button class="export-btn" onclick="doLogout()">⎋ IEȘIRE</button>
   </div>
 </header>
@@ -421,10 +422,14 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 </main>
 
 <div class="footer-bar">
-  <div class="stat-item"><span class="stat-label">PRODUSE:</span><span class="stat-val accent" id="stat-total">0</span></div>
-  <div class="stat-item"><span class="stat-label">CRITIC:</span><span class="stat-val warn" id="stat-low">0</span></div>
-  <div class="stat-item"><span class="stat-label">AZI:</span><span class="stat-val" id="stat-ops">0</span></div>
-  <div class="stat-item" style="margin-left:auto"><span class="stat-label">USER:</span><span class="stat-val" id="stat-user">—</span></div>
+  <div class="stat-item"><span class="stat-label" id="stat-label-products">PRODUSE:</span><span class="stat-val accent" id="stat-total">0</span></div>
+  <div class="stat-item"><span class="stat-label" id="stat-label-critical">CRITIC:</span><span class="stat-val warn" id="stat-low">0</span></div>
+  <div class="stat-item"><span class="stat-label" id="stat-label-today">AZI:</span><span class="stat-val" id="stat-ops">0</span></div>
+  <div class="stat-item" id="stock-value-display" style="display:none;cursor:pointer;color:#00e5a0;font-size:12px;font-weight:600" onclick="showStockValueDetails()"></div>
+  <div class="stat-item" style="margin-left:auto">
+    <button onclick="openCalendarModal()" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#ffa502;font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 8px;cursor:pointer;letter-spacing:1px;margin-right:8px">📅 CALENDAR</button>
+    <span class="stat-label" id="stat-label-user">USER:</span><span class="stat-val" id="stat-user">—</span>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -614,6 +619,10 @@ auth.onAuthStateChanged(async (user) => {
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
+    initLangModal();
+    applyTranslations();
+    setTimeout(checkExpiryAlerts, 3000);
+    setTimeout(updateStockValueDisplay, 2000);
     setFeedback(`✅ ${userProfile.depot} – gata de comenzi!`, 'ok');
   } else {
     currentUser = null;
@@ -1049,6 +1058,7 @@ function executeOperation(opType,product,qty,originalText,clientName){
       contact: '—',
       product: product.name,
       qty: `${qty} ${product.unit}`,
+      price_sell: product.price_sell || null,
       user: userProfile ? userProfile.name : '—',
       time: new Date().toLocaleString('ro-RO'),
       depot: userProfile ? userProfile.depot : '—'
@@ -1056,7 +1066,19 @@ function executeOperation(opType,product,qty,originalText,clientName){
     clients.push(clientEntry);
     localStorage.setItem('sv_clients', JSON.stringify(clients));
     if(window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
+    // Auto generate bon if client has name
+    setTimeout(()=>{
+      if(confirm(`Generezi bon de livrare pentru ${clientName}?`)){
+        generateBonLivrare(clientName, [{name:product.name,qty,unit:product.unit,price_sell:product.price_sell}]);
+      }
+    }, 500);
   }
+  
+  // Audit trail
+  addAudit(opType==='in'?'INTRARE':`IEȘIRE${clientName?' CLIENT':''}`, `${product.name}: ${qty} ${product.unit} · ${oldQty}→${product.qty}${clientName?' → '+clientName:''}`);
+  
+  // Update stock value display
+  setTimeout(updateStockValueDisplay, 500);
   
   const clientMsg = clientName ? ` → Client: ${clientName}` : '';
   let msg=`OK! ${opType==='in'?'Adăugat':'Scos'} ${qty} ${product.unit} ${product.name}${clientMsg}. Stoc: ${product.qty} ${product.unit}.`;
@@ -3419,9 +3441,612 @@ function printEtichete() {
         if(el) new QRCode(el, {text: JSON.stringify({id:p.id,name:p.name,depot,sku:p.sku||''}), width:80, height:80});
       });
     <\/script>
-    </body></html>`);
+    
+<!-- LANGUAGE MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🌍 Limbă / Language</div>
+      <button onclick="closeLangModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="lang-grid"></div>
+  </div>
+</div>
+
+
+<!-- CALENDAR MODAL -->
+<div id="calendar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="renderCalendar(calMonth===0?calYear-1:calYear,calMonth===0?11:calMonth-1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">‹</button>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;color:#ffa502;text-transform:uppercase" id="calendar-header">Calendar</div>
+        <button onclick="renderCalendar(calMonth===11?calYear+1:calYear,calMonth===11?0:calMonth+1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">›</button>
+      </div>
+      <button onclick="closeCalendarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="calendar-grid"></div>
+    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#6b7a8d">
+      <span>🟢 Recepționat</span><span>🟡 Așteptat</span><span style="border:1px solid #00e5a0;border-radius:4px;padding:1px 6px;color:#00e5a0">Azi</span>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
   printWindow.document.close();
   setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
+}
+
+
+// ── MULTI-LANGUAGE (toate limbile UE) ──
+const LANGUAGES = {
+  ro: { name:'Română', flag:'🇷🇴', translations: {
+    add_product:'+ Produs', excel:'📊 Excel', transfer:'🔄 Transfer', scan:'📷 Scan',
+    inventar:'🔁 Inventar', comanda:'📋 Comandă', rezervari:'⏰ Rezervări',
+    etichete:'🏷️ Etichete', grafice:'📊 Grafice', pdf:'📄 PDF',
+    search_product:'Caută produs...', stock_area:'Stocuri Depozit',
+    history:'Istoric', ok_stock:'Stoc OK', low_stock:'Stoc Scăzut', zero_stock:'Epuizat',
+    welcome:'Bun venit', depot_active:'activ', logout:'⎋ IEȘIRE', settings:'⚙️ SETĂRI',
+    install:'📱 INSTALEAZĂ', live:'LIVE', offline:'OFFLINE', ready:'GATA',
+    listening:'ASCULTĂ', standby:'STANDBY', stopped:'OPRIT',
+    manual_mode:'Mod manual activ', wake_mode:'Aștept "STOC" + comandă...',
+    continuous_mode:'Ascultare continuă activă', cmd_unrecognized:'Comandă nerecunoscută',
+    product_not_found:'Produsul nu a fost găsit', invalid_qty:'Cantitate nevalidă',
+    insufficient_stock:'Stoc insuficient', approved:'Aprobat', pending:'Așteptare',
+    today:'Astăzi', products:'PRODUSE', critical:'CRITIC', ops_today:'AZI', user:'USER'
+  }},
+  en: { name:'English', flag:'🇬🇧', translations: {
+    add_product:'+ Product', excel:'📊 Excel', transfer:'🔄 Transfer', scan:'📷 Scan',
+    inventar:'🔁 Inventory', comanda:'📋 Order', rezervari:'⏰ Reservations',
+    etichete:'🏷️ Labels', grafice:'📊 Charts', pdf:'📄 PDF',
+    search_product:'Search product...', stock_area:'Warehouse Stock',
+    history:'History', ok_stock:'OK Stock', low_stock:'Low Stock', zero_stock:'Out of Stock',
+    welcome:'Welcome', depot_active:'active', logout:'⎋ LOGOUT', settings:'⚙️ SETTINGS',
+    install:'📱 INSTALL', live:'LIVE', offline:'OFFLINE', ready:'READY',
+    listening:'LISTENING', standby:'STANDBY', stopped:'STOPPED',
+    manual_mode:'Manual mode active', wake_mode:'Waiting for "STOC" + command...',
+    continuous_mode:'Continuous listening active', cmd_unrecognized:'Command not recognized',
+    product_not_found:'Product not found', invalid_qty:'Invalid quantity',
+    insufficient_stock:'Insufficient stock', approved:'Approved', pending:'Pending',
+    today:'Today', products:'PRODUCTS', critical:'CRITICAL', ops_today:'TODAY', user:'USER'
+  }},
+  de: { name:'Deutsch', flag:'🇩🇪', translations: {
+    add_product:'+ Produkt', excel:'📊 Excel', transfer:'🔄 Transfer', scan:'📷 Scan',
+    inventar:'🔁 Inventur', comanda:'📋 Bestellung', rezervari:'⏰ Reservierungen',
+    etichete:'🏷️ Etiketten', grafice:'📊 Diagramme', pdf:'📄 PDF',
+    search_product:'Produkt suchen...', stock_area:'Lagerbestand',
+    history:'Verlauf', ok_stock:'OK Bestand', low_stock:'Niedriger Bestand', zero_stock:'Ausverkauft',
+    welcome:'Willkommen', depot_active:'aktiv', logout:'⎋ ABMELDEN', settings:'⚙️ EINSTELLUNGEN',
+    install:'📱 INSTALLIEREN', live:'LIVE', offline:'OFFLINE', ready:'BEREIT',
+    listening:'HÖRT ZU', standby:'STANDBY', stopped:'GESTOPPT',
+    manual_mode:'Manueller Modus', wake_mode:'Warte auf "STOC" + Befehl...',
+    continuous_mode:'Dauerhaftes Zuhören aktiv', cmd_unrecognized:'Befehl nicht erkannt',
+    product_not_found:'Produkt nicht gefunden', invalid_qty:'Ungültige Menge',
+    insufficient_stock:'Unzureichender Bestand', approved:'Genehmigt', pending:'Ausstehend',
+    today:'Heute', products:'PRODUKTE', critical:'KRITISCH', ops_today:'HEUTE', user:'BENUTZER'
+  }},
+  fr: { name:'Français', flag:'🇫🇷', translations: {
+    add_product:'+ Produit', excel:'📊 Excel', transfer:'🔄 Transfert', scan:'📷 Scanner',
+    inventar:'🔁 Inventaire', comanda:'📋 Commande', rezervari:'⏰ Réservations',
+    etichete:'🏷️ Étiquettes', grafice:'📊 Graphiques', pdf:'📄 PDF',
+    search_product:'Rechercher un produit...', stock_area:'Stock Entrepôt',
+    history:'Historique', ok_stock:'Stock OK', low_stock:'Stock Faible', zero_stock:'Épuisé',
+    welcome:'Bienvenue', depot_active:'actif', logout:'⎋ DÉCONNEXION', settings:'⚙️ PARAMÈTRES',
+    install:'📱 INSTALLER', live:'EN DIRECT', offline:'HORS LIGNE', ready:'PRÊT',
+    listening:'ÉCOUTE', standby:'ATTENTE', stopped:'ARRÊTÉ',
+    manual_mode:'Mode manuel actif', wake_mode:'En attente de commande...',
+    continuous_mode:'Écoute continue active', cmd_unrecognized:'Commande non reconnue',
+    product_not_found:'Produit non trouvé', invalid_qty:'Quantité invalide',
+    insufficient_stock:'Stock insuffisant', approved:'Approuvé', pending:'En attente',
+    today:'Aujourd'hui', products:'PRODUITS', critical:'CRITIQUE', ops_today:'AUJOURD'HUI', user:'UTILISATEUR'
+  }},
+  hu: { name:'Magyar', flag:'🇭🇺', translations: {
+    add_product:'+ Termék', excel:'📊 Excel', transfer:'🔄 Átvitel', scan:'📷 Szkennelés',
+    inventar:'🔁 Leltár', comanda:'📋 Rendelés', rezervari:'⏰ Foglalások',
+    etichete:'🏷️ Címkék', grafice:'📊 Grafikonok', pdf:'📄 PDF',
+    search_product:'Termék keresése...', stock_area:'Raktárkészlet',
+    history:'Előzmények', ok_stock:'Megfelelő', low_stock:'Alacsony', zero_stock:'Elfogyott',
+    welcome:'Üdvözöljük', depot_active:'aktív', logout:'⎋ KIJELENTKEZÉS', settings:'⚙️ BEÁLLÍTÁSOK',
+    install:'📱 TELEPÍTÉS', live:'ÉLŐ', offline:'OFFLINE', ready:'KÉSZ',
+    listening:'HALLGAT', standby:'KÉSZENLÉTI', stopped:'MEGÁLLÍTOTT',
+    manual_mode:'Kézi mód aktív', wake_mode:'Várakozás parancsra...',
+    continuous_mode:'Folyamatos hallgatás aktív', cmd_unrecognized:'Parancs nem ismerhető fel',
+    product_not_found:'A termék nem található', invalid_qty:'Érvénytelen mennyiség',
+    insufficient_stock:'Elégtelen készlet', approved:'Jóváhagyott', pending:'Függőben',
+    today:'Ma', products:'TERMÉKEK', critical:'KRITIKUS', ops_today:'MA', user:'FELHASZNÁLÓ'
+  }},
+  it: { name:'Italiano', flag:'🇮🇹', translations: {
+    add_product:'+ Prodotto', excel:'📊 Excel', transfer:'🔄 Trasferimento', scan:'📷 Scansiona',
+    inventar:'🔁 Inventario', comanda:'📋 Ordine', rezervari:'⏰ Prenotazioni',
+    etichete:'🏷️ Etichette', grafice:'📊 Grafici', pdf:'📄 PDF',
+    search_product:'Cerca prodotto...', stock_area:'Stock Magazzino',
+    history:'Cronologia', ok_stock:'Stock OK', low_stock:'Stock Basso', zero_stock:'Esaurito',
+    welcome:'Benvenuto', depot_active:'attivo', logout:'⎋ ESCI', settings:'⚙️ IMPOSTAZIONI',
+    install:'📱 INSTALLA', live:'LIVE', offline:'OFFLINE', ready:'PRONTO',
+    listening:'IN ASCOLTO', standby:'STANDBY', stopped:'FERMATO',
+    manual_mode:'Modalità manuale', wake_mode:'In attesa del comando...',
+    continuous_mode:'Ascolto continuo attivo', cmd_unrecognized:'Comando non riconosciuto',
+    product_not_found:'Prodotto non trovato', invalid_qty:'Quantità non valida',
+    insufficient_stock:'Scorte insufficienti', approved:'Approvato', pending:'In attesa',
+    today:'Oggi', products:'PRODOTTI', critical:'CRITICO', ops_today:'OGGI', user:'UTENTE'
+  }},
+  es: { name:'Español', flag:'🇪🇸', translations: {
+    add_product:'+ Producto', excel:'📊 Excel', transfer:'🔄 Transferir', scan:'📷 Escanear',
+    inventar:'🔁 Inventario', comanda:'📋 Pedido', rezervari:'⏰ Reservas',
+    etichete:'🏷️ Etiquetas', grafice:'📊 Gráficos', pdf:'📄 PDF',
+    search_product:'Buscar producto...', stock_area:'Stock Almacén',
+    history:'Historial', ok_stock:'Stock OK', low_stock:'Stock Bajo', zero_stock:'Agotado',
+    welcome:'Bienvenido', depot_active:'activo', logout:'⎋ SALIR', settings:'⚙️ AJUSTES',
+    install:'📱 INSTALAR', live:'EN VIVO', offline:'SIN CONEXIÓN', ready:'LISTO',
+    listening:'ESCUCHANDO', standby:'ESPERA', stopped:'DETENIDO',
+    manual_mode:'Modo manual activo', wake_mode:'Esperando comando...',
+    continuous_mode:'Escucha continua activa', cmd_unrecognized:'Comando no reconocido',
+    product_not_found:'Producto no encontrado', invalid_qty:'Cantidad inválida',
+    insufficient_stock:'Stock insuficiente', approved:'Aprobado', pending:'Pendiente',
+    today:'Hoy', products:'PRODUCTOS', critical:'CRÍTICO', ops_today:'HOY', user:'USUARIO'
+  }},
+  pl: { name:'Polski', flag:'🇵🇱', translations: {
+    add_product:'+ Produkt', excel:'📊 Excel', transfer:'🔄 Transfer', scan:'📷 Skanuj',
+    inventar:'🔁 Inwentarz', comanda:'📋 Zamówienie', rezervari:'⏰ Rezerwacje',
+    etichete:'🏷️ Etykiety', grafice:'📊 Wykresy', pdf:'📄 PDF',
+    search_product:'Szukaj produktu...', stock_area:'Stan Magazynu',
+    history:'Historia', ok_stock:'Stan OK', low_stock:'Niski Stan', zero_stock:'Wyczerpany',
+    welcome:'Witamy', depot_active:'aktywny', logout:'⎋ WYLOGUJ', settings:'⚙️ USTAWIENIA',
+    install:'📱 ZAINSTALUJ', live:'NA ŻYWO', offline:'OFFLINE', ready:'GOTOWY',
+    listening:'SŁUCHA', standby:'CZUWANIE', stopped:'ZATRZYMANY',
+    manual_mode:'Tryb ręczny', wake_mode:'Oczekiwanie na komendę...',
+    continuous_mode:'Ciągłe słuchanie aktywne', cmd_unrecognized:'Komenda nierozpoznana',
+    product_not_found:'Produkt nie znaleziony', invalid_qty:'Nieprawidłowa ilość',
+    insufficient_stock:'Niewystarczający stan', approved:'Zatwierdzony', pending:'Oczekujący',
+    today:'Dziś', products:'PRODUKTY', critical:'KRYTYCZNY', ops_today:'DZIŚ', user:'UŻYTKOWNIK'
+  }},
+  cs: { name:'Čeština', flag:'🇨🇿', translations: {
+    add_product:'+ Produkt', excel:'📊 Excel', transfer:'🔄 Přesun', scan:'📷 Skenovat',
+    inventar:'🔁 Inventura', comanda:'📋 Objednávka', rezervari:'⏰ Rezervace',
+    etichete:'🏷️ Štítky', grafice:'📊 Grafy', pdf:'📄 PDF',
+    search_product:'Hledat produkt...', stock_area:'Skladové zásoby',
+    history:'Historie', ok_stock:'Zásoby OK', low_stock:'Nízké zásoby', zero_stock:'Vyprodáno',
+    welcome:'Vítejte', depot_active:'aktivní', logout:'⎋ ODHLÁSIT', settings:'⚙️ NASTAVENÍ',
+    install:'📱 INSTALOVAT', live:'ŽIVĚ', offline:'OFFLINE', ready:'PŘIPRAVEN',
+    listening:'POSLOUCHÁ', standby:'POHOTOVOST', stopped:'ZASTAVENO',
+    manual_mode:'Ruční režim', wake_mode:'Čekám na příkaz...',
+    continuous_mode:'Nepřetržité poslouchání', cmd_unrecognized:'Příkaz nerozpoznán',
+    product_not_found:'Produkt nenalezen', invalid_qty:'Neplatné množství',
+    insufficient_stock:'Nedostatečné zásoby', approved:'Schváleno', pending:'Čekající',
+    today:'Dnes', products:'PRODUKTY', critical:'KRITICKÝ', ops_today:'DNES', user:'UŽIVATEL'
+  }},
+  sk: { name:'Slovenčina', flag:'🇸🇰', translations: {
+    add_product:'+ Produkt', ready:'PRIPRAVENÝ', listening:'POČÚVA', standby:'POHOTOVOSŤ',
+    stopped:'ZASTAVENÝ', products:'PRODUKTY', critical:'KRITICKÝ', ops_today:'DNES', user:'POUŽÍVATEĽ',
+    welcome:'Vitajte', logout:'⎋ ODHLÁSIŤ', settings:'⚙️ NASTAVENIA', history:'História',
+    search_product:'Hľadať produkt...', stock_area:'Skladové zásoby', pdf:'📄 PDF'
+  }},
+  bg: { name:'Български', flag:'🇧🇬', translations: {
+    add_product:'+ Продукт', ready:'ГОТОВ', listening:'СЛУША', standby:'В ГОТОВНОСТ',
+    stopped:'СПРЯН', products:'ПРОДУКТИ', critical:'КРИТИЧЕН', ops_today:'ДНЕС', user:'ПОТРЕБИТЕЛ',
+    welcome:'Добре дошли', logout:'⎋ ИЗХОД', settings:'⚙️ НАСТРОЙКИ', history:'История',
+    search_product:'Търси продукт...', stock_area:'Складови наличности', pdf:'📄 PDF'
+  }},
+  hr: { name:'Hrvatski', flag:'🇭🇷', translations: {
+    add_product:'+ Proizvod', ready:'SPREMAN', listening:'SLUŠA', standby:'PRIPRAVNOST',
+    stopped:'ZAUSTAVLJEN', products:'PROIZVODI', critical:'KRITIČAN', ops_today:'DANAS', user:'KORISNIK',
+    welcome:'Dobrodošli', logout:'⎋ ODJAVA', settings:'⚙️ POSTAVKE', history:'Povijest',
+    search_product:'Traži proizvod...', stock_area:'Skladišne zalihe', pdf:'📄 PDF'
+  }},
+  nl: { name:'Nederlands', flag:'🇳🇱', translations: {
+    add_product:'+ Product', ready:'KLAAR', listening:'LUISTERT', standby:'STANDBY',
+    stopped:'GESTOPT', products:'PRODUCTEN', critical:'KRITIEK', ops_today:'VANDAAG', user:'GEBRUIKER',
+    welcome:'Welkom', logout:'⎋ UITLOGGEN', settings:'⚙️ INSTELLINGEN', history:'Geschiedenis',
+    search_product:'Product zoeken...', stock_area:'Magazijn Voorraad', pdf:'📄 PDF'
+  }},
+  pt: { name:'Português', flag:'🇵🇹', translations: {
+    add_product:'+ Produto', ready:'PRONTO', listening:'OUVINDO', standby:'ESPERA',
+    stopped:'PARADO', products:'PRODUTOS', critical:'CRÍTICO', ops_today:'HOJE', user:'UTILIZADOR',
+    welcome:'Bem-vindo', logout:'⎋ SAIR', settings:'⚙️ DEFINIÇÕES', history:'Histórico',
+    search_product:'Procurar produto...', stock_area:'Stock Armazém', pdf:'📄 PDF'
+  }},
+  sv: { name:'Svenska', flag:'🇸🇪', translations: {
+    add_product:'+ Produkt', ready:'REDO', listening:'LYSSNAR', standby:'STANDBY',
+    stopped:'STOPPAD', products:'PRODUKTER', critical:'KRITISK', ops_today:'IDAG', user:'ANVÄNDARE',
+    welcome:'Välkommen', logout:'⎋ LOGGA UT', settings:'⚙️ INSTÄLLNINGAR', history:'Historik',
+    search_product:'Sök produkt...', stock_area:'Lagerstock', pdf:'📄 PDF'
+  }},
+  da: { name:'Dansk', flag:'🇩🇰', translations: {
+    add_product:'+ Produkt', ready:'KLAR', listening:'LYTTER', standby:'STANDBY',
+    stopped:'STOPPET', products:'PRODUKTER', critical:'KRITISK', ops_today:'I DAG', user:'BRUGER',
+    welcome:'Velkommen', logout:'⎋ LOG UD', settings:'⚙️ INDSTILLINGER', history:'Historik',
+    search_product:'Søg produkt...', stock_area:'Lagerbestand', pdf:'📄 PDF'
+  }},
+  fi: { name:'Suomi', flag:'🇫🇮', translations: {
+    add_product:'+ Tuote', ready:'VALMIS', listening:'KUUNTELEE', standby:'VALMIUSTILA',
+    stopped:'PYSÄYTETTY', products:'TUOTTEET', critical:'KRIITTINEN', ops_today:'TÄNÄÄN', user:'KÄYTTÄJÄ',
+    welcome:'Tervetuloa', logout:'⎋ KIRJAUDU ULOS', settings:'⚙️ ASETUKSET', history:'Historia',
+    search_product:'Hae tuotetta...', stock_area:'Varastovarasto', pdf:'📄 PDF'
+  }},
+  el: { name:'Ελληνικά', flag:'🇬🇷', translations: {
+    add_product:'+ Προϊόν', ready:'ΈΤΟΙΜΟ', listening:'ΑΚΟΎΕΙ', standby:'ΑΝΑΜΟΝΉ',
+    stopped:'ΣΤΑΜΑΤΗΜΈΝΟ', products:'ΠΡΟΪΌΝΤΑ', critical:'ΚΡΊΣΙΜΟ', ops_today:'ΣΉΜΕΡΑ', user:'ΧΡΉΣΤΗΣ',
+    welcome:'Καλωσορίσατε', logout:'⎋ ΑΠΟΣΎΝΔΕΣΗ', settings:'⚙️ ΡΥΘΜΊΣΕΙΣ', history:'Ιστορικό',
+    search_product:'Αναζήτηση προϊόντος...', stock_area:'Αποθήκη', pdf:'📄 PDF'
+  }},
+  et: { name:'Eesti', flag:'🇪🇪', translations: {
+    add_product:'+ Toode', ready:'VALMIS', products:'TOOTED', user:'KASUTAJA',
+    welcome:'Tere tulemast', logout:'⎋ LOGI VÄLJA', history:'Ajalugu', pdf:'📄 PDF'
+  }},
+  lv: { name:'Latviešu', flag:'🇱🇻', translations: {
+    add_product:'+ Produkts', ready:'GATAVS', products:'PRODUKTI', user:'LIETOTĀJS',
+    welcome:'Laipni lūdzam', logout:'⎋ IZIET', history:'Vēsture', pdf:'📄 PDF'
+  }},
+  lt: { name:'Lietuvių', flag:'🇱🇹', translations: {
+    add_product:'+ Produktas', ready:'PARUOŠTA', products:'PRODUKTAI', user:'VARTOTOJAS',
+    welcome:'Sveiki atvykę', logout:'⎋ ATSIJUNGTI', history:'Istorija', pdf:'📄 PDF'
+  }},
+  sl: { name:'Slovenščina', flag:'🇸🇮', translations: {
+    add_product:'+ Izdelek', ready:'PRIPRAVLJENO', products:'IZDELKI', user:'UPORABNIK',
+    welcome:'Dobrodošli', logout:'⎋ ODJAVA', history:'Zgodovina', pdf:'📄 PDF'
+  }},
+  mt: { name:'Malti', flag:'🇲🇹', translations: {
+    add_product:'+ Prodott', ready:'LEST', products:'PRODOTTI', user:'UTENT',
+    welcome:'Merħba', logout:'⎋ OĦROĠ', history:'Storja', pdf:'📄 PDF'
+  }},
+  ga: { name:'Gaeilge', flag:'🇮🇪', translations: {
+    add_product:'+ Táirge', ready:'RÉIDH', products:'TÁIRGÍ', user:'ÚSÁIDEOIR',
+    welcome:'Fáilte', logout:'⎋ LOGÁIL AMACH', history:'Stair', pdf:'📄 PDF'
+  }}
+};
+
+let currentLang = localStorage.getItem('sv_lang') || 'ro';
+
+function t(key) {
+  const lang = LANGUAGES[currentLang] || LANGUAGES['ro'];
+  return lang.translations[key] || LANGUAGES['ro'].translations[key] || key;
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('sv_lang', lang);
+  applyTranslations();
+  closeLangModal();
+}
+
+function applyTranslations() {
+  // Apply translations to key UI elements
+  const els = {
+    'stat-label-products': t('products'),
+    'stat-label-critical': t('critical'),
+    'stat-label-today': t('ops_today'),
+    'stat-label-user': t('user'),
+  };
+  Object.entries(els).forEach(([id, text]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  });
+  
+  // Update search placeholder
+  const search = document.getElementById('stock-search');
+  if (search) search.placeholder = t('search_product');
+  
+  // Update section title
+  const title = document.getElementById('depot-title');
+  if (title && userProfile) title.textContent = userProfile.depot;
+  
+  // Update logout button
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.textContent = t('logout');
+  
+  // Update settings button
+  const settingsBtn = document.getElementById('settings-btn');
+  if (settingsBtn) settingsBtn.textContent = t('settings');
+}
+
+function openLangModal() {
+  document.getElementById('lang-modal').style.display = 'flex';
+}
+function closeLangModal() {
+  document.getElementById('lang-modal').style.display = 'none';
+}
+
+
+function initLangModal() {
+  const grid = document.getElementById('lang-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(LANGUAGES).map(([code, lang]) => `
+    <button onclick="setLanguage('${code}')" style="background:${currentLang===code?'rgba(0,229,160,0.15)':'#181d24'};border:1px solid ${currentLang===code?'#00e5a0':'#1e2530'};border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;color:${currentLang===code?'#00e5a0':'#99a8b8'}" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='${currentLang===code?'#00e5a0':'#1e2530'}'">
+      <div style="font-size:24px;margin-bottom:4px">${lang.flag}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">${lang.name}</div>
+    </button>`).join('');
+}
+
+
+// ── ALERTE EXPIRARE ──
+function checkExpiryAlerts() {
+  if (!userProfile) return;
+  const today = new Date();
+  const in30 = new Date(); in30.setDate(in30.getDate()+30);
+  
+  stock.forEach(p => {
+    if (!p.expiry) return;
+    const expDate = new Date(p.expiry);
+    const daysLeft = Math.ceil((expDate-today)/(1000*60*60*24));
+    
+    if (daysLeft <= 0) {
+      triggerAlert(`🔴 EXPIRAT: ${p.name} a expirat pe ${p.expiry}!`, 'zero');
+      if (userProfile.telegram_id) {
+        sendTelegramAlert(`🔴 <b>PRODUS EXPIRAT!</b>\n📦 ${p.name}\n📅 Expirat: ${p.expiry}\n🏭 ${userProfile.depot}`, userProfile.telegram_id);
+      }
+    } else if (daysLeft <= 30) {
+      triggerAlert(`⚠️ EXPIRĂ CURÂND: ${p.name} — mai sunt ${daysLeft} zile!`, 'warn');
+      if (daysLeft <= 7 && userProfile.telegram_id) {
+        sendTelegramAlert(`⚠️ <b>EXPIRĂ ÎN ${daysLeft} ZILE!</b>\n📦 ${p.name}\n📅 Expiră: ${p.expiry}\n🏭 ${userProfile.depot}`, userProfile.telegram_id);
+      }
+    }
+  });
+}
+
+// ── ISTORIC PREȚURI ──
+function trackPriceHistory(product, newBuyPrice, newSellPrice) {
+  if (!product.price_history) product.price_history = [];
+  const lastEntry = product.price_history[product.price_history.length-1];
+  const priceChanged = !lastEntry || lastEntry.buy !== newBuyPrice || lastEntry.sell !== newSellPrice;
+  if (priceChanged && (newBuyPrice || newSellPrice)) {
+    product.price_history.push({
+      buy: newBuyPrice, sell: newSellPrice,
+      date: new Date().toISOString().slice(0,10),
+      user: userProfile ? userProfile.name : '—'
+    });
+    if (product.price_history.length > 50) product.price_history.shift();
+  }
+}
+
+// ── LOTURI / BATCH TRACKING ──
+let batches = JSON.parse(localStorage.getItem('sv_batches') || '{}');
+
+function addBatch(productId, batchData) {
+  if (!batches[productId]) batches[productId] = [];
+  batches[productId].push({
+    ...batchData,
+    id: Date.now(),
+    added: new Date().toISOString(),
+    user: userProfile ? userProfile.name : '—'
+  });
+  localStorage.setItem('sv_batches', JSON.stringify(batches));
+  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/batches').set(batches);
+}
+
+function getBatchInfo(productId) {
+  return batches[productId] || [];
+}
+
+// ── BON DE LIVRARE AUTOMAT ──
+async function generateBonLivrare(clientName, items) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const operator = userProfile ? userProfile.name : '—';
+  const now = new Date();
+  const bonNr = 'BON-' + now.getTime().toString().slice(-6);
+
+  // Header
+  doc.setFillColor(10,12,15);
+  doc.rect(0,0,210,40,'F');
+  doc.setFillColor(0,229,160);
+  doc.rect(0,40,210,1.5,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(20);
+  doc.setTextColor(232,236,240);
+  doc.text('BON DE LIVRARE', 14, 22);
+  doc.setFontSize(10);
+  doc.setTextColor(107,122,141);
+  doc.text(`${bonNr} · ${now.toLocaleString('ro-RO')}`, 14, 30);
+  doc.text(depot, 14, 37);
+
+  // Client info
+  doc.setFontSize(12);
+  doc.setTextColor(153,168,184);
+  doc.text('CLIENT:', 14, 55);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(232,236,240);
+  doc.text(clientName, 40, 55);
+
+  // Items table
+  doc.autoTable({
+    startY: 65,
+    head: [['Nr.', 'Produs', 'Cantitate', 'UM', 'Preț Unit.', 'Total']],
+    body: items.map((item, i) => [
+      i+1, item.name, item.qty, item.unit,
+      item.price_sell ? item.price_sell+' RON' : '—',
+      item.price_sell ? (item.qty * item.price_sell)+' RON' : '—'
+    ]),
+    styles:{fontSize:10,textColor:[153,168,184],fillColor:[17,20,24],lineColor:[30,37,48],lineWidth:0.3},
+    headStyles:{fillColor:[10,12,15],textColor:[0,229,160],fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[24,29,36]},
+    margin:{left:14,right:14}
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 10;
+  
+  // Total
+  const total = items.reduce((sum,item) => sum + (item.price_sell ? item.qty*item.price_sell : 0), 0);
+  if (total > 0) {
+    doc.setFillColor(0,229,160);
+    doc.roundedRect(130, finalY, 66, 16, 2, 2, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(12);
+    doc.setTextColor(0,0,0);
+    doc.text(`TOTAL: ${total} RON`, 163, finalY+10, {align:'center'});
+  }
+
+  // Signatures
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.setTextColor(107,122,141);
+  doc.text('Operator: ' + operator, 14, finalY+35);
+  doc.text('Client: _______________', 120, finalY+35);
+  doc.text('Semnătură: _______________', 14, finalY+50);
+  doc.text('Semnătură: _______________', 120, finalY+50);
+
+  // Footer
+  doc.setFillColor(10,12,15);
+  doc.rect(0,287,210,10,'F');
+  doc.setFontSize(8);
+  doc.setTextColor(107,122,141);
+  doc.text(`StocVoce · ${depot} · ${bonNr}`, 105, 293, {align:'center'});
+
+  doc.save(`${bonNr}_${clientName.replace(/\s+/g,'_')}.pdf`);
+  setFeedback(`✅ Bon ${bonNr} generat pentru ${clientName}!`, 'ok');
+  speak(`Bon de livrare generat pentru ${clientName}.`);
+}
+
+// ── VALOARE STOC ──
+function calculateStockValue() {
+  let totalBuy = 0, totalSell = 0, productsWithPrice = 0;
+  stock.forEach(p => {
+    if (p.price_buy) { totalBuy += p.qty * p.price_buy; productsWithPrice++; }
+    if (p.price_sell) { totalSell += p.qty * p.price_sell; }
+  });
+  return { totalBuy: totalBuy.toFixed(2), totalSell: totalSell.toFixed(2), profit: (totalSell-totalBuy).toFixed(2), productsWithPrice };
+}
+
+// Show stock value in footer
+function updateStockValueDisplay() {
+  const val = calculateStockValue();
+  const el = document.getElementById('stock-value-display');
+  if (el && val.productsWithPrice > 0) {
+    el.textContent = `💰 ${val.totalBuy} RON`;
+    el.title = `Valoare achiziție: ${val.totalBuy} RON · Valoare vânzare: ${val.totalSell} RON · Profit estimat: ${val.profit} RON`;
+    el.style.display = 'flex';
+  }
+}
+
+// ── AUDIT TRAIL ──
+let auditLog = [];
+
+function addAudit(action, details) {
+  const entry = {
+    action, details,
+    user: userProfile ? userProfile.name : '—',
+    email: currentUser ? currentUser.email : '—',
+    depot: userProfile ? userProfile.depot : '—',
+    ts: new Date().toISOString(),
+    time: new Date().toLocaleString('ro-RO')
+  };
+  auditLog.unshift(entry);
+  // Save to Firebase (append only, never delete)
+  if (window.fbReady) {
+    db.ref('audit/' + (getDepotKey()||'general')).push(entry);
+  }
+}
+
+// Hook into executeOperation for audit
+const _origExecForAudit = executeOperation;
+
+// ── CALENDAR LIVRĂRI ──
+function openCalendarModal() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  renderCalendar(year, month);
+  document.getElementById('calendar-modal').style.display = 'flex';
+}
+
+function closeCalendarModal() {
+  document.getElementById('calendar-modal').style.display = 'none';
+}
+
+let calYear, calMonth;
+
+function renderCalendar(year, month) {
+  calYear = year; calMonth = month;
+  const monthNames = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+  const el = document.getElementById('calendar-grid');
+  const headerEl = document.getElementById('calendar-header');
+  if (headerEl) headerEl.textContent = `${monthNames[month]} ${year}`;
+  
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const today = new Date();
+  
+  // Get deliveries for this month
+  const monthDeliveries = deliveries.filter(d => {
+    const dd = new Date(d.date);
+    return dd.getMonth() === month && dd.getFullYear() === year;
+  });
+  
+  let html = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
+  ['Lu','Ma','Mi','Jo','Vi','Sâ','Du'].forEach(d => {
+    html += `<div style="text-align:center;font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;padding:4px">${d}</div>`;
+  });
+  
+  const startDay = firstDay === 0 ? 6 : firstDay-1;
+  for(let i=0;i<startDay;i++) html += '<div></div>';
+  
+  for(let day=1;day<=daysInMonth;day++) {
+    const date = new Date(year,month,day);
+    const dateStr = date.toISOString().slice(0,10);
+    const dayDeliveries = monthDeliveries.filter(d => d.date === dateStr);
+    const isToday = date.toDateString() === today.toDateString();
+    const isPast = date < today && !isToday;
+    
+    html += `<div style="
+      min-height:50px;background:${isToday?'rgba(0,229,160,0.15)':'#181d24'};
+      border:1px solid ${isToday?'#00e5a0':'#1e2530'};border-radius:6px;padding:4px;
+      cursor:${dayDeliveries.length?'pointer':'default'};
+      opacity:${isPast?'0.5':'1'}"
+      ${dayDeliveries.length?`onclick="showDayDeliveries('${dateStr}')"`:''}
+      title="${dayDeliveries.length?dayDeliveries.map(d=>d.product).join(', '):''}">
+      <div style="font-size:12px;font-weight:600;color:${isToday?'#00e5a0':'#e8ecf0'};margin-bottom:2px">${day}</div>
+      ${dayDeliveries.map(d=>`<div style="font-size:9px;background:${d.status==='received'?'rgba(0,229,160,0.2)':'rgba(255,165,2,0.2)'};border-radius:3px;padding:1px 3px;margin-bottom:1px;color:${d.status==='received'?'#00e5a0':'#ffa502'};overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${d.product}</div>`).join('')}
+    </div>`;
+  }
+  html += '</div>';
+  if (el) el.innerHTML = html;
+}
+
+function showDayDeliveries(dateStr) {
+  const dayDels = deliveries.filter(d => d.date === dateStr);
+  alert(dayDels.map(d => `• ${d.product}: ${d.qty} unități\n  Furnizor: ${d.supplier||'—'}\n  Status: ${d.status==='received'?'✅ Recepționat':'⏳ Așteptat'}`).join('\n\n'));
+}
+
+// ── APROBARE IEȘIRI ──
+const APPROVAL_THRESHOLD = 50; // qty above this needs approval
+let pendingApprovals = [];
+
+function requestApproval(opType, product, qty, text, clientName) {
+  const approvalReq = { opType, product, qty, text, clientName, id: Date.now(), requestedBy: userProfile?userProfile.name:'—', time: new Date().toLocaleString('ro-RO') };
+  pendingApprovals.push(approvalReq);
+  
+  // Save to Firebase for supervisor to see
+  if(window.fbReady) {
+    db.ref('depozite/'+getDepotKey()+'/approvals/'+approvalReq.id).set(approvalReq);
+  }
+  
+  // Notify via Telegram
+  if (userProfile && userProfile.telegram_id) {
+    sendTelegramAlert(
+      `🤝 <b>APROBARE NECESARĂ</b>\n\n` +
+      `📦 Produs: <b>${product.name}</b>\n` +
+      `📊 Cantitate: <b>${qty} ${product.unit}</b>\n` +
+      `👤 Solicitat de: ${userProfile.name}\n` +
+      `🏭 ${userProfile.depot}\n\n` +
+      `Aprobați în aplicație!`,
+      userProfile.telegram_id
+    );
+  }
+  
+  setFeedback(`⏳ Cantitate mare (${qty}) — necesită aprobare supervisor!`, 'warn');
+  speak(`Cantitate mare detectată. Cerere de aprobare trimisă supervisorului.`);
+}
+
+
+function showStockValueDetails() {
+  const val = calculateStockValue();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  alert(`💰 VALOARE STOC — ${depot}\n\n` +
+    `Valoare Achiziție: ${val.totalBuy} RON\n` +
+    `Valoare Vânzare: ${val.totalSell} RON\n` +
+    `Profit Estimat: ${val.profit} RON\n\n` +
+    `(Bazat pe ${val.productsWithPrice} produse cu prețuri definite)`);
 }
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
@@ -3982,6 +4607,37 @@ function installApp() {
       <button onclick="selectAllEtichete()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 12px;cursor:pointer">SELECT ALL</button>
     </div>
     <div id="etichete-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-height:400px;overflow-y:auto"></div>
+  </div>
+</div>
+
+
+<!-- LANGUAGE MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🌍 Limbă / Language</div>
+      <button onclick="closeLangModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="lang-grid"></div>
+  </div>
+</div>
+
+
+<!-- CALENDAR MODAL -->
+<div id="calendar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="renderCalendar(calMonth===0?calYear-1:calYear,calMonth===0?11:calMonth-1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">‹</button>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;color:#ffa502;text-transform:uppercase" id="calendar-header">Calendar</div>
+        <button onclick="renderCalendar(calMonth===11?calYear+1:calYear,calMonth===11?0:calMonth+1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">›</button>
+      </div>
+      <button onclick="closeCalendarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="calendar-grid"></div>
+    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#6b7a8d">
+      <span>🟢 Recepționat</span><span>🟡 Așteptat</span><span style="border:1px solid #00e5a0;border-radius:4px;padding:1px 6px;color:#00e5a0">Azi</span>
+    </div>
   </div>
 </div>
 
