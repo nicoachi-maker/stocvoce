@@ -6348,7 +6348,7 @@ async function aiNameFromImage(imageBase64) {
           role: "user",
           content: [
             { type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageBase64 } },
-            { type: "text", text: "Ești expert în gestiune depozit. Identifică produsul din imagine și sugerează: 1) Nume produs (scurt, specific), 2) Categorie. Răspunde în format JSON: {"name":"...","cat":"..."}" }
+            { type: 'text', text: 'Identifică produsul din imagine. Răspunde DOAR cu JSON: {"name":"...","cat":"..."}' }
           ]
         }]
       })
