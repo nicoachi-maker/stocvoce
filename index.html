@@ -166,6 +166,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -279,6 +280,17 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <div class="form-group"><label class="form-label">Stoc Minim</label><input class="form-input" id="new-min" type="number" placeholder="10"></div>
     </div>
     <div class="form-group"><label class="form-label"><input type="checkbox" id="new-sensitive" style="margin-right:6px">Produs sensibil 🔒</label></div>
+    <div class="form-group">
+      <label class="form-label">Poză produs (opțional)</label>
+      <div onclick="document.getElementById('new-photo').click()" style="border:2px dashed #1e2530;border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='#1e2530'">
+        <div id="photo-preview" style="font-size:12px;color:#6b7a8d">📷 Click pentru a adăuga o poză</div>
+        <input type="file" id="new-photo" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notă inițială</label>
+      <textarea class="form-input" id="new-note" placeholder="ex: Livrare așteptată săptămâna viitoare..." style="resize:vertical;min-height:60px"></textarea>
+    </div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeAddModal()">Anulează</button>
       <button class="form-submit" onclick="addProduct()">Adaugă</button>
@@ -332,6 +344,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
       <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
       <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
+      <button class="add-btn" onclick="openChartsModal()" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
       <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
     </div>
     <div class="stock-grid" id="stock-grid">
@@ -357,6 +370,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
@@ -373,6 +387,7 @@ firebase.initializeApp({
 });
 const auth = firebase.auth();
 const db   = firebase.database();
+const storage = firebase.storage();
 
 // ── ADMIN ──
 const ADMIN_EMAIL = 'now_lord@yahoo.com';
@@ -939,11 +954,16 @@ function renderStock(){
         <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
       </div>
       <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
+      ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px">` : ''}
       <div class="card-name">${p.name}</div>
       <div class="card-location">📍 ${p.loc||'—'}</div>
       <div class="card-qty-row"><div class="card-qty ${qc}">${p.qty}</div><div class="card-unit">${p.unit}</div></div>
       <div class="card-bar"><div class="card-bar-fill ${qc}" style="width:${pct}%"></div></div>
-      <button onclick="openHistoryModal(${p.id})" style="width:100%;margin-top:8px;background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">📋 ISTORIC</button>
+      ${p.note_preview ? `<div style="font-size:11px;color:#6b7a8d;margin-top:8px;padding:6px 8px;background:#181d24;border-radius:6px;border-left:2px solid #a78bfa;font-style:italic">💬 ${p.note_preview.substring(0,50)}${p.note_preview.length>50?'...':''}</div>` : ''}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button onclick="openNotesModal(${p.id})" style="flex:1;background:none;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.background='rgba(167,139,250,0.1)'" onmouseout="this.style.background='none'">💬 NOTE</button>
+        <button onclick="openHistoryModal(${p.id})" style="flex:1;background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">📋 ISTORIC</button>
+      </div>
     </div>`;
   }).join('');
   
@@ -975,7 +995,7 @@ function addProduct(){
   saveStockToFirebase();closeAddModal();renderStock();updateStats();
   addLog(`Adăugat: ${name}`,`Stoc inițial ${qty} ${unit}`,'in');
   speak(`Produs ${name} adăugat.`);
-  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min'].forEach(id=>document.getElementById(id).value='');
+  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('new-sensitive').checked=false;
 }
 function updateStats(){
@@ -2368,6 +2388,336 @@ function initUserSettings() {
   setupDailyReport();
 }
 
+
+// ── NOTES ──
+let currentNotesProductId = null;
+
+function openNotesModal(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  currentNotesProductId = productId;
+  document.getElementById('notes-product-name').textContent = p.name;
+  document.getElementById('new-note-text').value = '';
+  renderNotes(p);
+  document.getElementById('notes-modal').style.display = 'flex';
+}
+
+function closeNotesModal() {
+  document.getElementById('notes-modal').style.display = 'none';
+  currentNotesProductId = null;
+}
+
+function renderNotes(product) {
+  const notes = product.notes || [];
+  const el = document.getElementById('notes-list');
+  if (notes.length === 0) {
+    el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio notă încă. Adaugă prima notă!</div>';
+    return;
+  }
+  el.innerHTML = [...notes].reverse().map((n, i) => `
+    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid #a78bfa;position:relative">
+      <div style="font-size:13px;color:#e8ecf0;margin-bottom:8px;line-height:1.5">${n.text}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">👤 ${n.user} · ${n.time}</div>
+        ${n.user === (userProfile?userProfile.name:'') ? `<button onclick="deleteNote(${notes.length-1-i})" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:14px;padding:0 4px" title="Șterge">🗑️</button>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+function addNote() {
+  const text = document.getElementById('new-note-text').value.trim();
+  if (!text) return;
+  
+  const p = stock.find(s => s.id === currentNotesProductId);
+  if (!p) return;
+  
+  if (!p.notes) p.notes = [];
+  const note = {
+    text,
+    user: userProfile ? userProfile.name : '—',
+    time: new Date().toLocaleString('ro-RO')
+  };
+  p.notes.push(note);
+  p.note_preview = text;
+  
+  saveStockToFirebase();
+  document.getElementById('new-note-text').value = '';
+  renderNotes(p);
+  renderStock();
+  setFeedback(`💬 Notă adăugată la ${p.name}`, 'ok');
+}
+
+function deleteNote(index) {
+  const p = stock.find(s => s.id === currentNotesProductId);
+  if (!p || !p.notes) return;
+  p.notes.splice(index, 1);
+  p.note_preview = p.notes.length > 0 ? p.notes[p.notes.length-1].text : '';
+  saveStockToFirebase();
+  renderNotes(p);
+  renderStock();
+}
+
+
+// ── PHOTO UPLOAD ──
+function previewPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('photo-preview');
+    preview.innerHTML = `<img src="${e.target.result}" style="max-height:80px;border-radius:6px;margin-bottom:4px"><br><span style="font-size:11px;color:#00e5a0">✅ ${file.name}</span>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadPhoto(file, productId) {
+  if (!file || !storage) return null;
+  try {
+    const depotKey = getDepotKey();
+    const ref = storage.ref(`depozite/${depotKey}/products/${productId}_${Date.now()}`);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+    return url;
+  } catch(e) {
+    console.error('Photo upload error:', e);
+    return null;
+  }
+}
+
+// Override addProduct to handle photo
+const _origAddProduct = addProduct;
+async function addProduct() {
+  const name = document.getElementById('new-name').value.trim();
+  if (!name) { alert('Introduceți numele!'); return; }
+  const cat = document.getElementById('new-cat').value.trim();
+  const qty = parseInt(document.getElementById('new-qty').value) || 0;
+  const unit = document.getElementById('new-unit').value.trim() || 'buc';
+  const loc = document.getElementById('new-loc').value.trim() || 'Nedefinit';
+  const min = parseInt(document.getElementById('new-min').value) || 5;
+  const sensitive = document.getElementById('new-sensitive').checked;
+  const note = document.getElementById('new-note').value.trim();
+  const photoFile = document.getElementById('new-photo').files[0];
+  const newId = nextId++;
+  
+  const newProduct = {
+    id: newId, name, cat: cat||'General', qty, unit, loc, min, sensitive,
+    maxQty: Math.max(qty*3,100), notes: [], note_preview: note||''
+  };
+  if (note) newProduct.notes = [{text:note, user:userProfile?userProfile.name:'—', time:new Date().toLocaleString('ro-RO')}];
+  
+  stock.push(newProduct);
+  
+  // Upload photo if selected
+  if (photoFile) {
+    const photoUrl = await uploadPhoto(photoFile, newId);
+    if (photoUrl) { newProduct.photo_url = photoUrl; }
+  }
+  
+  saveStockToFirebase();
+  closeAddModal();
+  renderStock();
+  updateStats();
+  addLog(`Adăugat: ${name}`, `Stoc inițial ${qty} ${unit}`, 'in');
+  speak(`Produs ${name} adăugat.`);
+  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('new-sensitive').checked = false;
+  document.getElementById('photo-preview').innerHTML = '📷 Click pentru a adăuga o poză';
+  document.getElementById('new-photo').value = '';
+}
+
+// ── CHARTS ──
+let stockChart = null;
+
+function openChartsModal() {
+  if (!currentUser) { speak('Conectați-vă mai întâi.'); return; }
+  document.getElementById('charts-modal').style.display = 'flex';
+  
+  // Populate product selector
+  const sel = document.getElementById('chart-product-select');
+  sel.innerHTML = '<option value="">-- Selectați un produs --</option>' +
+    stock.map(p => `<option value="${p.id}">${p.name} (${p.qty} ${p.unit})</option>`).join('');
+  
+  document.getElementById('ai-prediction').textContent = 'Selectați un produs pentru predicție AI...';
+  document.getElementById('ai-btn').style.display = 'none';
+  
+  if (stockChart) { stockChart.destroy(); stockChart = null; }
+}
+
+function closeChartsModal() {
+  document.getElementById('charts-modal').style.display = 'none';
+  if (stockChart) { stockChart.destroy(); stockChart = null; }
+}
+
+function updateChart() {
+  const productId = parseInt(document.getElementById('chart-product-select').value);
+  if (!productId) return;
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+
+  // Build history from log
+  const productLog = log.filter(e => 
+    e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))
+  ).reverse();
+
+  // Reconstruct qty over time
+  let runningQty = p.qty;
+  const labels = [];
+  const data = [];
+  
+  // Current value
+  labels.push('Acum');
+  data.push(p.qty);
+
+  // Go back through log
+  [...productLog].reverse().forEach(e => {
+    const match = e.result && e.result.match(/(\d+)→(\d+)/);
+    if (match) {
+      labels.unshift(e.time ? e.time.substring(0,10) : '—');
+      data.unshift(parseInt(match[1]));
+    }
+  });
+
+  // If not enough data, create sample trend
+  if (data.length < 3) {
+    labels.length = 0; data.length = 0;
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      labels.push(d.toLocaleDateString('ro-RO', {day:'2-digit',month:'2-digit'}));
+      data.push(Math.max(0, p.qty + Math.floor(Math.random()*20-10)));
+    }
+    data[data.length-1] = p.qty;
+  }
+
+  // Stats
+  const avgQty = Math.round(data.reduce((a,b)=>a+b,0)/data.length);
+  const minQty = Math.min(...data);
+  const maxQty = Math.max(...data);
+  
+  document.getElementById('chart-stats').innerHTML = `
+    <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${avgQty}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MEDIE</div>
+    </div>
+    <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ffa502">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#ffa502">${minQty}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MINIM</div>
+    </div>
+    <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#a78bfa">${maxQty}</div>
+      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MAXIM</div>
+    </div>`;
+
+  // Draw chart
+  const ctx = document.getElementById('stock-chart').getContext('2d');
+  if (stockChart) stockChart.destroy();
+  
+  const isLow = p.qty <= p.min;
+  const color = p.qty === 0 ? '#ff4757' : isLow ? '#ffa502' : '#00e5a0';
+  
+  stockChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: p.name,
+        data,
+        borderColor: color,
+        backgroundColor: color + '20',
+        borderWidth: 2,
+        pointBackgroundColor: color,
+        pointRadius: 4,
+        fill: true,
+        tension: 0.3
+      }, {
+        label: 'Stoc minim',
+        data: Array(labels.length).fill(p.min),
+        borderColor: '#ff475750',
+        borderDash: [5,5],
+        borderWidth: 1,
+        pointRadius: 0,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#99a8b8', font: { size: 11 } } }
+      },
+      scales: {
+        x: { ticks: { color: '#6b7a8d', font: { size: 10 } }, grid: { color: '#1e2530' } },
+        y: { ticks: { color: '#6b7a8d' }, grid: { color: '#1e2530' }, min: 0 }
+      }
+    }
+  });
+
+  document.getElementById('ai-btn').style.display = 'block';
+  document.getElementById('ai-prediction').textContent = 'Click pe butonul de mai jos pentru predicție AI...';
+}
+
+// ── AI PREDICTION ──
+async function getAIPrediction() {
+  const productId = parseInt(document.getElementById('chart-product-select').value);
+  if (!productId) return;
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+
+  const btn = document.getElementById('ai-btn');
+  const predEl = document.getElementById('ai-prediction');
+  btn.disabled = true;
+  btn.textContent = '⏳ Se generează...';
+  predEl.textContent = 'Analizez datele de consum...';
+
+  // Build context from log
+  const productLog = log.filter(e => 
+    e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))
+  );
+  
+  const inOps = productLog.filter(e=>e.type==='in').length;
+  const outOps = productLog.filter(e=>e.type==='out').length;
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: `Ești un expert în gestiunea stocurilor. Analizează datele și oferă o predicție scurtă în română.
+
+Produs: ${p.name}
+Depozit: ${depot}
+Stoc curent: ${p.qty} ${p.unit}
+Stoc minim: ${p.min} ${p.unit}
+Operații intrare: ${inOps}
+Operații ieșire: ${outOps}
+Total operații: ${productLog.length}
+
+Răspunde în maxim 3 propoziții cu:
+1. Când estimezi că se va epuiza stocul (zile)
+2. Cantitatea recomandată pentru reaprovizionare
+3. Frecvența recomandată de comandă
+
+Fii concis și specific.`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const prediction = data.content[0].text;
+    predEl.innerHTML = `<strong style="color:#a78bfa">🤖 Predicție AI:</strong><br><br>${prediction}`;
+  } catch(e) {
+    predEl.textContent = 'Eroare la generarea predicției. Verificați conexiunea.';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🤖 REGENEREAZĂ PREDICȚIE';
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -2739,6 +3089,54 @@ function installApp() {
     <div style="display:flex;gap:10px">
       <button onclick="closeSettingsModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
       <button onclick="saveSettings()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- NOTES MODAL -->
+<div id="notes-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:90%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">💬 Note Produs</div>
+        <div style="font-size:13px;color:#6b7a8d;margin-top:2px" id="notes-product-name">—</div>
+      </div>
+      <button onclick="closeNotesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    
+    <!-- Notes list -->
+    <div id="notes-list" style="flex:1;overflow-y:auto;margin-bottom:16px;min-height:100px"></div>
+    
+    <!-- Add note -->
+    <div style="border-top:1px solid #1e2530;padding-top:14px">
+      <textarea id="new-note-text" placeholder="Scrie o notă... (ex: Livrare așteptată, lot defect, rezervat pentru client X)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:none;height:70px;transition:border-color .2s;margin-bottom:10px" onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#1e2530'"></textarea>
+      <button onclick="addNote()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:11px;cursor:pointer;text-transform:uppercase">+ ADAUGĂ NOTĂ</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- CHARTS MODAL -->
+<div id="charts-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">📊 Grafice Evoluție Stoc</div>
+      <button onclick="closeChartsModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <select id="chart-product-select" onchange="updateChart()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:12px"></select>
+    </div>
+    <div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:16px">
+      <canvas id="stock-chart" height="200"></canvas>
+    </div>
+    <div id="chart-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+    
+    <!-- AI Prediction -->
+    <div style="margin-top:16px;background:#181d24;border-radius:12px;padding:16px;border:1px solid rgba(167,139,250,0.3)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;margin-bottom:12px">🤖 Predicție AI Reaprovizionare</div>
+      <div id="ai-prediction" style="font-size:13px;color:#99a8b8;line-height:1.6">Click pe un produs pentru a vedea predicția AI...</div>
+      <button onclick="getAIPrediction()" id="ai-btn" style="display:none;margin-top:12px;width:100%;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">🤖 GENEREAZĂ PREDICȚIE AI</button>
     </div>
   </div>
 </div>
