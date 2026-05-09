@@ -5586,31 +5586,50 @@ function handleVoiceQuery(text) {
 
 // 4. COMANDĂ VOCALĂ MULTI-PRODUS
 function handleMultiProductCommand(text, opType) {
-  // Pattern: "adaugă 10 șuruburi și 5 paleți cafea"
   const norm = normalizeText(text.toLowerCase());
-  if (!norm.includes(' si ') && !norm.includes(' and ') && !norm.includes(' und ') && !norm.includes(' et ')) return false;
   
-  const parts = text.split(/\s+(?:si|și|and|und|et)\s+/i);
+  // Check if contains connector words
+  const hasConnector = [' si ',' și ',' and ',' und ',' et ',' plus ',' cu '].some(c => 
+    norm.includes(normalizeText(c))
+  );
+  if (!hasConnector) return false;
+  
+  // Split by connector words
+  const parts = text.split(/\s+(?:si|și|and|und|et|plus|cu)\s+/i).filter(p => p.trim().length > 2);
   if (parts.length < 2) return false;
   
-  let processed = 0;
+  // Verify each part has a quantity AND a known product
+  const validParts = [];
   parts.forEach(part => {
-    const qty = parseQuantity(normalizeText(part.toLowerCase()));
+    const partNorm = normalizeText(part.toLowerCase());
+    const qty = parseQuantity(partNorm);
     const product = findProduct(part.split(' '));
-    if (qty && product) {
-      const oldQty = product.qty;
-      if (opType === 'in') product.qty += qty;
-      else product.qty = Math.max(0, product.qty - qty);
-      addLog(part.trim(), `${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, opType);
-      processed++;
+    if (qty && qty > 0 && product) {
+      validParts.push({ part, qty, product });
     }
+  });
+  
+  if (validParts.length < 2) return false; // Need at least 2 valid parts
+  
+  let processed = 0;
+  validParts.forEach(({ part, qty, product }) => {
+    const oldQty = product.qty;
+    if (opType === 'in') product.qty += qty;
+    else product.qty = Math.max(0, product.qty - qty);
+    addLog(part.trim(), `${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, opType);
+    processed++;
+    
+    // Check alerts
+    if (product.qty === 0) setTimeout(() => triggerAlert(`🔴 EPUIZAT: ${product.name}`, 'zero'), 300);
+    else if (product.qty <= product.min) setTimeout(() => triggerAlert(`⚠️ SCĂZUT: ${product.name} — ${product.qty} ${product.unit}`, 'warn'), 300);
   });
   
   if (processed > 0) {
     saveStockToFirebase();
     renderStock(); updateStats();
-    speak(`${processed} produse actualizate.`);
-    setFeedback(`✅ ${processed} produse actualizate dintr-o comandă`, 'ok');
+    const names = validParts.map(p => p.product.name).join(', ');
+    speak(`${processed} produse actualizate: ${names}.`);
+    setFeedback(`✅ ${processed} produse actualizate: ${names}`, 'ok');
     return true;
   }
   return false;
