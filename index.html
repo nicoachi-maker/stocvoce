@@ -8294,18 +8294,29 @@ function setupAutocomplete() {
       input.parentNode.appendChild(ac);
     }
     
-    ac.innerHTML = matches.map(p => `
-      <div onclick="document.getElementById('new-name').value='${p.name.replace(/'/g,"\'")}';hideAutocomplete()" 
+    ac.innerHTML = matches.map((p,idx) => `
+      <div onclick="selectAutocomplete(${idx})" 
         style="padding:10px 14px;cursor:pointer;font-size:13px;color:#e8ecf0;border-bottom:1px solid #1e2530"
         onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='transparent'">
         ${p.name} <span style="color:#6b7a8d;font-size:11px">(${p.qty} ${p.unit})</span>
       </div>`).join('');
+    window._autocompleteMatches = matches;
     ac.style.display = 'block';
   });
   
   document.addEventListener('click', e => {
     if (!input.contains(e.target)) hideAutocomplete();
   });
+}
+
+function selectAutocomplete(idx) {
+  const matches = window._autocompleteMatches || [];
+  const p = matches[idx];
+  if (p) {
+    const input = document.getElementById('new-name');
+    if (input) input.value = p.name;
+    hideAutocomplete();
+  }
 }
 
 function hideAutocomplete() {
