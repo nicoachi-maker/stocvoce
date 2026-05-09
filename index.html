@@ -280,6 +280,58 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <div class="form-group"><label class="form-label">Stoc Minim</label><input class="form-input" id="new-min" type="number" placeholder="10"></div>
     </div>
     <div class="form-group"><label class="form-label"><input type="checkbox" id="new-sensitive" style="margin-right:6px">Produs sensibil 🔒</label></div>
+    
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin:16px 0 10px;border-top:1px solid #1e2530;padding-top:14px">📦 Furnizor & Preț</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Furnizor</label>
+        <input class="form-input" id="new-supplier" placeholder="ex: SC Distribuție SRL">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Furnizor</label>
+        <input class="form-input" id="new-supplier-contact" placeholder="ex: 0722 123 456">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Preț Achiziție (RON)</label>
+        <input class="form-input" id="new-price-buy" type="number" step="0.01" placeholder="0.00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preț Vânzare (RON)</label>
+        <input class="form-input" id="new-price-sell" type="number" step="0.01" placeholder="0.00">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cod Produs / SKU</label>
+        <input class="form-input" id="new-sku" placeholder="ex: SKU-001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Termen Garanție (zile)</label>
+        <input class="form-input" id="new-warranty" type="number" placeholder="ex: 365">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data Expirare</label>
+        <input class="form-input" id="new-expiry" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Timp Livrare (zile)</label>
+        <input class="form-input" id="new-lead-time" type="number" placeholder="ex: 7">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cantitate Minimă Comandă</label>
+        <input class="form-input" id="new-moq" type="number" placeholder="ex: 100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Greutate (kg)</label>
+        <input class="form-input" id="new-weight" type="number" step="0.01" placeholder="ex: 0.5">
+      </div>
+    </div>
     <div class="form-group">
       <label class="form-label">Poză produs (opțional)</label>
       <div onclick="document.getElementById('new-photo').click()" style="border:2px dashed #1e2530;border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='#1e2530'">
@@ -344,6 +396,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
       <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
       <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
+      <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
+      <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
       <button class="add-btn" onclick="openChartsModal()" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
       <button class="add-btn" onclick="generatePDF()" style="border-color:#ffa502;color:#ffa502">📄 PDF</button>
     </div>
@@ -554,6 +608,7 @@ auth.onAuthStateChanged(async (user) => {
 
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
+    loadDeliveriesAndClients();
     setFeedback(`✅ ${userProfile.depot} – gata de comenzi!`, 'ok');
   } else {
     currentUser = null;
@@ -956,7 +1011,8 @@ function renderStock(){
       <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
       ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px">` : ''}
       <div class="card-name">${p.name}</div>
-      <div class="card-location">📍 ${p.loc||'—'}</div>
+      <div class="card-location">📍 ${p.loc||'—'} ${p.sku?`· <span style="color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px">${p.sku}</span>`:''}${p.expiry&&new Date(p.expiry)<new Date()?` <span style="color:#ff4757;font-size:10px">⚠️ EXPIRAT</span>`:''}${p.expiry&&new Date(p.expiry)>new Date()&&(new Date(p.expiry)-new Date())<30*24*3600*1000?` <span style="color:#ffa502;font-size:10px">⚠️ Expiră curând</span>`:''}</div>
+      ${p.price_buy||p.price_sell?`<div style="font-size:11px;color:#6b7a8d;margin-bottom:8px">${p.price_buy?`Achiz: <span style="color:#00e5a0">${p.price_buy} RON</span>`:''} ${p.price_sell?`· Vânz: <span style="color:#a78bfa">${p.price_sell} RON</span>`:''}</div>`:''}
       <div class="card-qty-row"><div class="card-qty ${qc}">${p.qty}</div><div class="card-unit">${p.unit}</div></div>
       <div class="card-bar"><div class="card-bar-fill ${qc}" style="width:${pct}%"></div></div>
       ${p.note_preview ? `<div style="font-size:11px;color:#6b7a8d;margin-top:8px;padding:6px 8px;background:#181d24;border-radius:6px;border-left:2px solid #a78bfa;font-style:italic">💬 ${p.note_preview.substring(0,50)}${p.note_preview.length>50?'...':''}</div>` : ''}
@@ -995,7 +1051,7 @@ function addProduct(){
   saveStockToFirebase();closeAddModal();renderStock();updateStats();
   addLog(`Adăugat: ${name}`,`Stoc inițial ${qty} ${unit}`,'in');
   speak(`Produs ${name} adăugat.`);
-  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note'].forEach(id=>document.getElementById(id).value='');
+  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note','new-supplier','new-supplier-contact','new-price-buy','new-price-sell','new-sku','new-warranty','new-expiry','new-lead-time','new-moq','new-weight'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('new-sensitive').checked=false;
 }
 function updateStats(){
@@ -2501,7 +2557,19 @@ async function addProduct() {
   
   const newProduct = {
     id: newId, name, cat: cat||'General', qty, unit, loc, min, sensitive,
-    maxQty: Math.max(qty*3,100), notes: [], note_preview: note||''
+    maxQty: Math.max(qty*3,100), notes: [], note_preview: note||'',
+    supplier: document.getElementById('new-supplier').value.trim()||null,
+    supplier_contact: document.getElementById('new-supplier-contact').value.trim()||null,
+    price_buy: parseFloat(document.getElementById('new-price-buy').value)||null,
+    price_sell: parseFloat(document.getElementById('new-price-sell').value)||null,
+    sku: document.getElementById('new-sku').value.trim()||null,
+    warranty: parseInt(document.getElementById('new-warranty').value)||null,
+    expiry: document.getElementById('new-expiry').value||null,
+    lead_time: parseInt(document.getElementById('new-lead-time').value)||null,
+    moq: parseInt(document.getElementById('new-moq').value)||null,
+    weight: parseFloat(document.getElementById('new-weight').value)||null,
+    deliveries: [],
+    clients: []
   };
   if (note) newProduct.notes = [{text:note, user:userProfile?userProfile.name:'—', time:new Date().toLocaleString('ro-RO')}];
   
@@ -2519,7 +2587,7 @@ async function addProduct() {
   updateStats();
   addLog(`Adăugat: ${name}`, `Stoc inițial ${qty} ${unit}`, 'in');
   speak(`Produs ${name} adăugat.`);
-  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note'].forEach(id=>document.getElementById(id).value='');
+  ['new-name','new-cat','new-qty','new-unit','new-loc','new-min','new-note','new-supplier','new-supplier-contact','new-price-buy','new-price-sell','new-sku','new-warranty','new-expiry','new-lead-time','new-moq','new-weight'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('new-sensitive').checked = false;
   document.getElementById('photo-preview').innerHTML = '📷 Click pentru a adăuga o poză';
   document.getElementById('new-photo').value = '';
@@ -2716,6 +2784,146 @@ Fii concis și specific.`
 
   btn.disabled = false;
   btn.textContent = '🤖 REGENEREAZĂ PREDICȚIE';
+}
+
+
+// ── DELIVERIES ──
+let deliveries = JSON.parse(localStorage.getItem('sv_deliveries') || '[]');
+
+function openDeliveryModal() {
+  renderDeliveries();
+  document.getElementById('delivery-modal').style.display = 'flex';
+}
+function closeDeliveryModal() {
+  document.getElementById('delivery-modal').style.display = 'none';
+}
+
+function renderDeliveries() {
+  const el = document.getElementById('delivery-list');
+  if (!deliveries.length) {
+    el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio livrare așteptată.</div>';
+    return;
+  }
+  const sorted = [...deliveries].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  el.innerHTML = sorted.map((d,i) => {
+    const dDate = new Date(d.date);
+    const isOverdue = dDate < new Date() && d.status !== 'received';
+    const isSoon = !isOverdue && (dDate-new Date()) < 3*24*3600*1000;
+    const statusColor = d.status==='received'?'#00e5a0':isOverdue?'#ff4757':isSoon?'#ffa502':'#6b7a8d';
+    const statusText = d.status==='received'?'✅ RECEPȚIONAT':isOverdue?'⚠️ ÎNTÂRZIAT':isSoon?'🔜 CURÂND':'⏳ AȘTEPTARE';
+    return `
+    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid ${statusColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${d.product}</div>
+          <div style="font-size:12px;color:#6b7a8d">📦 ${d.qty} unități · 🏭 ${d.supplier||'—'}</div>
+          <div style="font-size:11px;color:#6b7a8d;margin-top:2px">📅 ${d.date} · 👤 ${d.user||'—'}</div>
+        </div>
+        <span style="background:rgba(0,0,0,0.3);border:1px solid ${statusColor};border-radius:6px;padding:2px 8px;font-size:10px;color:${statusColor};font-family:'JetBrains Mono',monospace;flex-shrink:0">${statusText}</span>
+      </div>
+      ${d.status!=='received'?`<button onclick="markDeliveryReceived(${i})" style="width:100%;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',monospace;font-size:12px;padding:5px;cursor:pointer;letter-spacing:1px">✅ MARCHEAZĂ RECEPȚIONAT</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function addDelivery() {
+  const product = document.getElementById('del-product').value.trim();
+  const qty = document.getElementById('del-qty').value;
+  const supplier = document.getElementById('del-supplier').value.trim();
+  const date = document.getElementById('del-date').value;
+  if (!product || !date) { alert('Completați produsul și data!'); return; }
+  
+  deliveries.push({
+    product, qty, supplier,
+    date, status: 'pending',
+    user: userProfile ? userProfile.name : '—',
+    created: new Date().toISOString()
+  });
+  
+  localStorage.setItem('sv_deliveries', JSON.stringify(deliveries));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
+  
+  ['del-product','del-qty','del-supplier','del-date'].forEach(id=>document.getElementById(id).value='');
+  renderDeliveries();
+  setFeedback(`🚚 Livrare adăugată: ${product}`, 'ok');
+}
+
+function markDeliveryReceived(index) {
+  deliveries[index].status = 'received';
+  deliveries[index].received_at = new Date().toISOString();
+  localStorage.setItem('sv_deliveries', JSON.stringify(deliveries));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/deliveries').set(deliveries);
+  
+  // Auto add to stock
+  const d = deliveries[index];
+  const p = findProduct(d.product.split(' '));
+  if (p && d.qty) {
+    p.qty += parseInt(d.qty) || 0;
+    saveStockToFirebase();
+    addLog(`Recepție: ${d.product}`, `Livrare recepționată: +${d.qty} unități`, 'in');
+    renderStock(); updateStats();
+    speak(`Livrare recepționată! ${d.qty} unități de ${d.product} adăugate în stoc.`);
+  }
+  renderDeliveries();
+}
+
+// ── CLIENTS ──
+let clients = JSON.parse(localStorage.getItem('sv_clients') || '[]');
+
+function openClientsModal() {
+  renderClients();
+  document.getElementById('clients-modal').style.display = 'flex';
+}
+function closeClientsModal() {
+  document.getElementById('clients-modal').style.display = 'none';
+}
+
+function renderClients() {
+  const el = document.getElementById('clients-list');
+  if (!clients.length) {
+    el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio ieșire înregistrată.</div>';
+    return;
+  }
+  el.innerHTML = [...clients].reverse().map(c => `
+    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #a78bfa">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${c.name}</div>
+      <div style="font-size:12px;color:#6b7a8d;margin-top:2px">📞 ${c.contact||'—'} · 📦 ${c.product}: ${c.qty} unități</div>
+      <div style="font-size:11px;color:#6b7a8d;margin-top:2px">🕐 ${c.time} · 👤 ${c.user||'—'}</div>
+    </div>`).join('');
+}
+
+function addClient() {
+  const name = document.getElementById('cli-name').value.trim();
+  const contact = document.getElementById('cli-contact').value.trim();
+  const product = document.getElementById('cli-product').value.trim();
+  const qty = document.getElementById('cli-qty').value;
+  if (!name || !product) { alert('Completați numele clientului și produsul!'); return; }
+  
+  clients.push({
+    name, contact, product, qty,
+    user: userProfile ? userProfile.name : '—',
+    time: new Date().toLocaleString('ro-RO')
+  });
+  
+  localStorage.setItem('sv_clients', JSON.stringify(clients));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
+  
+  ['cli-name','cli-contact','cli-product','cli-qty'].forEach(id=>document.getElementById(id).value='');
+  renderClients();
+  setFeedback(`👥 Client înregistrat: ${name}`, 'ok');
+  addLog(`Client: ${name}`, `${product}: ${qty} unități`, 'out');
+}
+
+// Load deliveries and clients from Firebase on login
+function loadDeliveriesAndClients() {
+  const key = getDepotKey();
+  if (!key) return;
+  db.ref('depozite/' + key + '/deliveries').once('value').then(snap => {
+    if (snap.val()) { deliveries = snap.val(); localStorage.setItem('sv_deliveries', JSON.stringify(deliveries)); }
+  });
+  db.ref('depozite/' + key + '/clients').once('value').then(snap => {
+    if (snap.val()) { clients = snap.val(); localStorage.setItem('sv_clients', JSON.stringify(clients)); }
+  });
 }
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
@@ -3137,6 +3345,53 @@ function installApp() {
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;margin-bottom:12px">🤖 Predicție AI Reaprovizionare</div>
       <div id="ai-prediction" style="font-size:13px;color:#99a8b8;line-height:1.6">Click pe un produs pentru a vedea predicția AI...</div>
       <button onclick="getAIPrediction()" id="ai-btn" style="display:none;margin-top:12px;width:100%;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">🤖 GENEREAZĂ PREDICȚIE AI</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- DELIVERY TRACKING MODAL -->
+<div id="delivery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">🚚 Livrări Așteptate</div>
+      <button onclick="closeDeliveryModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="delivery-list" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
+    <div style="border-top:1px solid #1e2530;padding-top:14px">
+      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Adaugă Livrare Așteptată</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <input id="del-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <input id="del-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <input id="del-supplier" placeholder="Furnizor" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <input id="del-date" type="date" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+      </div>
+      <button onclick="addDelivery()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ ADAUGĂ LIVRARE</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS MODAL -->
+<div id="clients-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">👥 Clienți</div>
+      <button onclick="closeClientsModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="clients-list" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
+    <div style="border-top:1px solid #1e2530;padding-top:14px">
+      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Înregistrează Ieșire Client</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <input id="cli-name" placeholder="Nume client" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <input id="cli-contact" placeholder="Telefon / Email" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <input id="cli-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <input id="cli-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+      </div>
+      <button onclick="addClient()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ ÎNREGISTREAZĂ</button>
     </div>
   </div>
 </div>
