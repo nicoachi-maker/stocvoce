@@ -897,32 +897,56 @@ function normalizeText(text){
   return text.replace(/[șş]/g,'s').replace(/[țţ]/g,'t').replace(/[ăâ]/g,'a').replace(/î/g,'i')
     .replace(/[ȘŞ]/g,'S').replace(/[ȚŢ]/g,'T').replace(/[ĂÂ]/g,'A').replace(/Î/g,'I');
 }
-function findProduct(words){
-  const s=normalizeText(words.join(' '));
+function findProduct(words, clientName){
+  // Remove client name and action words from search
+  let searchText = words.join(' ');
+  if(clientName) {
+    searchText = searchText.replace(new RegExp(clientName, 'gi'), '').trim();
+  }
+  // Remove action words
+  const actionWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','luat','ridicat','preluat','scoate','adauga','adaugă','pune','stoc','stock','de','un','o','buc','bucati','bucăți','palet','paleți','cutie','cutii','kg','litri'];
+  actionWords.forEach(w => {
+    searchText = searchText.replace(new RegExp('\\b'+w+'\\b','gi'), ' ');
+  });
+  // Remove numbers
+  searchText = searchText.replace(/\b\d+\b/g, '').trim();
+  
+  const s = normalizeText(searchText);
+  if(!s || s.length < 2) return null;
+  
   let f=stock.find(p=>{const n=normalizeText(p.name.toLowerCase());return s.includes(n)||n.includes(s);});
   if(f)return f;
-  f=stock.find(p=>normalizeText(p.name.toLowerCase()).split(/\s+/).some(pw=>pw.length>3&&s.includes(pw)));
+  f=stock.find(p=>normalizeText(p.name.toLowerCase()).split(/\s+/).some(pw=>pw.length>2&&s.includes(pw)));
   if(f)return f;
   return stock.find(p=>s.includes(normalizeText(p.cat.toLowerCase())))||null;
 }
 function parseQuantity(text){
-  const nw={'unu':1,'una':1,'doua':2,'două':2,'trei':3,'patru':4,'cinci':5,'sase':6,'sapte':7,'opt':8,'noua':9,'zece':10,'unsprezece':11,'doisprezece':12,'treisprezece':13,'paisprezece':14,'cincisprezece':15,'saisprezece':16,'saptesprezece':17,'optsprezece':18,'nouasprezece':19,'douazeci':20,'treizeci':30,'patruzeci':40,'cincizeci':50,'saizeci':60,'saptezeci':70,'optzeci':80,'nouazeci':90};
-  const m=text.match(/\b(\d+)\b/);
+  const nw={'unu':1,'una':1,'doua':2,'două':2,'trei':3,'patru':4,'cinci':5,'sase':6,'sapte':7,'opt':8,'noua':9,'zece':10,'unsprezece':11,'doisprezece':12,'treisprezece':13,'paisprezece':14,'cincisprezece':15,'saisprezece':16,'saptesprezece':17,'optsprezece':18,'nouasprezece':19,'douazeci':20,'treizeci':30,'patruzeci':40,'cincizeci':50,'saizeci':60,'saptezeci':70,'optzeci':80,'nouazeci':90,'o suta':100,'o sută':100,'doua sute':200,'două sute':200,'trei sute':300};
+  // Match "30 de" or just "30"
+  const m=text.match(/\b(\d+)\s*(?:de\s+)?/);
   if(m)return parseInt(m[1]);
-  for(const[w,v]of Object.entries(nw))if(text.includes(w))return v;
+  const normText = normalizeText(text);
+  for(const[w,v]of Object.entries(nw))if(normText.includes(normalizeText(w)))return v;
   return null;
 }
 function extractClientName(text, norm) {
-  // Patterns: "George a luat", "Maria a ridicat", "Firma X a preluat"
+  // Patterns: "George a luat", "Soria a luat", "Firma X a preluat", "Ion a ridicat"
   const clientPatterns = [
-    /^([a-zA-ZăâîșțĂÂÎȘȚ\s]+?)\s+a\s+(luat|ridicat|preluat|primit)/i,
-    /^([a-zA-ZăâîșțĂÂÎȘȚ\s]+?)\s+(a luat|a ridicat|a preluat)/i,
+    /^([\wăâîșțĂÂÎȘȚ][\wăâîșțĂÂÎȘȚ\s]{1,30}?)\s+a\s+(luat|ridicat|preluat|primit|cumparat|cumpărat|achizitionat|achizitionat|luat|scos|retras)/i,
+    /^([\wăâîșțĂÂÎȘȚ][\wăâîșțĂÂÎȘȚ\s]{1,30}?)\s+(a luat|a ridicat|a preluat|a primit|a cumparat|a scos)/i,
   ];
   for (const pattern of clientPatterns) {
-    const match = text.match(pattern);
-    if (match && match[1] && match[1].trim().length > 1) {
-      return match[1].trim();
-    }
+    try {
+      const match = text.match(pattern);
+      if (match && match[1]) {
+        const name = match[1].trim();
+        // Make sure it's not a command keyword
+        const keywords = ['adauga','scoate','pune','stoc','stock','cat','câte','verifica'];
+        if (name.length > 1 && !keywords.some(k => normalizeText(name.toLowerCase()).includes(k))) {
+          return name;
+        }
+      }
+    } catch(e) {}
   }
   return null;
 }
@@ -934,14 +958,20 @@ function processCommand(text){
   const outKW=['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat'];
   const listKW=['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'];
   
-  // Detect client name in command
+  // Detect client name in command FIRST
   const clientName = extractClientName(text, norm);
   
   let opType=null;
-  if(inKW.some(k=>norm.includes(normalizeText(k))))opType='in';
-  else if(outKW.some(k=>norm.includes(normalizeText(k))))opType='out';
-  else if(clientName)opType='out'; // "George a luat" = always OUT
-  else if(listKW.some(k=>norm.includes(normalizeText(k))))opType='list';
+  if(clientName) {
+    // "George a luat 10 șuruburi" = always OUT
+    opType='out';
+  } else if(inKW.some(k=>norm.includes(normalizeText(k)))) {
+    opType='in';
+  } else if(outKW.some(k=>norm.includes(normalizeText(k)))) {
+    opType='out';
+  } else if(listKW.some(k=>norm.includes(normalizeText(k)))) {
+    opType='list';
+  }
   if(opType==='list'){
     const p=findProduct(text.split(/\s+/));
     if(p){const msg=`${p.name}: ${p.qty} ${p.unit}.`;setFeedback(`ℹ️ ${msg}`,'ok');speak(msg);addLog(text,msg,'ok');}
@@ -950,7 +980,7 @@ function processCommand(text){
   }
   if(!opType){setFeedback('⚠️ Nerecunoscut. Ex: Adaugă 10 șuruburi M6','warn');speak('Comandă nerecunoscută.');addLog(text,'Nerecunoscut','err');return;}
   const qty=parseQuantity(text);
-  const product=findProduct(text.split(/\s+/));
+  const product=findProduct(text.split(/\s+/), clientName);
   if(!product){setFeedback('⚠️ Produs negăsit.','warn');speak('Produsul nu a fost găsit.');addLog(text,'Produs negăsit','err');return;}
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
   if(opType==='out'){
