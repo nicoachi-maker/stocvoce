@@ -423,6 +423,12 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="undoLastOperation()" style="border-color:#ff4757;color:#ff4757">↩️ Undo</button>
         <button class="add-btn" onclick="transcribeToCSV()" style="border-color:#6b7a8d;color:#6b7a8d">📝 Transcriere</button>
         <button class="add-btn" onclick="startDailyVoiceSummary()" style="border-color:#00e5a0;color:#00e5a0">🌅 Rezumat</button>
+        <button class="add-btn" onclick="filterFavorites()" style="border-color:#ffa502;color:#ffa502">⭐ Favorite</button>
+        <button class="add-btn" onclick="sortStock('qty')" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
+        <button class="add-btn" onclick="autoArchiveInactive(90)" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
+        <button class="add-btn" onclick="document.getElementById('sort-bar').style.display=document.getElementById('sort-bar').style.display==='none'?'flex':'none'" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
+        <button class="add-btn" onclick="autoArchiveInactive()" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
+        <button class="add-btn" onclick="printDashboard()" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
       </div>
       
       <!-- Tab: RAPOARTE -->
@@ -446,6 +452,15 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="calcVATReport()" style="border-color:#6b7a8d;color:#6b7a8d">🧾 TVA</button>
         <button class="add-btn" onclick="forecastBudget()" style="border-color:#a78bfa;color:#a78bfa">💸 Buget</button>
         <button class="add-btn" onclick="runFullAnalysis()" style="border-color:#00e5a0;color:#00e5a0">🔬 Analiză</button>
+        <button class="add-btn" onclick="showSupplierReport()" style="border-color:#ffa502;color:#ffa502">🏭 Furnizori</button>
+        <button class="add-btn" onclick="showLocationReport()" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
+        <button class="add-btn" onclick="showNoMovementReport()" style="border-color:#6b7a8d;color:#6b7a8d">💤 Fără mișcare</button>
+        <button class="add-btn" onclick="printDashboard()" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
+        <button class="add-btn" onclick="showSupplierReport()" style="border-color:#00e5a0;color:#00e5a0">🏭 Furnizori</button>
+        <button class="add-btn" onclick="showLocationReport()" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
+        <button class="add-btn" onclick="showStagnantReport()" style="border-color:#6b7a8d;color:#6b7a8d">💤 Stagnante</button>
+        <button class="add-btn" onclick="startLiveChart()" style="border-color:#00e5a0;color:#00e5a0">📊 Live</button>
+        <button class="add-btn" onclick="voiceFullStatus()" style="border-color:#a78bfa;color:#a78bfa">🤖 Rezumat AI</button>
       </div>
       
       <!-- Tab: CLIENȚI -->
@@ -693,6 +708,7 @@ auth.onAuthStateChanged(async (user) => {
     initUserSettings();
     loadDeliveriesAndClients();
     setTimeout(checkDailySummary, 3000);
+    setTimeout(initNewFeatures, 1500);
     // Load preferred language
     if (userProfile.preferred_lang) {
       currentLang = userProfile.preferred_lang;
@@ -1119,6 +1135,8 @@ function processCommand(text){
   if(typeof handleVoiceNote==='function'&&handleVoiceNote(text))return;
   // Check voice query
   if(typeof handleVoiceQuery==='function'&&handleVoiceQuery(text))return;
+  // Check full status command
+  if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
   // Check approximate qty
   if(typeof handleApproxQty==='function'&&handleApproxQty(text))return;
   
@@ -1166,6 +1184,12 @@ function processCommand(text){
   executeOperation(opType,product,qty,text,clientName);
 }
 function executeOperation(opType,product,qty,originalText,clientName){
+  // Check if product is locked
+  if (product.locked && opType === 'out') {
+    setFeedback(`🔒 ${product.name} este blocat!`, 'err');
+    speak(`${product.name} este blocat.`);
+    return;
+  }
   const oldQty=product.qty;
   // Save for undo
   try { saveLastOperation(product, opType, qty); } catch(e) {}
@@ -1290,6 +1314,7 @@ function renderStock(){
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
     return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
       <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
+        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
         <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
         <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
       </div>
@@ -3876,6 +3901,85 @@ function printEtichete() {
       <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="profit-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- PRODUCT ZOOM MODAL -->
+<div id="product-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 16px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="zoom-title">Produs</div>
+      <button onclick="closeZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:14px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="zoom-content" style="overflow-y:auto;padding:20px;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER REPORT MODAL -->
+<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🏭 Raport Furnizori</div>
+      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- STAGNANT FULL MODAL -->
+<div id="stagnant-full-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:540px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
+      <button onclick="document.getElementById('stagnant-full-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="stagnant-full-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT TOOLBAR -->
+<div id="sort-bar" style="display:none;gap:4px;flex-wrap:wrap;padding:6px 0">
+  <span style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;padding:4px">↕️ SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Nume</button>
+  <button onclick="sortStock('qty')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Cantitate</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Locație</button>
+  <button onclick="sortStock('price_buy')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Preț</button>
+  <button onclick="sortField=null;renderStock()" style="background:#181d24;border:1px solid #ff4757;border-radius:5px;color:#ff4757;font-size:11px;padding:4px 8px;cursor:pointer">✕ Reset</button>
+</div>
+
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER REPORT MODAL -->
+<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
+      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
@@ -7413,6 +7517,995 @@ function runFullAnalysis() {
   setFeedback('✅ Analiză completă efectuată!', 'ok');
 }
 
+
+// ══════════════════════════════════════════
+// BLOC 1: MOBILE & UX (1-6)
+// ══════════════════════════════════════════
+
+// 1. SORTARE AVANSATĂ
+let sortField = null, sortDir = 1;
+
+
+// 2. MOD NOAPTE AUTOMAT
+
+setInterval(checkAutoNightMode, 60000);
+
+// 3. ZOOM PE CARD
+function openProductZoom(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const margin = p.price_buy && p.price_sell ? ((p.price_sell - p.price_buy) / p.price_sell * 100).toFixed(1) : null;
+  const pred = typeof predictStockDepletion === 'function' ? predictStockDepletion(p) : null;
+  const el = document.getElementById('zoom-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      ${[
+        ['Cantitate', `${p.qty} ${p.unit}`, '#00e5a0'],
+        ['Stoc Minim', `${p.min} ${p.unit}`, '#ffa502'],
+        ['Categorie', p.cat||'—', '#a78bfa'],
+        ['Locație', p.loc||'—', '#6b7a8d'],
+        ['SKU', p.sku||'—', '#6b7a8d'],
+        ['Furnizor', p.supplier||'—', '#6b7a8d'],
+        ['Preț Achiz.', p.price_buy ? p.price_buy+' RON' : '—', '#ffa502'],
+        ['Preț Vânz.', p.price_sell ? p.price_sell+' RON' : '—', '#00e5a0'],
+        ['Marjă', margin ? margin+'%' : '—', '#00e5a0'],
+        ['Epuizare', pred ? pred.message : '—', '#ff4757'],
+        ['Garanție', p.warranty ? p.warranty+' zile' : '—', '#6b7a8d'],
+        ['Expiră', p.expiry||'—', '#6b7a8d'],
+      ].map(([k,v,c]) => `
+        <div style="background:#181d24;border-radius:8px;padding:10px">
+          <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${k}</div>
+          <div style="font-size:14px;font-weight:700;color:${c}">${v}</div>
+        </div>`).join('')}
+    </div>
+    ${p.note_preview ? `<div style="background:#181d24;border-radius:8px;padding:12px;border-left:3px solid #a78bfa;font-size:13px;color:#99a8b8;margin-bottom:10px">💬 ${p.note_preview}</div>` : ''}
+    <div style="display:flex;gap:8px">
+      <button onclick="openEditModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
+      <button onclick="openNotesModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
+      <button onclick="openHistoryModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #6b7a8d;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">📋 ISTORIC</button>
+    </div>`;
+  document.getElementById('product-zoom-modal').style.display = 'flex';
+  document.getElementById('zoom-title').textContent = p.name;
+}
+function closeZoom() { document.getElementById('product-zoom-modal').style.display = 'none'; }
+
+// 4. FAVORIT PRODUSE
+let favProducts = JSON.parse(localStorage.getItem('sv_fav_products') || '[]');
+function toggleFavProduct(productId) {
+  const idx = favProducts.indexOf(productId);
+  if (idx === -1) { favProducts.push(productId); }
+  else { favProducts.splice(idx, 1); }
+  localStorage.setItem('sv_fav_products', JSON.stringify(favProducts));
+  renderStock();
+}
+function isFavProduct(productId) { return favProducts.includes(productId); }
+
+// 5. SORTARE - apply in renderStock (patch)
+const _origRenderForSort = renderStock;
+
+
+// 6. AUTO-COMPLETARE NUME PRODUS
+function initAutocomplete() {
+  const input = document.getElementById('new-name');
+  if (!input) return;
+  input.addEventListener('input', function() {
+    const val = normalizeText(this.value.toLowerCase());
+    if (val.length < 2) { removeAutocomplete(); return; }
+    const matches = stock.filter(p => normalizeText(p.name.toLowerCase()).includes(val)).slice(0, 5);
+    if (!matches.length) { removeAutocomplete(); return; }
+    removeAutocomplete();
+    const list = document.createElement('div');
+    list.id = 'autocomplete-list';
+    list.style.cssText = 'position:absolute;background:#181d24;border:1px solid #1e2530;border-radius:8px;z-index:1000;width:100%;max-height:200px;overflow-y:auto;top:100%;left:0';
+    matches.forEach(p => {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:10px 14px;cursor:pointer;color:#e8ecf0;font-size:13px;border-bottom:1px solid #1e2530';
+      item.textContent = p.name;
+      item.onmouseover = () => item.style.background = '#1e2530';
+      item.onmouseout = () => item.style.background = 'transparent';
+      item.onclick = () => { input.value = p.name; removeAutocomplete(); };
+      list.appendChild(item);
+    });
+    input.parentElement.style.position = 'relative';
+    input.parentElement.appendChild(list);
+  });
+  document.addEventListener('click', (e) => { if (!e.target.closest('#autocomplete-list')) removeAutocomplete(); });
+}
+function removeAutocomplete() { const el = document.getElementById('autocomplete-list'); if (el) el.remove(); }
+
+// ══════════════════════════════════════════
+// BLOC 2: NOTIFICĂRI (7-12)
+// ══════════════════════════════════════════
+
+// 7. REMINDER REZERVĂRI
+
+setInterval(checkReservationReminders, 300000); // every 5 min
+
+// 8. DIGEST SĂPTĂMÂNAL TELEGRAM
+
+setInterval(sendWeeklyDigest, 3600000); // check every hour
+
+// 9. ALERTĂ STOC RECORD
+let stockRecords = JSON.parse(localStorage.getItem('sv_stock_records') || '{}');
+
+
+// 10. ALERTĂ BUGET DEPĂȘIT
+let monthlyBudget = parseFloat(localStorage.getItem('sv_monthly_budget') || '0');
+
+
+
+// 11. NOTIFICARE RECEPȚIE COMPLETĂ
+
+
+// 12. DETECTARE DUPLICAT LA ADĂUGARE
+
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => i||j));
+  for (let i=1;i<=m;i++) for (let j=1;j<=n;j++)
+    dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// ══════════════════════════════════════════
+// BLOC 3: PRODUSE (13-18)
+// ══════════════════════════════════════════
+
+// 13. NOTE RAPIDE PE CARD (inline edit)
+function openInlineNote(productId) {
+  const existing = document.getElementById('inline-note-' + productId);
+  if (existing) { existing.remove(); return; }
+  
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  
+  const card = document.getElementById('card-' + productId);
+  if (!card) return;
+  
+  const noteDiv = document.createElement('div');
+  noteDiv.id = 'inline-note-' + productId;
+  noteDiv.style.cssText = 'padding:8px;background:#181d24;border-top:1px solid #1e2530';
+  noteDiv.innerHTML = `
+    <textarea id="inline-textarea-${productId}" placeholder="Notă rapidă..." style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:6px;resize:none;height:60px;outline:none">${p.note_preview||''}</textarea>
+    <button onclick="saveInlineNote(${productId})" style="width:100%;margin-top:4px;background:#a78bfa;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px;cursor:pointer">SALVEAZĂ</button>`;
+  card.appendChild(noteDiv);
+}
+
+function saveInlineNote(productId) {
+  const ta = document.getElementById('inline-textarea-' + productId);
+  if (!ta) return;
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.note_preview = ta.value.trim();
+  if (!p.notes) p.notes = [];
+  if (p.note_preview) p.notes.push({ text: p.note_preview, user: userProfile?userProfile.name:'—', time: new Date().toLocaleString('ro-RO') });
+  saveStockToFirebase();
+  renderStock();
+  setFeedback('✅ Notă salvată!', 'ok');
+}
+
+// 14. CULOARE CUSTOM PER PRODUS
+let productColors = JSON.parse(localStorage.getItem('sv_product_colors') || '{}');
+
+function getProductColor(productId) { return productColors[productId] || null; }
+
+// 15. PRODUS BLOCAT
+
+
+// 16. CANTITATE REZERVATĂ VIZIBILĂ
+
+function getAvailableQty(product) {
+  return Math.max(0, product.qty - getReservedQty(product.id));
+}
+
+// 17. TAG-URI LIBERE
+
+
+function filterByTag(tag) {
+  document.getElementById('stock-search').value = '#' + tag;
+  renderStock();
+}
+
+// 18. PRODUS RECOMANDAT (bestseller/nou)
+
+
+// ══════════════════════════════════════════
+// BLOC 4: RAPOARTE (19-24)
+// ══════════════════════════════════════════
+
+// 19. RAPORT FURNIZORI
+
+
+// 20. RAPORT LOCAȚII
+
+
+// 21. RAPORT CLIENT PDF COMPLET
+async function exportClientFullPDF(clientName) {
+  if (typeof exportClientHistoryPDF === 'function') {
+    await exportClientHistoryPDF(clientName);
+  }
+}
+
+// 22. RAPORT PRODUSE FĂRĂ MIȘCARE
+function showStagnantReport() {
+  const days = [30, 60, 90];
+  const result = days.map(d => {
+    const cutoff = new Date(Date.now() - d*24*3600*1000);
+    const stagnant = stock.filter(p => {
+      const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && e.cmd && 
+        normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+      return !lastMove;
+    });
+    return { days: d, count: stagnant.length, products: stagnant };
+  });
+  
+  const el = document.getElementById('stagnant-full-content');
+  if (!el) { showStagnant(30); return; }
+  
+  el.innerHTML = result.map(r => `
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">
+        💤 ${r.days} ZILE FĂRĂ MIȘCARE (${r.count} produse)
+      </div>
+      ${r.products.slice(0,5).map(p => `
+        <div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">
+          <span style="color:#99a8b8">${p.name}</span>
+          <span style="color:#6b7a8d;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>
+        </div>`).join('')}
+      ${r.products.length > 5 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px">... și încă ${r.products.length-5}</div>` : ''}
+    </div>`).join('');
+  
+  document.getElementById('stagnant-full-modal').style.display = 'flex';
+}
+
+// 23. DASHBOARD PRINT FRIENDLY
+
+
+// 24. GRAFIC LIVE (auto-refresh)
+let liveChartInterval = null;
+function startLiveChart() {
+  if (liveChartInterval) { clearInterval(liveChartInterval); liveChartInterval = null; setFeedback('⏹️ Grafic live oprit', 'ok'); return; }
+  liveChartInterval = setInterval(() => {
+    updateStockValueDisplay();
+    updateStats();
+  }, 5000);
+  setFeedback('📊 Grafic live activ — actualizare la 5 secunde', 'ok');
+}
+
+// ══════════════════════════════════════════
+// BLOC 5: AI & AUTOMATIZĂRI (25-30)
+// ══════════════════════════════════════════
+
+// 25. AI SUGESTIE REDENUMIRE
+async function aiSuggestRename(product) {
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{ role: 'user', content: `Produsul "${product.name}" din categoria "${product.cat||'General'}" are un nume potrivit pentru un sistem de gestiune depozit? Dacă nu, sugerează un nume mai bun și mai specific. Răspunde în română cu DOAR numele sugerat sau "OK" dacă e bun.` }]
+      })
+    });
+    const data = await response.json();
+    const suggestion = data.content[0].text.trim();
+    if (suggestion !== 'OK' && suggestion !== product.name) {
+      if (confirm(`🤖 AI sugerează redenumirea:
+"${product.name}" → "${suggestion}"
+
+Accepți?`)) {
+        product.name = suggestion;
+        saveStockToFirebase();
+        renderStock();
+        setFeedback(`✅ Produs redenumit: ${suggestion}`, 'ok');
+      }
+    } else {
+      setFeedback(`✅ Numele "${product.name}" este OK`, 'ok');
+    }
+  } catch(e) { setFeedback('❌ Eroare AI', 'err'); }
+}
+
+// 26. SITUAȚIE COMPLETĂ VOCALĂ AI
+async function voiceFullStatus() {
+  speak('Generez situația completă a depozitului.');
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: `Generează un rezumat vocal scurt (3-4 propoziții) pentru operatorul de depozit. Date: ${stock.length} produse, ${stock.filter(p=>p.qty===0).length} epuizate, ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length} cu stoc scăzut. Răspunde în română, natural, ca și cum ai vorbi cu un coleg.` }]
+      })
+    });
+    const data = await response.json();
+    speak(data.content[0].text);
+    setFeedback(`🤖 ${data.content[0].text.substring(0,80)}...`, 'ok');
+  } catch(e) { speak('Eroare la generarea rezumatului.'); }
+}
+
+// 27. PREDICȚIE FURNIZOR OPTIMAL AI
+async function aiOptimalSupplier(product) {
+  if (!product.supplier) { setFeedback('⚠️ Produsul nu are furnizor definit!', 'warn'); return; }
+  
+  const el = document.getElementById('ai-prediction');
+  if (el) el.innerHTML = '⏳ AI analizează furnizorii...';
+  
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: `Analizează situația pentru produsul "${product.name}": furnizor actual "${product.supplier}", preț achiziție ${product.price_buy||'necunoscut'} RON, timp livrare ${product.lead_time||'necunoscut'} zile, stoc curent ${product.qty} ${product.unit}. Sugerează strategie optimă de comandă în 2-3 propoziții în română.` }]
+      })
+    });
+    const data = await response.json();
+    if (el) el.innerHTML = `<strong style="color:#a78bfa">🤖 Strategie optimă:</strong><br><br>${data.content[0].text}`;
+    setFeedback('✅ Analiză furnizor generată!', 'ok');
+  } catch(e) { if (el) el.innerHTML = 'Eroare AI.'; }
+}
+
+// 28. AUTO-ARHIVARE PRODUSE INACTIVE (90 zile)
+
+
+// 29. COMANDĂ VOCALĂ SITUAȚIE
+function handleVoiceSituation(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('situatie') && !norm.includes('situație') && !norm.includes('status') && !norm.includes('rezumat')) return false;
+  voiceFullStatus();
+  return true;
+}
+
+// 30. INIT ALL NEW FEATURES
+function initNewFeatures() {
+  initAutocomplete();
+  checkAutoNightMode();
+  
+  // Check duplicate on product name input
+  const nameInput = document.getElementById('new-name');
+  if (nameInput) {
+    nameInput.addEventListener('blur', function() {
+      const dupes = checkDuplicate(this.value);
+      if (dupes && dupes.length > 0) {
+        setFeedback(`⚠️ Produs similar există: "${dupes[0].name}" (${dupes[0].qty} ${dupes[0].unit})`, 'warn');
+      }
+    });
+  }
+  
+  // Add situation check to processCommand
+  const _origPCFinal = processCommand;
+  if (typeof _origPCFinal === 'function') {
+    // Patch processCommand for situatie
+    const origRef = processCommand;
+    window.processCommand = function(text) {
+      if (typeof handleVoiceSituation === 'function' && handleVoiceSituation(text)) return;
+      origRef(text);
+    };
+  }
+  
+  // Check budget and records periodically
+  setInterval(checkBudgetAlert, 3600000);
+  setInterval(checkAllDeliveriesReceived, 300000);
+}
+
+
+// ══════════════════════════════════════════
+// 30 FUNCȚII NOI
+// ══════════════════════════════════════════
+
+// 1. GESTURI TOUCH
+function initTouchGestures() {
+  const grid = document.getElementById('stock-grid');
+  if (!grid) return;
+  
+  let touchStartX = 0, touchStartY = 0;
+  
+  grid.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  
+  grid.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    
+    if (Math.abs(dx) < 50 || Math.abs(dy) > 50) return;
+    
+    const card = e.target.closest('.stock-card');
+    if (!card) return;
+    
+    const productId = parseInt(card.id.replace('card-', ''));
+    const p = stock.find(s => s.id === productId);
+    if (!p) return;
+    
+    if (dx < -50) {
+      // Swipe left = remove 1
+      document.getElementById('manual-input').value = `scoate 1 ${p.name}`;
+      processManual();
+      card.style.transform = 'translateX(-10px)';
+      setTimeout(() => card.style.transform = '', 300);
+    } else if (dx > 50) {
+      // Swipe right = add 1
+      document.getElementById('manual-input').value = `adaugă 1 ${p.name}`;
+      processManual();
+      card.style.transform = 'translateX(10px)';
+      setTimeout(() => card.style.transform = '', 300);
+    }
+  }, { passive: true });
+}
+
+// 2. MOD NOAPTE AUTOMAT
+function checkAutoNightMode() {
+  const hour = new Date().getHours();
+  const isNight = hour >= 20 || hour < 7;
+  const currentTheme = appSettings.theme || 'dark';
+  
+  if (isNight && currentTheme !== 'dark') {
+    setTheme('dark', false);
+    setFeedback('🌙 Mod noapte activat automat', 'ok');
+  } else if (!isNight && currentTheme === 'dark' && appSettings.auto_night) {
+    setTheme('light', false);
+  }
+}
+setInterval(checkAutoNightMode, 60000);
+
+// 3. SHAKE TO REFRESH
+let lastShake = 0;
+if (window.DeviceMotionEvent) {
+  window.addEventListener('devicemotion', e => {
+    const acc = e.acceleration;
+    if (!acc) return;
+    const force = Math.abs(acc.x||0) + Math.abs(acc.y||0) + Math.abs(acc.z||0);
+    if (force > 25 && Date.now() - lastShake > 2000) {
+      lastShake = Date.now();
+      loadStockFromFirebase();
+      setFeedback('🔄 Stoc reîmprospătat!', 'ok');
+      speak('Stoc actualizat.');
+    }
+  }, { passive: true });
+}
+
+// 4. ZOOM PE CARD
+function openCardZoom(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  
+  const margin = calcProductMargin ? calcProductMargin(p) : null;
+  const pred = predictStockDepletion ? predictStockDepletion(p) : null;
+  const locHist = getLocationHistory ? getLocationHistory(productId) : [];
+  
+  const el = document.getElementById('card-zoom-content');
+  if (!el) return;
+  
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      ${p.photo_url ? `<img src="${p.photo_url}" style="grid-column:1/-1;width:100%;height:120px;object-fit:cover;border-radius:10px">` : ''}
+      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#00e5a0">${p.qty}</div>
+        <div style="font-size:11px;color:#6b7a8d">${p.unit} ÎN STOC</div>
+      </div>
+      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ffa502">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#ffa502">${p.min}</div>
+        <div style="font-size:11px;color:#6b7a8d">STOC MINIM</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:#99a8b8;margin-bottom:12px">
+      ${p.supplier ? `<div>🏭 <b>Furnizor:</b> ${p.supplier}</div>` : ''}
+      ${p.supplier_contact ? `<div>📞 <b>Contact:</b> ${p.supplier_contact}</div>` : ''}
+      ${p.price_buy ? `<div>💰 <b>Achiz:</b> ${p.price_buy} RON</div>` : ''}
+      ${p.price_sell ? `<div>💵 <b>Vânz:</b> ${p.price_sell} RON</div>` : ''}
+      ${p.sku ? `<div>🔢 <b>SKU:</b> ${p.sku}</div>` : ''}
+      ${p.expiry ? `<div>📅 <b>Expiră:</b> ${p.expiry}</div>` : ''}
+      ${p.lead_time ? `<div>⏱️ <b>Livrare:</b> ${p.lead_time} zile</div>` : ''}
+      ${p.weight ? `<div>⚖️ <b>Greutate:</b> ${p.weight} kg</div>` : ''}
+      ${margin ? `<div>📈 <b>Marjă:</b> ${margin.margin}%</div>` : ''}
+      ${pred && pred.days !== Infinity ? `<div>🔮 <b>Epuizare:</b> ~${pred.days} zile</div>` : ''}
+    </div>
+    ${p.notes && p.notes.length > 0 ? `
+      <div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:10px">
+        <div style="font-size:11px;color:#6b7a8d;margin-bottom:6px;letter-spacing:1px">NOTE</div>
+        ${p.notes.slice(-2).map(n => `<div style="font-size:12px;color:#99a8b8;border-left:2px solid #a78bfa;padding-left:8px;margin-bottom:4px">${n.text}</div>`).join('')}
+      </div>` : ''}
+    <div style="display:flex;gap:8px">
+      <button onclick="openEditModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
+      <button onclick="openNotesModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
+    </div>`;
+  
+  document.getElementById('card-zoom-name').textContent = p.name;
+  document.getElementById('card-zoom-modal').style.display = 'flex';
+}
+function closeCardZoom() { document.getElementById('card-zoom-modal').style.display='none'; }
+
+// 5. FAVORITE PRODUSE
+let favoriteProducts = JSON.parse(localStorage.getItem('sv_fav_products') || '[]');
+function toggleFavoriteProduct(productId) {
+  const idx = favoriteProducts.indexOf(productId);
+  if (idx === -1) { favoriteProducts.push(productId); }
+  else { favoriteProducts.splice(idx, 1); }
+  localStorage.setItem('sv_fav_products', JSON.stringify(favoriteProducts));
+  renderStock();
+}
+function isFavoriteProduct(id) { return favoriteProducts.includes(id); }
+function filterFavorites() {
+  const input = document.getElementById('stock-search');
+  if (input.value === '⭐') { input.value = ''; renderStock(); }
+  else { input.value = '⭐'; renderStock(); }
+}
+
+// 6. SORTARE AVANSATĂ
+let sortField = 'name', sortDir = 1;
+function sortStock(field) {
+  if (sortField === field) sortDir *= -1;
+  else { sortField = field; sortDir = 1; }
+  renderStock();
+  setFeedback(`📊 Sortat după: ${field}`, 'ok');
+}
+
+// 7. NOTIFICARE RECEPȚIE COMPLETĂ
+function checkAllDeliveriesReceived() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayDels = deliveries.filter(d => d.date === today);
+  if (todayDels.length > 0 && todayDels.every(d => d.status === 'received')) {
+    triggerAlert('✅ Toate livrările de azi au fost recepționate!', 'ok');
+    sendBrowserNotification('✅ Recepție completă!', 'Toate livrările de azi sunt primite.');
+  }
+}
+
+// 8. REMINDER REZERVĂRI
+function checkReservationReminders() {
+  const now = new Date();
+  rezervari.filter(r => r.status !== 'completed').forEach(r => {
+    const rDate = new Date(r.date);
+    const diff = (rDate - now) / 3600000; // hours
+    if (diff > 0 && diff <= 1) {
+      triggerAlert(`⏰ REMINDER: ${r.client} ridică ${r.product_name} în mai puțin de 1 oră!`, 'warn');
+      if (userProfile && userProfile.telegram_id) {
+        sendTelegramAlert(`⏰ REMINDER: ${r.client} ridică ${r.product_name} (${r.qty} ${r.unit}) la ora ${r.date}!`, userProfile.telegram_id);
+      }
+    }
+  });
+}
+setInterval(checkReservationReminders, 300000); // check every 5 min
+
+// 9. ALERTĂ STOC RECORD
+let stockRecords = JSON.parse(localStorage.getItem('sv_records') || '{}');
+function checkStockRecord(product) {
+  const key = String(product.id);
+  if (!stockRecords[key] || product.qty > stockRecords[key]) {
+    stockRecords[key] = product.qty;
+    localStorage.setItem('sv_records', JSON.stringify(stockRecords));
+    if (product.qty > 0) {
+      triggerAlert(`🏆 RECORD! ${product.name} a atins cel mai mare stoc: ${product.qty} ${product.unit}!`, 'ok');
+    }
+  }
+}
+
+// 10. DIGEST SĂPTĂMÂNAL TELEGRAM
+function sendWeeklyDigest() {
+  const lastDigest = localStorage.getItem('sv_last_digest');
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 1 = Monday
+  
+  if (dayOfWeek !== 1) return; // Only Monday
+  const todayStr = today.toISOString().slice(0,10);
+  if (lastDigest === todayStr) return;
+  
+  localStorage.setItem('sv_last_digest', todayStr);
+  
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const weekLog = log.filter(e => {
+    if (!e.ts) return false;
+    const d = new Date(e.ts);
+    return (today - d) <= 7 * 24 * 3600000;
+  });
+  
+  const msg = `📊 <b>DIGEST SĂPTĂMÂNAL</b>
+🏭 ${depot}
+
+` +
+    `📦 Produse totale: ${stock.length}
+` +
+    `📈 Operații săptămâna: ${weekLog.length}
+` +
+    `⚠️ Stoc scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}
+` +
+    `🔴 Epuizat: ${stock.filter(p=>p.qty===0).length}
+` +
+    `💰 Valoare stoc: ${calculateStockValue().totalBuy} RON`;
+  
+  if (userProfile && userProfile.telegram_id) {
+    sendTelegramAlert(msg, userProfile.telegram_id);
+  }
+}
+setInterval(sendWeeklyDigest, 3600000); // check every hour
+
+// 11. ALERTĂ BUGET DEPĂȘIT
+let monthlyBudget = parseFloat(localStorage.getItem('sv_monthly_budget') || '0');
+function setMonthlyBudget(amount) {
+  monthlyBudget = amount;
+  localStorage.setItem('sv_monthly_budget', String(amount));
+  setFeedback(`✅ Buget lunar setat: ${amount} RON`, 'ok');
+}
+function checkBudgetAlert() {
+  if (!monthlyBudget) return;
+  const spent = parseFloat(calculateStockValue().totalBuy) || 0;
+  if (spent > monthlyBudget) {
+    triggerAlert(`💸 BUGET DEPĂȘIT! Cheltuit: ${spent} RON / Budget: ${monthlyBudget} RON`, 'zero');
+  }
+}
+
+// 12. CULOARE CUSTOM PER PRODUS
+function setProductColor(productId, color) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.custom_color = color;
+  saveStockToFirebase();
+  renderStock();
+  setFeedback('✅ Culoare setată!', 'ok');
+}
+
+// 13. PRODUS BLOCAT
+function toggleProductLock(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.locked = !p.locked;
+  saveStockToFirebase();
+  renderStock();
+  setFeedback(`${p.locked ? '🔒 Produs blocat' : '🔓 Produs deblocat'}: ${p.name}`, 'ok');
+}
+
+// Lock check integrated in executeOperation via hook below
+
+// 14. CANTITATE REZERVATĂ VIZIBILĂ pe card
+function getReservedQty(productId) {
+  return (rezervari || [])
+    .filter(r => r.product_id === productId && r.status !== 'completed')
+    .reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0);
+}
+
+// 15. TAG-URI LIBERE
+function addTag(productId, tag) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  if (!p.tags) p.tags = [];
+  const cleanTag = tag.startsWith('#') ? tag : '#' + tag;
+  if (!p.tags.includes(cleanTag)) {
+    p.tags.push(cleanTag);
+    saveStockToFirebase();
+    renderStock();
+    setFeedback(`✅ Tag adăugat: ${cleanTag}`, 'ok');
+  }
+}
+function removeTag(productId, tag) {
+  const p = stock.find(s => s.id === productId);
+  if (!p || !p.tags) return;
+  p.tags = p.tags.filter(t => t !== tag);
+  saveStockToFirebase();
+  renderStock();
+}
+
+// 16. PRODUS RECOMANDAT (bestseller/nou)
+function setProductBadge(productId, badge) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.badge = p.badge === badge ? null : badge; // toggle
+  saveStockToFirebase();
+  renderStock();
+  setFeedback(`✅ Badge: ${badge || 'eliminat'}`, 'ok');
+}
+
+// 17. RAPORT FURNIZORI
+function showSupplierReport() {
+  const suppliers = {};
+  stock.forEach(p => {
+    const sup = p.supplier || 'Necunoscut';
+    if (!suppliers[sup]) suppliers[sup] = { products: 0, totalValue: 0, items: [] };
+    suppliers[sup].products++;
+    suppliers[sup].totalValue += (p.price_buy || 0) * p.qty;
+    suppliers[sup].items.push(p.name);
+  });
+  
+  const el = document.getElementById('supplier-report-content');
+  if (!el) return;
+  
+  const sorted = Object.entries(suppliers).sort((a,b) => b[1].totalValue - a[1].totalValue);
+  
+  el.innerHTML = sorted.map(([sup, data]) => `
+    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #ffa502">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">🏭 ${sup}</div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#ffa502">${data.totalValue.toFixed(0)} RON</div>
+          <div style="font-size:11px;color:#6b7a8d">${data.products} produse</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6b7a8d">${data.items.slice(0,3).join(', ')}${data.items.length>3?'...':''}</div>
+    </div>`).join('');
+  
+  document.getElementById('supplier-report-modal').style.display = 'flex';
+}
+
+// 18. RAPORT LOCAȚII
+function showLocationReport() {
+  const locs = {};
+  stock.forEach(p => {
+    const loc = p.loc || 'Nedefinit';
+    if (!locs[loc]) locs[loc] = { products: 0, totalQty: 0, low: 0 };
+    locs[loc].products++;
+    locs[loc].totalQty += p.qty;
+    if (p.qty <= p.min) locs[loc].low++;
+  });
+  
+  const sorted = Object.entries(locs).sort((a,b) => b[1].products - a[1].products);
+  
+  let msg = '📍 RAPORT LOCAȚII
+
+';
+  sorted.forEach(([loc, data]) => {
+    msg += `${loc}: ${data.products} produse, ${data.low} critice
+`;
+  });
+  alert(msg);
+}
+
+// 19. DETECTARE DUPLICAT LA ADĂUGARE
+function checkDuplicate(name) {
+  const norm = normalizeText(name.toLowerCase());
+  const similar = stock.filter(p => {
+    const pNorm = normalizeText(p.name.toLowerCase());
+    // Check similarity
+    if (pNorm === norm) return true;
+    const words = norm.split(' ').filter(w => w.length > 3);
+    return words.length > 0 && words.every(w => pNorm.includes(w));
+  });
+  return similar;
+}
+
+// Hook into add modal
+const origNewName = document.getElementById ? document.getElementById('new-name') : null;
+
+// 20. AUTO-COMPLETARE NUME PRODUS
+function setupAutocomplete() {
+  const input = document.getElementById('new-name');
+  if (!input) return;
+  
+  input.addEventListener('input', function() {
+    const val = normalizeText(this.value.toLowerCase());
+    if (val.length < 2) { hideAutocomplete(); return; }
+    
+    const matches = stock.filter(p => normalizeText(p.name.toLowerCase()).includes(val)).slice(0, 5);
+    
+    // Also check for duplicates
+    const dupes = checkDuplicate(this.value);
+    if (dupes.length > 0 && this.value.length > 3) {
+      setFeedback(`⚠️ Produs similar există: ${dupes[0].name} (${dupes[0].qty} ${dupes[0].unit})`, 'warn');
+    }
+    
+    if (matches.length === 0) { hideAutocomplete(); return; }
+    
+    let ac = document.getElementById('autocomplete-list');
+    if (!ac) {
+      ac = document.createElement('div');
+      ac.id = 'autocomplete-list';
+      ac.style.cssText = 'position:absolute;background:#181d24;border:1px solid #1e2530;border-radius:8px;z-index:999;width:100%;max-height:200px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.5)';
+      input.parentNode.style.position = 'relative';
+      input.parentNode.appendChild(ac);
+    }
+    
+    ac.innerHTML = matches.map(p => `
+      <div onclick="document.getElementById('new-name').value='${p.name.replace(/'/g,"\'")}';hideAutocomplete()" 
+        style="padding:10px 14px;cursor:pointer;font-size:13px;color:#e8ecf0;border-bottom:1px solid #1e2530"
+        onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='transparent'">
+        ${p.name} <span style="color:#6b7a8d;font-size:11px">(${p.qty} ${p.unit})</span>
+      </div>`).join('');
+    ac.style.display = 'block';
+  });
+  
+  document.addEventListener('click', e => {
+    if (!input.contains(e.target)) hideAutocomplete();
+  });
+}
+
+function hideAutocomplete() {
+  const ac = document.getElementById('autocomplete-list');
+  if (ac) ac.style.display = 'none';
+}
+
+// 21. COMANDĂ VOCALĂ SITUAȚIE COMPLETĂ
+async function handleFullStatusCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('situatie') && !norm.includes('situație') && !norm.includes('status complet') && !norm.includes('raport complet')) return false;
+  
+  speak('Generez situația completă...');
+  
+  const total = stock.length;
+  const low = stock.filter(p=>p.qty<=p.min&&p.qty>0).length;
+  const zero = stock.filter(p=>p.qty===0).length;
+  const val = calculateStockValue();
+  const health = calcDepotHealth();
+  
+  const summary = `Situație depozit: ${total} produse totale. ${zero} epuizate. ${low} cu stoc scăzut. Valoare stoc: ${val.totalBuy} RON. Sănătate depozit: ${health} la sută.`;
+  speak(summary);
+  setFeedback(`📊 ${summary}`, 'ok');
+  return true;
+}
+
+// 22. AUTO-ARHIVARE PRODUSE INACTIVE
+function autoArchiveInactive(days) {
+  const cutoff = new Date(Date.now() - days * 24 * 3600000);
+  let archived = 0;
+  
+  stock.forEach(p => {
+    if (p.archived) return;
+    const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && 
+      e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    
+    if (!lastMove && p.qty === 0) {
+      p.archived = true;
+      archived++;
+    }
+  });
+  
+  if (archived > 0) {
+    saveStockToFirebase();
+    renderStock();
+    setFeedback(`📦 ${archived} produse arhivate automat (inactive ${days}+ zile cu stoc 0)`, 'ok');
+    speak(`${archived} produse arhivate automat.`);
+  } else {
+    setFeedback('✅ Niciun produs de arhivat.', 'ok');
+  }
+}
+
+// 23. PREDICȚIE FURNIZOR OPTIMAL
+async function suggestOptimalSupplier(productName) {
+  const suppliers = [...new Set(stock.filter(p => p.supplier).map(p => p.supplier))];
+  if (!suppliers.length) { setFeedback('⚠️ Nu există furnizori definiți.', 'warn'); return; }
+  
+  const supplierData = suppliers.map(sup => {
+    const supProducts = stock.filter(p => p.supplier === sup);
+    const avgLeadTime = supProducts.reduce((s,p) => s+(p.lead_time||7), 0) / supProducts.length;
+    const avgPrice = supProducts.reduce((s,p) => s+(p.price_buy||0), 0) / supProducts.length;
+    return { sup, avgLeadTime, avgPrice, products: supProducts.length };
+  });
+  
+  // Score: lower price + faster delivery = better
+  const scored = supplierData.map(s => ({
+    ...s,
+    score: 100 - (s.avgPrice/10) - (s.avgLeadTime*2)
+  })).sort((a,b) => b.score - a.score);
+  
+  const best = scored[0];
+  setFeedback(`🏆 Furnizor recomandat: ${best.sup} (${best.products} produse, ~${best.avgLeadTime.toFixed(0)} zile livrare)`, 'ok');
+  speak(`Furnizorul recomandat este ${best.sup}.`);
+}
+
+// 24. EXPORT RAPORT PER CLIENT PDF
+async function exportClientReport(clientName) {
+  await exportClientHistoryPDF(clientName);
+}
+
+// 25. RAPORT PRODUSE FĂRĂ MIȘCARE
+function showNoMovementReport() {
+  const days = 30;
+  const cutoff = new Date(Date.now() - days * 24 * 3600000);
+  
+  const stagnant = stock.map(p => {
+    const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && 
+      e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    const firstMove = [...log].reverse().find(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    const daysSince = firstMove && firstMove.ts ? Math.floor((Date.now() - new Date(firstMove.ts)) / 86400000) : '?';
+    return { ...p, hasRecentMove: !!lastMove, daysSince };
+  }).filter(p => !p.hasRecentMove);
+  
+  const el = document.getElementById('no-movement-content');
+  if (!el) return;
+  
+  el.innerHTML = stagnant.length === 0 
+    ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate produsele au avut mișcare în ultimele 30 zile!</div>'
+    : stagnant.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">
+        <div>
+          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
+          <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="color:#6b7a8d;font-size:12px">💤 ${p.daysSince}+ zile</div>
+          <button onclick="toggleArchive(${p.id})" style="background:none;border:1px solid #6b7a8d;border-radius:4px;color:#6b7a8d;font-size:10px;padding:2px 6px;cursor:pointer;margin-top:2px">📦 ARHIVEAZĂ</button>
+        </div>
+      </div>`).join('');
+  
+  document.getElementById('no-movement-modal').style.display = 'flex';
+}
+
+// 26. DASHBOARD PRINT-FRIENDLY
+function printDashboard() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  
+  const printWindow = window.open('', '_blank');
+  const stockHTML = stock.map(p => `
+    <tr>
+      <td>${p.name}</td>
+      <td>${p.cat||'—'}</td>
+      <td><b>${p.qty}</b></td>
+      <td>${p.unit}</td>
+      <td>${p.loc||'—'}</td>
+      <td>${p.min}</td>
+      <td>${p.qty===0?'EPUIZAT':p.qty<=p.min?'SCĂZUT':'OK'}</td>
+    </tr>`).join('');
+  
+  printWindow.document.write(`
+    <!DOCTYPE html><html><head>
+    <title>StocVoce — ${depot} — ${now}</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:20px;color:#000}
+      h1{font-size:20px;border-bottom:2px solid #000;padding-bottom:8px}
+      table{width:100%;border-collapse:collapse;font-size:12px}
+      th{background:#000;color:#fff;padding:6px;text-align:left}
+      td{padding:5px;border-bottom:1px solid #ddd}
+      tr:nth-child(even){background:#f5f5f5}
+      .ok{color:green}.low{color:orange}.zero{color:red;font-weight:bold}
+      @media print{button{display:none}}
+    </style></head><body>
+    <h1>StocVoce — ${depot} — ${now}</h1>
+    <p>Total: ${stock.length} produse | Scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length} | Epuizat: ${stock.filter(p=>p.qty===0).length}</p>
+    <button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;cursor:pointer">🖨️ Printează</button>
+    <table>
+      <tr><th>Produs</th><th>Categorie</th><th>Cantitate</th><th>UM</th><th>Locație</th><th>Min.</th><th>Status</th></tr>
+      ${stockHTML}
+    </table>
+    
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER REPORT MODAL -->
+<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
+      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+</body></html>`);
+  printWindow.document.close();
+}
+
+// Initialize on app load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    initTouchGestures();
+    setupAutocomplete();
+    checkAutoNightMode();
+  }, 2000);
+});
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -8349,6 +9442,85 @@ function installApp() {
       <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="profit-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- PRODUCT ZOOM MODAL -->
+<div id="product-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 16px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="zoom-title">Produs</div>
+      <button onclick="closeZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:14px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="zoom-content" style="overflow-y:auto;padding:20px;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER REPORT MODAL -->
+<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🏭 Raport Furnizori</div>
+      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- STAGNANT FULL MODAL -->
+<div id="stagnant-full-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:540px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
+      <button onclick="document.getElementById('stagnant-full-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="stagnant-full-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT TOOLBAR -->
+<div id="sort-bar" style="display:none;gap:4px;flex-wrap:wrap;padding:6px 0">
+  <span style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;padding:4px">↕️ SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Nume</button>
+  <button onclick="sortStock('qty')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Cantitate</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Locație</button>
+  <button onclick="sortStock('price_buy')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Preț</button>
+  <button onclick="sortField=null;renderStock()" style="background:#181d24;border:1px solid #ff4757;border-radius:5px;color:#ff4757;font-size:11px;padding:4px 8px;cursor:pointer">✕ Reset</button>
+</div>
+
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER REPORT MODAL -->
+<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
+      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
