@@ -8038,7 +8038,6 @@ function filterFavorites() {
 }
 
 // 6. SORTARE AVANSATĂ
-let sortField = 'name', sortDir = 1;
 function sortStock(field) {
   if (sortField === field) sortDir *= -1;
   else { sortField = field; sortDir = 1; }
@@ -8073,7 +8072,6 @@ function checkReservationReminders() {
 setInterval(checkReservationReminders, 300000); // check every 5 min
 
 // 9. ALERTĂ STOC RECORD
-let stockRecords = JSON.parse(localStorage.getItem('sv_records') || '{}');
 function checkStockRecord(product) {
   const key = String(product.id);
   if (!stockRecords[key] || product.qty > stockRecords[key]) {
@@ -8125,7 +8123,6 @@ function sendWeeklyDigest() {
 setInterval(sendWeeklyDigest, 3600000); // check every hour
 
 // 11. ALERTĂ BUGET DEPĂȘIT
-let monthlyBudget = parseFloat(localStorage.getItem('sv_monthly_budget') || '0');
 function setMonthlyBudget(amount) {
   monthlyBudget = amount;
   localStorage.setItem('sv_monthly_budget', String(amount));
