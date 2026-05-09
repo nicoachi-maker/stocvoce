@@ -705,27 +705,30 @@ function buildRecognition(){
 
 function handleWakeMode(transcript,isFinal){
   const norm=normalizeText(transcript);
+  
   if(!isCommandMode){
-    // Detectează wake word
     const hasWake=WAKE_WORDS.some(w=>norm.includes(normalizeText(w)));
     if(hasWake){
       isCommandMode=true;
       setMicState('listening');
       document.getElementById('audio-bars').classList.add('active');
       
-      // Extrage comanda dacă e în același enunț
+      // Extrage comanda din același enunț
       let cmd=transcript;
       WAKE_WORDS.forEach(w=>{cmd=cmd.replace(new RegExp(w,'gi'),'').trim();});
+      cmd=cmd.trim();
       
       if(cmd.length>3){
-        // Comanda e în același enunț cu wake word
+        // Comanda e în același enunț: "Stoc adaugă 10 șuruburi"
+        isCommandMode=false;
         handleCommand(cmd);
         return;
       }
       
-      // Așteaptă comanda separată
-      setFeedback('✅ Activ – spuneți comanda acum!','ok');
-      speak('Da.');
+      // Comanda vine separat - așteaptă
+      setFeedback('✅ Activ – spuneți comanda!','ok');
+      document.getElementById('transcript-display').textContent='...';
+      
       clearTimeout(wakeTimeout);
       wakeTimeout=setTimeout(()=>{
         if(isCommandMode){
@@ -733,14 +736,19 @@ function handleWakeMode(transcript,isFinal){
           setMicState('standby');
           setFeedback('👂 Aștept "STOC" + comandă...','');
           document.getElementById('audio-bars').classList.remove('active');
+          document.getElementById('transcript-display').textContent='...';
         }
-      },6000);
+      },7000);
     }
   } else {
-    // Suntem în modul comandă - orice spune e comandă
-    if(transcript.trim().length>2){
+    // Modul comandă - procesează imediat ce e final
+    if(isFinal && transcript.trim().length>2){
       clearTimeout(wakeTimeout);
+      isCommandMode=false;
       handleCommand(transcript);
+    } else if(!isFinal && transcript.trim().length>2){
+      // Arată ce se aude în timp real
+      document.getElementById('transcript-display').textContent=transcript.trim();
     }
   }
 }
