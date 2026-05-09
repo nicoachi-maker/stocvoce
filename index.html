@@ -778,8 +778,8 @@ function speak(text) {
   if(recognition){try{recognition.abort();}catch(e){} recognition=null;}
   
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = (typeof LANG_SPEECH !== 'undefined' && typeof currentLang !== 'undefined') ? 
-    (LANG_SPEECH[currentLang] || 'ro-RO') : 'ro-RO';
+  const _ls = typeof LANG_SPEECH !== 'undefined' ? LANG_SPEECH : null;
+  utt.lang = (_ls && typeof currentLang !== 'undefined') ? (_ls[currentLang] || 'ro-RO') : 'ro-RO';
   utt.rate=1.1; utt.pitch=1;
   const voices=synth.getVoices();
   
