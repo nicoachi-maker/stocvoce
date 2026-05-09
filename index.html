@@ -167,6 +167,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
@@ -395,6 +396,10 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button class="add-btn" onclick="openAddModal()">+ Produs</button>
       <button class="add-btn" onclick="openImportModal()" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
       <button class="add-btn" onclick="openTransferModal()" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
+      <button class="add-btn" onclick="openInventarModal()" style="border-color:#00e5a0;color:#00e5a0">🔁 Inventar</button>
+      <button class="add-btn" onclick="openComandaModal()" style="border-color:#ffa502;color:#ffa502">📋 Comandă</button>
+      <button class="add-btn" onclick="openRezervariModal()" style="border-color:#a78bfa;color:#a78bfa">⏰ Rezervări</button>
+      <button class="add-btn" onclick="openEticheteModal()" style="border-color:#00e5a0;color:#00e5a0">🏷️ Etichete</button>
       <button class="add-btn" onclick="openQRModal()" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
       <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
       <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
@@ -3103,6 +3108,322 @@ function loadDeliveriesAndClients() {
   });
 }
 
+
+// ── 1. INVENTAR PERIODIC ──
+let inventarData = {};
+
+function openInventarModal() {
+  inventarData = {};
+  const el = document.getElementById('inventar-list');
+  el.innerHTML = stock.map(p => `
+    <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid #1e2530" id="inv-row-${p.id}">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>
+        <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Sistem: <span style="color:#00e5a0;font-weight:600">${p.qty} ${p.unit}</span></div>
+      </div>
+      <input type="number" id="inv-${p.id}" placeholder="${p.qty}" oninput="checkInventarDiff(${p.id},${p.qty})" 
+        style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:7px;outline:none;text-align:center">
+      <div id="inv-diff-${p.id}" style="font-size:12px;width:60px;text-align:right">—</div>
+    </div>
+  `).join('');
+  document.getElementById('inventar-modal').style.display = 'flex';
+}
+
+function checkInventarDiff(id, systemQty) {
+  const input = document.getElementById('inv-'+id);
+  const diffEl = document.getElementById('inv-diff-'+id);
+  const row = document.getElementById('inv-row-'+id);
+  const val = parseInt(input.value);
+  if (isNaN(val)) { diffEl.textContent='—'; row.style.borderLeftColor='#1e2530'; return; }
+  const diff = val - systemQty;
+  inventarData[id] = val;
+  if (diff === 0) {
+    diffEl.textContent='✅ OK'; diffEl.style.color='#00e5a0'; row.style.borderLeftColor='#00e5a0';
+  } else if (diff > 0) {
+    diffEl.textContent=`+${diff}`; diffEl.style.color='#a78bfa'; row.style.borderLeftColor='#a78bfa';
+  } else {
+    diffEl.textContent=`${diff}`; diffEl.style.color='#ff4757'; row.style.borderLeftColor='#ff4757';
+  }
+}
+
+function finishInventar() {
+  let changes = 0;
+  Object.entries(inventarData).forEach(([id, newQty]) => {
+    const p = stock.find(s => s.id === parseInt(id));
+    if (p && p.qty !== newQty) {
+      const diff = newQty - p.qty;
+      const oldQty = p.qty;
+      p.qty = newQty;
+      changes++;
+      addLog(`Inventar: ${p.name}`, `Corecție inventar: ${oldQty}→${newQty} (${diff>0?'+':''}${diff})`, diff>0?'in':'out');
+    }
+  });
+  if (changes > 0) {
+    saveStockToFirebase();
+    renderStock(); updateStats();
+    speak(`Inventar finalizat! ${changes} produse actualizate.`);
+    setFeedback(`✅ Inventar finalizat: ${changes} produse corectate.`, 'ok');
+  } else {
+    speak('Inventar finalizat. Nicio diferență găsită.');
+    setFeedback('✅ Inventar OK — nicio diferență!', 'ok');
+  }
+  closeInventarModal();
+}
+
+function closeInventarModal() { document.getElementById('inventar-modal').style.display='none'; }
+
+// ── 2. COMANDĂ FURNIZOR ──
+function openComandaModal() {
+  const lowProducts = stock.filter(p => p.qty <= p.min);
+  const el = document.getElementById('comanda-list');
+  if (!lowProducts.length) {
+    el.innerHTML = '<div style="color:#00e5a0;font-size:13px;text-align:center;padding:20px">✅ Toate produsele au stoc suficient!</div>';
+  } else {
+    el.innerHTML = lowProducts.map(p => {
+      const needed = Math.max(p.moq || (p.min * 3), p.min * 3 - p.qty);
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#111418;border-radius:8px;margin-bottom:8px;border-left:3px solid ${p.qty===0?'#ff4757':'#ffa502'}">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>
+          <div style="font-size:11px;color:#6b7a8d">Stoc: <span style="color:${p.qty===0?'#ff4757':'#ffa502'}">${p.qty} ${p.unit}</span> · Min: ${p.min} · Furnizor: ${p.supplier||'Nedefinit'}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#00e5a0">${needed}</div>
+          <div style="font-size:10px;color:#6b7a8d">${p.unit} de comandat</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('comanda-modal').style.display = 'flex';
+}
+
+function closeComandaModal() { document.getElementById('comanda-modal').style.display='none'; }
+
+async function exportComandaPDF() {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  const lowProducts = stock.filter(p => p.qty <= p.min);
+  
+  doc.setFillColor(10,12,15);
+  doc.rect(0,0,210,30,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(232,236,240);
+  doc.text('COMANDĂ REAPROVIZIONARE',14,18);
+  doc.setFontSize(10);
+  doc.setTextColor(107,122,141);
+  doc.text(`${depot} · ${now}`,14,25);
+  
+  doc.autoTable({
+    startY:38,
+    head:[['Produs','Stoc Curent','De Comandat','Furnizor','Contact']],
+    body: lowProducts.map(p=>[ p.name, `${p.qty} ${p.unit}`, `${Math.max(p.moq||p.min*3, p.min*3-p.qty)} ${p.unit}`, p.supplier||'—', p.supplier_contact||'—' ]),
+    styles:{fontSize:9,textColor:[153,168,184],fillColor:[17,20,24],lineColor:[30,37,48]},
+    headStyles:{fillColor:[10,12,15],textColor:[0,229,160],fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[24,29,36]},
+    margin:{left:14,right:14}
+  });
+  
+  doc.save(`Comanda_${depot}_${now.replace(/\./g,'-')}.pdf`);
+  setFeedback('✅ PDF comandă generat!', 'ok');
+}
+
+async function exportComandaTelegram() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  const lowProducts = stock.filter(p => p.qty <= p.min);
+  
+  let msg = `📋 <b>COMANDĂ REAPROVIZIONARE</b>\n🏭 ${depot} · ${now}\n\n`;
+  lowProducts.forEach(p => {
+    const needed = Math.max(p.moq||p.min*3, p.min*3-p.qty);
+    msg += `• <b>${p.name}</b>: ${needed} ${p.unit}\n`;
+    if(p.supplier) msg += `  Furnizor: ${p.supplier}\n`;
+  });
+  
+  if(userProfile && userProfile.telegram_id) {
+    await sendTelegramAlert(msg, userProfile.telegram_id);
+    setFeedback('✅ Comandă trimisă pe Telegram!', 'ok');
+  } else {
+    setFeedback('⚠️ Nu ai Telegram ID setat în setări!', 'warn');
+  }
+}
+
+// ── 3. REZERVĂRI ──
+let rezervari = JSON.parse(localStorage.getItem('sv_rezervari') || '[]');
+
+function openRezervariModal() {
+  // Populate product select
+  const sel = document.getElementById('rez-product');
+  sel.innerHTML = stock.map(p => `<option value="${p.id}">${p.name} (${p.qty} ${p.unit})</option>`).join('');
+  // Set default date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate()+1);
+  document.getElementById('rez-date').value = tomorrow.toISOString().slice(0,10);
+  renderRezervari();
+  document.getElementById('rezervari-modal').style.display = 'flex';
+}
+
+function closeRezervariModal() { document.getElementById('rezervari-modal').style.display='none'; }
+
+function renderRezervari() {
+  const el = document.getElementById('rezervari-list');
+  const active = rezervari.filter(r => r.status !== 'completed');
+  if (!active.length) {
+    el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio rezervare activă.</div>';
+    return;
+  }
+  el.innerHTML = active.map((r,i) => {
+    const dDate = new Date(r.date);
+    const isToday = dDate.toDateString() === new Date().toDateString();
+    const isOverdue = dDate < new Date() && !isToday;
+    const color = isOverdue ? '#ff4757' : isToday ? '#ffa502' : '#a78bfa';
+    return `
+    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid ${color}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${r.client}</div>
+          <div style="font-size:12px;color:#99a8b8">📦 ${r.product_name}: <span style="color:#a78bfa;font-weight:600">${r.qty} ${r.unit}</span></div>
+          <div style="font-size:11px;color:#6b7a8d;margin-top:2px">📅 ${r.date} · ${isOverdue?'⚠️ EXPIRAT':isToday?'🔔 AZI':'⏰ Programat'}</div>
+        </div>
+        <button onclick="completeRezervare(${i})" style="background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px 10px;cursor:pointer;flex-shrink:0">✅ RIDICĂ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addRezervare() {
+  const client = document.getElementById('rez-client').value.trim();
+  const productId = parseInt(document.getElementById('rez-product').value);
+  const qty = parseInt(document.getElementById('rez-qty').value);
+  const date = document.getElementById('rez-date').value;
+  
+  if (!client || !qty || !date) { alert('Completați toate câmpurile!'); return; }
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  if (qty > p.qty) { alert(`Stoc insuficient! Disponibil: ${p.qty} ${p.unit}`); return; }
+  
+  rezervari.push({ client, product_id: productId, product_name: p.name, unit: p.unit, qty, date, status: 'active', created: new Date().toISOString(), user: userProfile?userProfile.name:'—' });
+  localStorage.setItem('sv_rezervari', JSON.stringify(rezervari));
+  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
+  
+  ['rez-client','rez-qty'].forEach(id=>document.getElementById(id).value='');
+  renderRezervari();
+  speak(`Rezervare creată pentru ${client}: ${qty} ${p.unit} de ${p.name}.`);
+  setFeedback(`⏰ Rezervat pentru ${client}`, 'ok');
+}
+
+function completeRezervare(index) {
+  const r = rezervari.filter(r=>r.status!=='completed')[index];
+  if (!r) return;
+  const p = stock.find(s => s.id === r.product_id);
+  if (p) {
+    if (r.qty > p.qty) { alert('Stoc insuficient pentru a finaliza rezervarea!'); return; }
+    p.qty -= r.qty;
+    saveStockToFirebase();
+    renderStock(); updateStats();
+  }
+  r.status = 'completed';
+  r.completed_at = new Date().toISOString();
+  localStorage.setItem('sv_rezervari', JSON.stringify(rezervari));
+  if(window.fbReady) db.ref('depozite/'+getDepotKey()+'/rezervari').set(rezervari);
+  
+  addLog(`Rezervare ridicată: ${r.client}`, `${r.product_name}: ${r.qty} ${r.unit}`, 'out', r.client);
+  renderRezervari();
+  speak(`${r.client} a ridicat rezervarea de ${r.qty} ${r.unit} de ${r.product_name}.`);
+}
+
+// ── 4 & 5. ETICHETE QR ──
+let selectedEtichete = new Set();
+
+function openEticheteModal() {
+  selectedEtichete = new Set(stock.map(p => p.id));
+  renderEticheteGrid(stock);
+  document.getElementById('etichete-modal').style.display = 'flex';
+}
+
+function closeEticheteModal() { document.getElementById('etichete-modal').style.display='none'; }
+
+function filterEtichete() {
+  const search = normalizeText(document.getElementById('etichete-search').value.toLowerCase());
+  const filtered = search ? stock.filter(p => normalizeText(p.name.toLowerCase()).includes(search) || normalizeText((p.loc||'').toLowerCase()).includes(search)) : stock;
+  renderEticheteGrid(filtered);
+}
+
+function selectAllEtichete() {
+  selectedEtichete = new Set(stock.map(p=>p.id));
+  filterEtichete();
+}
+
+function renderEticheteGrid(products) {
+  const grid = document.getElementById('etichete-grid');
+  grid.innerHTML = products.map(p => `
+    <div onclick="toggleEticheta(${p.id})" id="eticheta-card-${p.id}" 
+      style="background:#181d24;border:2px solid ${selectedEtichete.has(p.id)?'#00e5a0':'#1e2530'};border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;text-align:center">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;margin-bottom:4px;line-height:1.2">${p.name}</div>
+      <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px">📍 ${p.loc||'—'}</div>
+      ${selectedEtichete.has(p.id)?'<div style="color:#00e5a0;font-size:18px">✅</div>':'<div style="color:#1e2530;font-size:18px">○</div>'}
+    </div>`).join('');
+}
+
+function toggleEticheta(id) {
+  if (selectedEtichete.has(id)) selectedEtichete.delete(id);
+  else selectedEtichete.add(id);
+  filterEtichete();
+}
+
+function printEtichete() {
+  const selected = stock.filter(p => selectedEtichete.has(p.id));
+  if (!selected.length) { alert('Selectați cel puțin un produs!'); return; }
+  
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const printWindow = window.open('', '_blank');
+  
+  let eticheteHTML = selected.map(p => {
+    const data = JSON.stringify({ id: p.id, name: p.name, depot, sku: p.sku||'' });
+    return `
+    <div class="eticheta">
+      <div class="eticheta-name">${p.name}</div>
+      <div class="eticheta-info">${p.sku ? p.sku + ' · ' : ''}📍 ${p.loc||'—'}</div>
+      <div class="eticheta-depot">${depot}</div>
+      <div id="qr-${p.id}" class="qr-container"></div>
+      <div class="eticheta-min">Min: ${p.min} ${p.unit}</div>
+    </div>`;
+  }).join('');
+
+  printWindow.document.write(`
+    <!DOCTYPE html><html><head>
+    <title>Etichete QR - ${depot}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+    <style>
+      body{margin:0;padding:10px;font-family:Arial,sans-serif;background:#fff}
+      .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+      .eticheta{border:2px solid #000;border-radius:6px;padding:10px;text-align:center;break-inside:avoid}
+      .eticheta-name{font-weight:900;font-size:14px;margin-bottom:3px}
+      .eticheta-info{font-size:10px;color:#666;margin-bottom:2px}
+      .eticheta-depot{font-size:10px;color:#666;margin-bottom:6px}
+      .qr-container{display:flex;justify-content:center;margin:6px 0}
+      .qr-container img,.qr-container canvas{width:80px!important;height:80px!important}
+      .eticheta-min{font-size:10px;color:#666;margin-top:3px}
+      @media print{body{margin:0}button{display:none}}
+    </style>
+    </head><body>
+    <button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;background:#000;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px">🖨️ Printează</button>
+    <div class="grid">${eticheteHTML}</div>
+    <script>
+      const products = ${JSON.stringify(selected)};
+      const depot = "${depot}";
+      products.forEach(p => {
+        const el = document.getElementById('qr-'+p.id);
+        if(el) new QRCode(el, {text: JSON.stringify({id:p.id,name:p.name,depot,sku:p.sku||''}), width:80, height:80});
+      });
+    <\/script>
+    </body></html>`);
+  printWindow.document.close();
+  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -3581,6 +3902,86 @@ function installApp() {
       </div>
       <button onclick="addClient()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ ÎNREGISTREAZĂ</button>
     </div>
+  </div>
+</div>
+
+
+<!-- 1. INVENTAR PERIODIC MODAL -->
+<div id="inventar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:680px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🔁 Inventar Periodic</div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:2px">Verifică și actualizează stocul fizic</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="finishInventar()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer;letter-spacing:1px">✅ FINALIZEAZĂ</button>
+        <button onclick="closeInventarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:14px;font-size:12px;color:#ffa502">
+      ⚠️ Introduceți cantitatea FIZICĂ reală pentru fiecare produs. Diferențele vor fi marcate.
+    </div>
+    <div id="inventar-list"></div>
+  </div>
+</div>
+
+<!-- 2. COMANDĂ FURNIZOR MODAL -->
+<div id="comanda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📋 Comandă Furnizor</div>
+      <button onclick="closeComandaModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">Produse sub stoc minim</div>
+      <div id="comanda-list"></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="exportComandaPDF()" style="flex:1;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📄 EXPORT PDF</button>
+      <button onclick="exportComandaTelegram()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📱 TRIMITE TELEGRAM</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. REZERVĂRI MODAL -->
+<div id="rezervari-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">⏰ Rezervări</div>
+      <button onclick="closeRezervariModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="rezervari-list" style="flex:1;overflow-y:auto;margin-bottom:14px"></div>
+    <div style="border-top:1px solid #1e2530;padding-top:14px">
+      <div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Rezervare Nouă</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <input id="rez-client" placeholder="Nume client" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <select id="rez-product" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none;cursor:pointer"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <input id="rez-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+        <input id="rez-date" type="date" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
+      </div>
+      <button onclick="addRezervare()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ REZERVĂ</button>
+    </div>
+  </div>
+</div>
+
+<!-- 4. ETICHETE QR MODAL -->
+<div id="etichete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Etichete QR</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="printEtichete()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">🖨️ PRINTEAZĂ</button>
+        <button onclick="closeEticheteModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
+      <input id="etichete-search" placeholder="Filtrează produse..." oninput="filterEtichete()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px 12px;outline:none">
+      <button onclick="selectAllEtichete()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 12px;cursor:pointer">SELECT ALL</button>
+    </div>
+    <div id="etichete-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-height:400px;overflow-y:auto"></div>
   </div>
 </div>
 
