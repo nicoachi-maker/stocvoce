@@ -898,27 +898,59 @@ function normalizeText(text){
     .replace(/[ȘŞ]/g,'S').replace(/[ȚŢ]/g,'T').replace(/[ĂÂ]/g,'A').replace(/Î/g,'I');
 }
 function findProduct(words, clientName){
-  // Remove client name and action words from search
+  // Build search text - remove client name, numbers, action words
   let searchText = words.join(' ');
+  
+  // Remove client name
   if(clientName) {
-    searchText = searchText.replace(new RegExp(clientName, 'gi'), '').trim();
+    searchText = searchText.replace(clientName, ' ');
   }
-  // Remove action words
-  const actionWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','luat','ridicat','preluat','scoate','adauga','adaugă','pune','stoc','stock','de','un','o','buc','bucati','bucăți','palet','paleți','cutie','cutii','kg','litri'];
-  actionWords.forEach(w => {
-    searchText = searchText.replace(new RegExp('\\b'+w+'\\b','gi'), ' ');
+  
+  // Remove common words that are not product names
+  const removeWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos',
+    'luat','ridicat','preluat','scoate','scot','adauga','adaugă','pune','bag',
+    'stoc','stock','de','un','o','bucati','bucăți','paleți','cutii','litri',
+    'intrare','iesire','ieșire','plus','minus','consum'];
+  removeWords.forEach(w => {
+    searchText = searchText.replace(new RegExp('\\b' + normalizeText(w) + '\\b', 'gi'), ' ');
   });
-  // Remove numbers
-  searchText = searchText.replace(/\b\d+\b/g, '').trim();
   
-  const s = normalizeText(searchText);
+  // Remove numbers  
+  searchText = searchText.replace(/\b\d+\b/g, ' ').replace(/\s+/g, ' ').trim();
+  const s = normalizeText(searchText.toLowerCase());
+  
   if(!s || s.length < 2) return null;
-  
-  let f=stock.find(p=>{const n=normalizeText(p.name.toLowerCase());return s.includes(n)||n.includes(s);});
-  if(f)return f;
-  f=stock.find(p=>normalizeText(p.name.toLowerCase()).split(/\s+/).some(pw=>pw.length>2&&s.includes(pw)));
-  if(f)return f;
-  return stock.find(p=>s.includes(normalizeText(p.cat.toLowerCase())))||null;
+
+  // 1. Exact match - product name fully in search
+  let f = stock.find(p => {
+    const n = normalizeText(p.name.toLowerCase());
+    return s.includes(n);
+  });
+  if(f) return f;
+
+  // 2. Search text in product name
+  f = stock.find(p => {
+    const n = normalizeText(p.name.toLowerCase());
+    return n.includes(s);
+  });
+  if(f) return f;
+
+  // 3. All significant words of product found in search
+  f = stock.find(p => {
+    const pWords = normalizeText(p.name.toLowerCase()).split(/\s+/).filter(w => w.length > 2);
+    return pWords.length > 0 && pWords.every(pw => s.includes(pw));
+  });
+  if(f) return f;
+
+  // 4. Any significant word of product found in search
+  f = stock.find(p => {
+    const pWords = normalizeText(p.name.toLowerCase()).split(/\s+/).filter(w => w.length > 3);
+    return pWords.some(pw => s.includes(pw));
+  });
+  if(f) return f;
+
+  // 5. Category match
+  return stock.find(p => s.includes(normalizeText(p.cat.toLowerCase()))) || null;
 }
 function parseQuantity(text){
   const nw={'unu':1,'una':1,'doua':2,'două':2,'trei':3,'patru':4,'cinci':5,'sase':6,'sapte':7,'opt':8,'noua':9,'zece':10,'unsprezece':11,'doisprezece':12,'treisprezece':13,'paisprezece':14,'cincisprezece':15,'saisprezece':16,'saptesprezece':17,'optsprezece':18,'nouasprezece':19,'douazeci':20,'treizeci':30,'patruzeci':40,'cincizeci':50,'saizeci':60,'saptezeci':70,'optzeci':80,'nouazeci':90,'o suta':100,'o sută':100,'doua sute':200,'două sute':200,'trei sute':300};
