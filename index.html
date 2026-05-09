@@ -2583,6 +2583,25 @@ function openSettingsModal() {
     updateToggleUI(enabled);
   });
   document.getElementById('settings-modal').style.display = 'flex';
+  
+  // Load extra app settings
+  try {
+    appSettings = JSON.parse(localStorage.getItem('sv_app_settings') || '{}');
+    const sd = document.getElementById('settings-sound');
+    const vc = document.getElementById('settings-voice-confirm');
+    const bn = document.getElementById('settings-browser-notif');
+    const ac = document.getElementById('settings-auto-csv');
+    const dm = document.getElementById('settings-demo-mode');
+    if(sd) sd.checked = appSettings.sound || false;
+    if(vc) vc.checked = appSettings.voice_confirm !== false;
+    if(bn) bn.checked = appSettings.browser_notif || false;
+    if(ac) ac.checked = appSettings.auto_csv || false;
+    if(dm) dm.checked = appSettings.demo_mode || false;
+    setTheme(appSettings.theme || 'dark', false);
+    setFontSize(appSettings.font_size || 'normal', false);
+    setGridSize(appSettings.grid_size || 'normal', false);
+    setApprovalThreshold(appSettings.approval_threshold || 50);
+  } catch(e) { console.error('Settings load error:', e); }
 }
 
 function closeSettingsModal() {
@@ -2636,6 +2655,24 @@ async function saveSettings() {
   // Setup daily report
   setupDailyReport();
 
+  // Save extra app settings
+  try {
+    appSettings = JSON.parse(localStorage.getItem('sv_app_settings') || '{}');
+    const sd = document.getElementById('settings-sound');
+    const vc = document.getElementById('settings-voice-confirm');
+    const bn = document.getElementById('settings-browser-notif');
+    const ac = document.getElementById('settings-auto-csv');
+    const dm = document.getElementById('settings-demo-mode');
+    if(sd) appSettings.sound = sd.checked;
+    if(vc) appSettings.voice_confirm = vc.checked;
+    if(bn) appSettings.browser_notif = bn.checked;
+    if(ac) appSettings.auto_csv = ac.checked;
+    if(dm) appSettings.demo_mode = dm.checked;
+    saveAppSettings();
+    applyAppSettings();
+    if(appSettings.browser_notif) Notification.requestPermission();
+  } catch(e) { console.error('Settings save error:', e); }
+  
   closeSettingsModal();
   setFeedback('✅ Setări salvate cu succes!', 'ok');
   speak('Setări salvate.');
@@ -5351,40 +5388,7 @@ function playCommandSound() {
   } catch(e) {}
 }
 
-// Load settings in openSettingsModal
-const _origOpenSettings = openSettingsModal;
-function openSettingsModal() {
-  _origOpenSettings();
-  // Load extra settings
-  document.getElementById('settings-sound').checked = appSettings.sound || false;
-  document.getElementById('settings-voice-confirm').checked = appSettings.voice_confirm !== false;
-  document.getElementById('settings-browser-notif').checked = appSettings.browser_notif || false;
-  document.getElementById('settings-auto-csv').checked = appSettings.auto_csv || false;
-  document.getElementById('settings-demo-mode').checked = appSettings.demo_mode || false;
-  
-  // Update button states
-  setTheme(appSettings.theme || 'dark', false);
-  setFontSize(appSettings.font_size || 'normal', false);
-  setGridSize(appSettings.grid_size || 'normal', false);
-  setApprovalThreshold(appSettings.approval_threshold || 50);
-}
-
-// Save extra settings
-const _origSaveSettings = saveSettings;
-async function saveSettings() {
-  await _origSaveSettings();
-  appSettings.sound = document.getElementById('settings-sound').checked;
-  appSettings.voice_confirm = document.getElementById('settings-voice-confirm').checked;
-  appSettings.browser_notif = document.getElementById('settings-browser-notif').checked;
-  appSettings.auto_csv = document.getElementById('settings-auto-csv').checked;
-  appSettings.demo_mode = document.getElementById('settings-demo-mode').checked;
-  saveAppSettings();
-  applyAppSettings();
-  
-  if (appSettings.browser_notif) {
-    Notification.requestPermission();
-  }
-}
+// Extended settings integrated below
 
 // Apply settings on page load
 document.addEventListener('DOMContentLoaded', () => {
