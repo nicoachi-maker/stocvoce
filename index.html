@@ -620,6 +620,11 @@ auth.onAuthStateChanged(async (user) => {
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
+    // Load preferred language
+    if (userProfile.preferred_lang) {
+      currentLang = userProfile.preferred_lang;
+      localStorage.setItem('sv_lang', currentLang);
+    }
     initLangModal();
     applyTranslations();
     setTimeout(checkExpiryAlerts, 3000);
@@ -769,7 +774,7 @@ function buildRecognition(){
   if(recognition){try{recognition.abort();}catch(e){}}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recognition=new SR();
-  recognition.lang='ro-RO';
+  recognition.lang = LANG_SPEECH[currentLang] || 'ro-RO';
   recognition.continuous=false; // false = mai stabil pe toate dispozitivele
   recognition.interimResults=true;
   recognition.maxAlternatives=1;
@@ -1012,12 +1017,15 @@ function extractClientName(text, norm) {
 function processCommand(text){
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   const norm=normalizeText(text);
-  const inKW=['adauga','adaugă','pune','bag','intra','intră','primire','receptie','intrare','plus'];
-  const outKW=['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat'];
-  const listKW=['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'];
   
-  // Detect client name in command FIRST
-  const clientName = extractClientName(text, norm);
+  // Use multilingual keywords
+  const cmds = getVoiceCommands();
+  const inKW = cmds.in;
+  const outKW = cmds.out;
+  const listKW = cmds.list;
+  
+  // Detect client name using multilingual patterns
+  const clientName = extractClientNameML(text) || extractClientName(text, norm);
   
   let opType=null;
   if(clientName) {
@@ -2488,6 +2496,15 @@ let userSettings = {};
 
 function openSettingsModal() {
   if (!currentUser) return;
+  
+  // Populate language selector
+  const langSel = document.getElementById('settings-language');
+  if (langSel) {
+    langSel.innerHTML = Object.entries(LANGUAGES).map(([code, lang]) => 
+      `<option value="${code}" ${currentLang===code?'selected':''}>${lang.flag} ${lang.name}</option>`
+    ).join('');
+  }
+  
   // Load current settings
   db.ref('users/' + currentUser.uid + '/settings').once('value').then(snap => {
     const s = snap.val() || {};
@@ -2528,10 +2545,17 @@ async function saveSettings() {
   const reportHour = parseInt(document.getElementById('settings-report-hour').value);
   const alertLow = document.getElementById('settings-alert-low').checked;
   const alertZero = document.getElementById('settings-alert-zero').checked;
+  const selectedLang = document.getElementById('settings-language').value;
+  
+  // Apply language immediately
+  if (selectedLang && selectedLang !== currentLang) {
+    setLanguage(selectedLang);
+  }
 
   // Save to Firebase
   await db.ref('users/' + currentUser.uid).update({
     telegram_id: telegramId || null,
+    preferred_lang: selectedLang || 'ro',
     settings: {
       report_enabled: reportEnabled,
       report_hour: reportHour,
@@ -3688,6 +3712,15 @@ const LANGUAGES = {
   }}
 };
 
+
+const LANG_SPEECH = {
+  ro:'ro-RO', en:'en-GB', de:'de-DE', fr:'fr-FR', hu:'hu-HU',
+  it:'it-IT', es:'es-ES', pl:'pl-PL', cs:'cs-CZ', sk:'sk-SK',
+  bg:'bg-BG', hr:'hr-HR', nl:'nl-NL', pt:'pt-PT', sv:'sv-SE',
+  da:'da-DK', fi:'fi-FI', el:'el-GR', et:'et-EE', lv:'lv-LV',
+  lt:'lt-LT', sl:'sl-SI', mt:'mt-MT', ga:'ga-IE'
+};
+
 let currentLang = localStorage.getItem('sv_lang') || 'ro';
 
 function t(key) {
@@ -3700,6 +3733,12 @@ function setLanguage(lang) {
   localStorage.setItem('sv_lang', lang);
   applyTranslations();
   closeLangModal();
+  // Restart recognition with new language
+  if (isRunning) {
+    if (recognition) { try { recognition.abort(); } catch(e) {} }
+    setTimeout(buildRecognition, 500);
+  }
+  speak(LANGUAGES[lang]?.translations?.welcome || 'OK');
 }
 
 function applyTranslations() {
@@ -4044,6 +4083,106 @@ function showStockValueDetails() {
     `(Bazat pe ${val.productsWithPrice} produse cu prețuri definite)`);
 }
 
+
+// ── COMENZI VOCALE MULTILINGVĂ ──
+const VOICE_COMMANDS = {
+  ro: {
+    in:  ['adauga','adaugă','pune','bag','intra','intră','primire','receptie','intrare','plus'],
+    out: ['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat'],
+    list: ['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'],
+    client_actions: ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos'],
+    wake: ['stoc','stock']
+  },
+  en: {
+    in:  ['add','added','put','receive','received','entry','plus','in','incoming'],
+    out: ['remove','take','took','out','consume','deliver','delivered','minus','withdraw','sold'],
+    list: ['how many','check','show','status','list','quantity'],
+    client_actions: ['took','picked up','received','bought','collected'],
+    wake: ['stock','store']
+  },
+  de: {
+    in:  ['hinzufügen','hinzufügen','eingang','plus','empfangen','lager'],
+    out: ['entnehmen','entfernen','ausgabe','minus','verbraucht','geliefert'],
+    list: ['wie viele','prüfen','zeigen','status','liste'],
+    client_actions: ['hat genommen','hat abgeholt','hat erhalten','hat gekauft'],
+    wake: ['lager','bestand']
+  },
+  fr: {
+    in:  ['ajouter','ajoute','entree','entrée','plus','recevoir','reçu'],
+    out: ['retirer','enlever','sortie','moins','consommé','livré'],
+    list: ['combien','vérifier','montrer','statut','liste'],
+    client_actions: ['a pris','a récupéré','a reçu','a acheté'],
+    wake: ['stock','magasin']
+  },
+  hu: {
+    in:  ['hozzáad','bevét','bevételez','behoz','plusz','érkezik'],
+    out: ['kivesz','kimegy','fogyaszt','lead','szállít','mínusz'],
+    list: ['mennyi','ellenőriz','mutat','státusz','lista'],
+    client_actions: ['elvett','átvett','megkapta','megvette'],
+    wake: ['raktár','készlet']
+  },
+  it: {
+    in:  ['aggiungere','aggiungi','entrata','plus','ricevuto','inserire'],
+    out: ['rimuovere','togli','uscita','meno','consumato','consegnato'],
+    list: ['quanti','controllare','mostrare','stato','lista'],
+    client_actions: ['ha preso','ha ritirato','ha ricevuto','ha acquistato'],
+    wake: ['magazzino','scorte']
+  },
+  es: {
+    in:  ['agregar','añadir','entrada','más','recibido','ingresar'],
+    out: ['quitar','sacar','salida','menos','consumido','entregado'],
+    list: ['cuántos','verificar','mostrar','estado','lista'],
+    client_actions: ['tomó','recogió','recibió','compró'],
+    wake: ['almacén','inventario']
+  },
+  pl: {
+    in:  ['dodaj','przyjmij','wejście','plus','odebrano','dodano'],
+    out: ['usuń','wyjmij','wyjście','minus','zużyto','dostarczono'],
+    list: ['ile','sprawdź','pokaż','status','lista'],
+    client_actions: ['wziął','odebrał','otrzymał','kupił'],
+    wake: ['magazyn','stan']
+  },
+  cs: {
+    in:  ['přidat','příjem','příjmout','plus','přijato','naskladnit'],
+    out: ['odebrat','výdej','minus','spotřebováno','doručeno'],
+    list: ['kolik','zkontrolovat','zobrazit','stav','seznam'],
+    client_actions: ['vzal','převzal','obdržel','koupil'],
+    wake: ['sklad','zásoby']
+  }
+};
+
+// Get commands for current language (fallback to RO)
+function getVoiceCommands() {
+  return VOICE_COMMANDS[currentLang] || VOICE_COMMANDS['ro'];
+}
+
+// Extract client name for current language
+function extractClientNameML(text) {
+  const cmds = getVoiceCommands();
+  const lowerText = ' ' + text.toLowerCase() + ' ';
+  const normLower = ' ' + normalizeText(text.toLowerCase()) + ' ';
+  
+  for (const phrase of cmds.client_actions) {
+    const normPhrase = ' ' + normalizeText(phrase) + ' ';
+    let idx = normLower.indexOf(normPhrase);
+    if (idx < 0) idx = lowerText.indexOf(' ' + phrase + ' ');
+    if (idx > 0) {
+      let clientName = text.substring(0, idx).trim();
+      // Remove wake word
+      cmds.wake.forEach(w => {
+        clientName = clientName.replace(new RegExp('^' + w + '\\s+', 'i'), '').trim();
+      });
+      const badWords = ['add','remove','put','take','adauga','scoate','stoc','stock','lager','magasin','magazzino'];
+      const normClient = normalizeText(clientName.toLowerCase());
+      if (clientName.length > 1 && clientName.length < 40 && 
+          !badWords.some(w => normClient.includes(w))) {
+        return clientName;
+      }
+    }
+  }
+  return null;
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -4369,6 +4508,13 @@ function installApp() {
   <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:32px;max-width:420px;width:90%">
     <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:6px">⚙️ Setări Cont</div>
     <div style="font-size:13px;color:#6b7a8d;margin-bottom:24px">Personalizează notificările tale</div>
+
+    <!-- Language selector -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">🌍 Limba aplicației și comenzi vocale</div>
+      <select id="settings-language" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer"></select>
+      <div style="font-size:11px;color:#6b7a8d;margin-top:4px">Microfonul va asculta în limba selectată</div>
+    </div>
 
     <!-- Telegram ID -->
     <div style="margin-bottom:18px">
