@@ -1068,10 +1068,12 @@ function executeOperation(opType,product,qty,originalText,clientName){
     if(window.fbReady) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
     // Auto generate bon if client has name
     setTimeout(()=>{
-      if(confirm(`Generezi bon de livrare pentru ${clientName}?`)){
-        generateBonLivrare(clientName, [{name:product.name,qty,unit:product.unit,price_sell:product.price_sell}]);
-      }
-    }, 500);
+      try {
+        if(confirm(`Generezi bon de livrare pentru ${clientName}?`)){
+          generateBonLivrare(clientName, [{name:product.name,qty,unit:product.unit,price_sell:product.price_sell}]);
+        }
+      } catch(e) { console.error('Bon error:', e); }
+    }, 800);
   }
   
   // Audit trail
@@ -3760,6 +3762,7 @@ function initLangModal() {
 
 // ── ALERTE EXPIRARE ──
 function checkExpiryAlerts() {
+  try {
   if (!userProfile) return;
   const today = new Date();
   const in30 = new Date(); in30.setDate(in30.getDate()+30);
@@ -3781,6 +3784,7 @@ function checkExpiryAlerts() {
       }
     }
   });
+  } catch(e) { console.error('Expiry check error:', e); }
 }
 
 // ── ISTORIC PREȚURI ──
@@ -3923,23 +3927,23 @@ function updateStockValueDisplay() {
 let auditLog = [];
 
 function addAudit(action, details) {
-  const entry = {
-    action, details,
-    user: userProfile ? userProfile.name : '—',
-    email: currentUser ? currentUser.email : '—',
-    depot: userProfile ? userProfile.depot : '—',
-    ts: new Date().toISOString(),
-    time: new Date().toLocaleString('ro-RO')
-  };
-  auditLog.unshift(entry);
-  // Save to Firebase (append only, never delete)
-  if (window.fbReady) {
-    db.ref('audit/' + (getDepotKey()||'general')).push(entry);
-  }
+  try {
+    const entry = {
+      action, details,
+      user: userProfile ? userProfile.name : '—',
+      email: currentUser ? currentUser.email : '—',
+      depot: userProfile ? userProfile.depot : '—',
+      ts: new Date().toISOString(),
+      time: new Date().toLocaleString('ro-RO')
+    };
+    auditLog.unshift(entry);
+    if (window.fbReady && typeof getDepotKey === 'function') {
+      db.ref('audit/' + (getDepotKey()||'general')).push(entry);
+    }
+  } catch(e) { console.error('Audit error:', e); }
 }
 
-// Hook into executeOperation for audit
-const _origExecForAudit = executeOperation;
+// Audit trail integrated in executeOperation directly
 
 // ── CALENDAR LIVRĂRI ──
 function openCalendarModal() {
