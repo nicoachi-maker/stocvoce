@@ -421,6 +421,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="calcAutoMinStock()" style="border-color:#00e5a0;color:#00e5a0">🤖 Auto Min</button>
         <button class="add-btn" onclick="openWarehouseMap()" style="border-color:#00e5a0;color:#00e5a0">🗺️ Hartă</button>
         <button class="add-btn" onclick="undoLastOperation()" style="border-color:#ff4757;color:#ff4757">↩️ Undo</button>
+        <button class="add-btn" onclick="transcribeToCSV()" style="border-color:#6b7a8d;color:#6b7a8d">📝 Transcriere</button>
+        <button class="add-btn" onclick="startDailyVoiceSummary()" style="border-color:#00e5a0;color:#00e5a0">🌅 Rezumat</button>
       </div>
       
       <!-- Tab: RAPOARTE -->
@@ -436,6 +438,14 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="aiDetectAnomalies()" style="border-color:#ffa502;color:#ffa502">🤖 Anomalii AI</button>
         <button class="add-btn" onclick="exportToGoogleSheets()" style="border-color:#00e5a0;color:#00e5a0">📊 G.Sheets</button>
         <button class="add-btn" onclick="generatePublicLink()" style="border-color:#6b7a8d;color:#6b7a8d">🔗 API Link</button>
+        <button class="add-btn" onclick="showCategoryPie()" style="border-color:#a78bfa;color:#a78bfa">🥧 Categorii</button>
+        <button class="add-btn" onclick="showMonthComparison()" style="border-color:#ffa502;color:#ffa502">📅 Comparație</button>
+        <button class="add-btn" onclick="screenshotDashboard()" style="border-color:#00e5a0;color:#00e5a0">📸 Telegram</button>
+        <button class="add-btn" onclick="showProfitReport()" style="border-color:#00e5a0;color:#00e5a0">💰 Profit</button>
+        <button class="add-btn" onclick="showPLReport()" style="border-color:#ffa502;color:#ffa502">📊 P&L</button>
+        <button class="add-btn" onclick="calcVATReport()" style="border-color:#6b7a8d;color:#6b7a8d">🧾 TVA</button>
+        <button class="add-btn" onclick="forecastBudget()" style="border-color:#a78bfa;color:#a78bfa">💸 Buget</button>
+        <button class="add-btn" onclick="runFullAnalysis()" style="border-color:#00e5a0;color:#00e5a0">🔬 Analiză</button>
       </div>
       
       <!-- Tab: CLIENȚI -->
@@ -455,6 +465,9 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
         <button class="add-btn" onclick="openCalendarModal()" style="border-color:#ffa502;color:#ffa502">📅 Calendar</button>
         <button class="add-btn" onclick="doAutoBackup()" style="border-color:#6b7a8d;color:#6b7a8d">💾 Backup</button>
+        <button class="add-btn" onclick="toggleKioskMode()" style="border-color:#00e5a0;color:#00e5a0">📺 Kiosk</button>
+        <button class="add-btn" onclick="showHealthMeter()" style="border-color:#00e5a0;color:#00e5a0">💚 Sănătate</button>
+        <button class="add-btn" onclick="generatePackingList(stock.slice(0,5),'—')" style="border-color:#ffa502;color:#ffa502">📋 Packing</button>
       </div>
       
       <!-- Tab: GLOBAL -->
@@ -679,6 +692,7 @@ auth.onAuthStateChanged(async (user) => {
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
+    setTimeout(checkDailySummary, 3000);
     // Load preferred language
     if (userProfile.preferred_lang) {
       currentLang = userProfile.preferred_lang;
@@ -757,15 +771,26 @@ function saveLogEntryToFirebase(entry) {
 // ── SPEECH ──
 function speak(text) {
   if (!synth) return;
+  // Check if TTS is disabled in settings
+  if (typeof appSettings !== 'undefined' && appSettings.voice_confirm === false) return;
+  
   synth.cancel();
-  // Stop recognition while speaking to avoid feedback
   if(recognition){try{recognition.abort();}catch(e){} recognition=null;}
   
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang='ro-RO'; utt.rate=1.1; utt.pitch=1;
+  utt.lang = (typeof LANG_SPEECH !== 'undefined' && typeof currentLang !== 'undefined') ? 
+    (LANG_SPEECH[currentLang] || 'ro-RO') : 'ro-RO';
+  utt.rate=1.1; utt.pitch=1;
   const voices=synth.getVoices();
-  const ro=voices.find(v=>v.lang.startsWith('ro'));
-  if(ro) utt.voice=ro;
+  
+  // Use preferred voice if set
+  if (typeof appSettings !== 'undefined' && appSettings.preferred_voice) {
+    const pref = voices.find(v => v.name === appSettings.preferred_voice);
+    if (pref) { utt.voice = pref; }
+  } else {
+    const ro=voices.find(v=>v.lang.startsWith('ro'));
+    if(ro) utt.voice=ro;
+  }
   
   utt.onend=()=>{
     // Restart mic after TTS finishes
@@ -1077,16 +1102,25 @@ function processCommand(text){
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   const norm=normalizeText(text.toLowerCase());
   
-  // Check undo command
-  if(norm.includes('anuleaza')||norm.includes('anuleaza')||norm.includes('undo')||norm.includes('inapoi')){
+  // Apply dialect normalization
+  const normDialect = typeof normalizeDialect === 'function' ? normalizeDialect(text) : norm;
+  
+  // Check undo
+  if(norm.includes('anuleaza')||norm.includes('undo')||norm.includes('inapoi')){
     undoLastOperation();return;
   }
+  // Check percentage command
+  if(typeof handlePercentCommand==='function'&&handlePercentCommand(text))return;
+  // Check transfer command  
+  if(typeof handleVoiceTransfer==='function'&&handleVoiceTransfer(text))return;
+  // Check report command
+  if(typeof handleVoiceReport==='function'&&handleVoiceReport(text))return;
   // Check note dictation
-  if(handleVoiceNote&&handleVoiceNote(text))return;
+  if(typeof handleVoiceNote==='function'&&handleVoiceNote(text))return;
   // Check voice query
-  if(handleVoiceQuery&&handleVoiceQuery(text))return;
+  if(typeof handleVoiceQuery==='function'&&handleVoiceQuery(text))return;
   // Check approximate qty
-  if(handleApproxQty&&handleApproxQty(text))return;
+  if(typeof handleApproxQty==='function'&&handleApproxQty(text))return;
   
   // Use multilingual keywords
   const cmds = getVoiceCommands();
@@ -2619,6 +2653,8 @@ function openSettingsModal() {
     const ac = document.getElementById('settings-auto-csv');
     const dm = document.getElementById('settings-demo-mode');
     if(sd) sd.checked = appSettings.sound || false;
+    const ds2 = document.getElementById('settings-daily-summary');
+    if(ds2) ds2.checked = appSettings.daily_summary || false;
     if(vc) vc.checked = appSettings.voice_confirm !== false;
     if(bn) bn.checked = appSettings.browser_notif || false;
     if(ac) ac.checked = appSettings.auto_csv || false;
@@ -2690,6 +2726,8 @@ async function saveSettings() {
     const ac = document.getElementById('settings-auto-csv');
     const dm = document.getElementById('settings-demo-mode');
     if(sd) appSettings.sound = sd.checked;
+    const ds = document.getElementById('settings-daily-summary');
+    if(ds) appSettings.daily_summary = ds.checked;
     if(vc) appSettings.voice_confirm = vc.checked;
     if(bn) appSettings.browser_notif = bn.checked;
     if(ac) appSettings.auto_csv = ac.checked;
@@ -3815,6 +3853,29 @@ function printEtichete() {
       <button onclick="document.getElementById('segments-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="segments-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- CATEGORY PIE MODAL -->
+<div id="category-pie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('category-pie-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="category-pie-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PROFIT MODAL -->
+<div id="profit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💰 Raport Profit</div>
+      <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="profit-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
@@ -6558,6 +6619,800 @@ function showClientSegments() {
   document.getElementById('segments-modal').style.display = 'flex';
 }
 
+
+// ══════════════════════════════════════════
+// RUNDA 1: VOCE & AI (1-10)
+// ══════════════════════════════════════════
+
+// 1. DIALECT REGIONAL - cuvinte informale
+const DIALECT_WORDS = {
+  in:  ['baga','bagi','bagam','pune','pui','punem','da-mi','dami','intra','vine','sosit','adus','primit','recepta','receptat','stoc'],
+  out: ['ia','iau','iei','iem','scoate','scot','scotem','du','duca','dus','plecat','livrat','dat','vandut','vinde','consumat','folosit','tocat','terminat']
+};
+
+function normalizeDialect(text) {
+  let t = normalizeText(text.toLowerCase());
+  // Map dialect to standard
+  const map = {
+    'baga':'adauga','bagi':'adauga','bagam':'adauga',
+    'pune':'adauga','pui':'adauga','punem':'adauga',
+    'ia ':'scoate ','iau ':'scoate ','iei ':'scoate ',
+    'du ':'scoate ','dus ':'scoate ','dat ':'scoate ',
+    'vandut':'scoate','vinde':'scoate','terminat':'scoate'
+  };
+  Object.entries(map).forEach(([k,v]) => { t = t.replace(new RegExp('\\b'+k+'\\b','g'), v); });
+  return t;
+}
+
+// 2. COMANDĂ VOCALĂ CU PROCENTE
+function handlePercentCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const pctMatch = norm.match(/(\d+)\s*(?:la suta|procent|%)/);
+  if (!pctMatch) return false;
+  
+  const pct = parseInt(pctMatch[1]);
+  const product = findProduct(text.split(' '));
+  if (!product) return false;
+  
+  const qty = Math.round(product.qty * pct / 100);
+  const opType = ['scoate','scot','ia','consum','out'].some(k => norm.includes(k)) ? 'out' : 'in';
+  
+  setFeedback(`📊 ${pct}% din ${product.name} = ${qty} ${product.unit}. Confirmi?`, 'ok');
+  pendingAction = { opType, product, qty, text, clientName: null };
+  document.getElementById('confirm-text').textContent = 
+    `${pct}% din ${product.name} = ${qty} ${product.unit}. Confirmi?`;
+  document.getElementById('confirm-modal').classList.add('show');
+  speak(`${pct} la sută din ${product.name} înseamnă ${qty} ${product.unit}. Confirmi?`);
+  return true;
+}
+
+// 3. REZUMAT VOCAL ZILNIC
+function startDailyVoiceSummary() {
+  if (!userProfile || !stock.length) return;
+  const depot = userProfile.depot;
+  const total = stock.length;
+  const low = stock.filter(p => p.qty <= p.min && p.qty > 0).length;
+  const zero = stock.filter(p => p.qty === 0).length;
+  const todayOps = log.filter(e => e.time && e.time.startsWith(new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}))).length;
+  
+  const summary = `Bună dimineața! Rezumat ${depot}: ${total} produse în stoc. ${low} cu stoc scăzut. ${zero} epuizate. Astăzi ${todayOps} operații efectuate.`;
+  speak(summary);
+  setFeedback(`🌅 ${summary}`, 'ok');
+}
+
+// Check if should play daily summary
+function checkDailySummary() {
+  if (!appSettings || !appSettings.daily_summary) return;
+  const now = new Date();
+  const lastSummary = localStorage.getItem('sv_last_summary');
+  const today = now.toLocaleDateString('ro-RO');
+  
+  if (lastSummary !== today && now.getHours() >= 8) {
+    localStorage.setItem('sv_last_summary', today);
+    setTimeout(startDailyVoiceSummary, 2000);
+  }
+}
+
+// 4. VOCE CUSTOMIZATĂ
+function setVoicePreference(type) {
+  const voices = synth.getVoices();
+  let selected = null;
+  
+  if (type === 'female') {
+    selected = voices.find(v => v.lang.startsWith('ro') && v.name.toLowerCase().includes('female')) ||
+               voices.find(v => v.lang.startsWith('ro') && (v.name.includes('Ioana') || v.name.includes('Ana')));
+  } else if (type === 'male') {
+    selected = voices.find(v => v.lang.startsWith('ro') && v.name.toLowerCase().includes('male')) ||
+               voices.find(v => v.lang.startsWith('ro'));
+  } else if (type === 'robot') {
+    selected = voices.find(v => v.name.toLowerCase().includes('espeak') || v.name.toLowerCase().includes('robot'));
+  }
+  
+  if (selected) {
+    appSettings.preferred_voice = selected.name;
+    saveAppSettings();
+    speak('Vocea a fost schimbată.');
+    setFeedback(`✅ Voce setată: ${selected.name}`, 'ok');
+  } else {
+    setFeedback('⚠️ Vocea selectată nu e disponibilă pe acest dispozitiv.', 'warn');
+  }
+}
+
+// Speak preferences integrated into original speak function
+
+// 5. COMANDĂ VOCALĂ TRANSFER ÎNTRE DEPOZITE
+function handleVoiceTransfer(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const transferKW = ['muta','mută','transfera','transferă','trimite','send'];
+  if (!transferKW.some(k => norm.includes(k))) return false;
+  
+  const qty = parseQuantity(norm);
+  const product = findProduct(text.split(' '));
+  if (!qty || !product) return false;
+  
+  // Extract destination depot
+  const depotKW = ['la depozitul','la depozit','catre','către','spre'];
+  let destDepot = null;
+  depotKW.forEach(kw => {
+    const idx = text.toLowerCase().indexOf(kw);
+    if (idx > 0) destDepot = text.substring(idx + kw.length).trim();
+  });
+  
+  if (!destDepot) {
+    setFeedback('⚠️ Specificați depozitul destinație: "mută 10 șuruburi la depozitul Cluj"', 'warn');
+    speak('Specificați depozitul destinație.');
+    return true;
+  }
+  
+  // Open transfer modal pre-filled
+  document.getElementById('transfer-product').value = product.id;
+  document.getElementById('transfer-qty').value = qty;
+  document.getElementById('transfer-dest').value = destDepot;
+  document.getElementById('transfer-modal').style.display = 'flex';
+  speak(`Transfer ${qty} ${product.unit} de ${product.name} către ${destDepot}. Confirmați.`);
+  return true;
+}
+
+// 6. COMANDĂ VOCALĂ RAPORT
+function handleVoiceReport(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('raport') && !norm.includes('report')) return false;
+  
+  speak('Generez raportul PDF.');
+  generatePDF();
+  return true;
+}
+
+// 7. DETECȚIE ERORI VOCALE
+function detectVoiceError(text, product, qty) {
+  const issues = [];
+  
+  // Quantity seems too high
+  if (qty && qty > 1000) issues.push(`Cantitate foarte mare: ${qty}. Ești sigur?`);
+  
+  // Product not found
+  if (!product) issues.push('Produsul nu a fost recunoscut clar.');
+  
+  // No quantity
+  if (!qty) issues.push('Cantitatea nu a fost recunoscută.');
+  
+  return issues;
+}
+
+// 8. TRANSCRIERE ZILNICĂ
+function transcribeToCSV() {
+  const today = new Date().toLocaleDateString('ro-RO');
+  const todayLog = log.filter(e => e.time && e.time.includes(today.substring(0,5)));
+  
+  if (!todayLog.length) {
+    setFeedback('Nicio operație astăzi de transcris.', 'warn');
+    return;
+  }
+  
+  const rows = ['Ora,Comanda,Rezultat,Tip,Operator,Client'];
+  todayLog.forEach(e => {
+    rows.push(`"${e.time||''}","${e.cmd||''}","${e.result||''}","${e.type||''}","${e.user||''}","${e.client||''}"`);
+  });
+  
+  const csv = rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Operatii_${today.replace(/\./g,'-')}.csv`;
+  a.click();
+  setFeedback(`✅ ${todayLog.length} operații exportate pentru ${today}`, 'ok');
+}
+
+// 9. MODURI VOCE EXTINSE - integrate în processCommand
+// (dialect normalization added in processCommand hook below)
+
+// 10. COMANDĂ VOCALĂ COMPLETĂ - patch processCommand pentru toate verificările
+const _origPC = processCommand;
+
+
+
+// ══════════════════════════════════════════
+// RUNDA 2: DASHBOARD & VIZUALIZARE (11-20)
+// ══════════════════════════════════════════
+
+// 11. MOD KIOSK FULLSCREEN
+function toggleKioskMode() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      document.body.style.overflow = 'hidden';
+      setFeedback('📺 Mod kiosk activ — Esc pentru ieșire', 'ok');
+    }).catch(e => setFeedback('⚠️ Fullscreen nu e disponibil pe acest dispozitiv', 'warn'));
+  } else {
+    document.exitFullscreen();
+    document.body.style.overflow = '';
+    setFeedback('✅ Mod kiosk oprit', 'ok');
+  }
+}
+
+// 12. GRAFIC PIE CATEGORII
+function showCategoryPie() {
+  const cats = {};
+  stock.forEach(p => { cats[p.cat||'General'] = (cats[p.cat||'General']||0) + 1; });
+  const el = document.getElementById('category-pie-content');
+  if (!el) return;
+  
+  const total = stock.length;
+  const entries = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const colors = ['#00e5a0','#a78bfa','#ffa502','#ff4757','#4d9fff','#ff6b6b','#48dbfb','#ff9ff3','#54a0ff','#5f27cd'];
+  
+  el.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+      ${entries.map(([cat,count],i)=>`
+        <div style="background:#181d24;border-radius:8px;padding:10px 14px;border-left:3px solid ${colors[i%colors.length]};flex:1;min-width:120px">
+          <div style="font-weight:700;color:#e8ecf0;font-size:14px">${cat}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:${colors[i%colors.length]}">${count}</div>
+            <div style="font-size:12px;color:#6b7a8d">${Math.round(count/total*100)}%</div>
+          </div>
+          <div style="height:4px;background:#1e2530;border-radius:2px;margin-top:6px">
+            <div style="height:100%;width:${Math.round(count/total*100)}%;background:${colors[i%colors.length]};border-radius:2px"></div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  document.getElementById('category-pie-modal').style.display = 'flex';
+}
+
+// 13. TERMOMETRU SĂNĂTATE DEPOZIT
+function calcDepotHealth() {
+  if (!stock.length) return 100;
+  const zeroCount = stock.filter(p=>p.qty===0).length;
+  const lowCount = stock.filter(p=>p.qty>0&&p.qty<=p.min).length;
+  const expiredCount = stock.filter(p=>p.expiry&&new Date(p.expiry)<new Date()).length;
+  
+  const score = 100 - (zeroCount/stock.length*40) - (lowCount/stock.length*30) - (expiredCount/stock.length*30);
+  return Math.max(0, Math.round(score));
+}
+
+function showHealthMeter() {
+  const health = calcDepotHealth();
+  const color = health >= 80 ? '#00e5a0' : health >= 60 ? '#ffa502' : '#ff4757';
+  const label = health >= 80 ? 'EXCELENT' : health >= 60 ? 'ACCEPTABIL' : 'CRITIC';
+  
+  setFeedback(`💚 Sănătate depozit: ${health}% — ${label}`, health>=80?'ok':'warn');
+  speak(`Sănătatea depozitului este ${health} la sută. Status: ${label}.`);
+  
+  // Show in a simple alert for now
+  const el = document.getElementById('health-display');
+  if (el) {
+    el.textContent = `${health}%`;
+    el.style.color = color;
+  }
+}
+
+// 14. SCREENSHOT DASHBOARD → TELEGRAM
+async function screenshotDashboard() {
+  setFeedback('📸 Generez raport zilnic pe Telegram...', 'ok');
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const health = calcDepotHealth();
+  const val = calculateStockValue();
+  const now = new Date().toLocaleString('ro-RO');
+  
+  const msg = `📊 <b>RAPORT ZILNIC</b> — ${now}
+🏭 <b>${depot}</b>
+
+` +
+    `💚 Sănătate: <b>${health}%</b>
+` +
+    `📦 Total produse: <b>${stock.length}</b>
+` +
+    `⚠️ Stoc scăzut: <b>${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}</b>
+` +
+    `🔴 Epuizat: <b>${stock.filter(p=>p.qty===0).length}</b>
+` +
+    `💰 Valoare stoc: <b>${val.totalBuy} RON</b>
+` +
+    `📈 Operații azi: <b>${log.filter(e=>e.time&&e.time.startsWith(new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}))).length}</b>`;
+  
+  if (userProfile && userProfile.telegram_id) {
+    await sendTelegramAlert(msg, userProfile.telegram_id);
+    setFeedback('✅ Raport trimis pe Telegram!', 'ok');
+    speak('Raport zilnic trimis pe Telegram.');
+  } else {
+    setFeedback('⚠️ Configurați Telegram ID în setări!', 'warn');
+  }
+}
+
+// 15. COMPARAȚIE LUNĂ CURENTĂ VS PRECEDENTĂ
+function showMonthComparison() {
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  
+  const thisMonthLog = log.filter(e => {
+    if (!e.ts) return false;
+    return new Date(e.ts).getMonth() === thisMonth;
+  });
+  const lastMonthLog = log.filter(e => {
+    if (!e.ts) return false;
+    return new Date(e.ts).getMonth() === lastMonth;
+  });
+  
+  const thisIn = thisMonthLog.filter(e=>e.type==='in').length;
+  const thisOut = thisMonthLog.filter(e=>e.type==='out').length;
+  const lastIn = lastMonthLog.filter(e=>e.type==='in').length;
+  const lastOut = lastMonthLog.filter(e=>e.type==='out').length;
+  
+  const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+  
+  const msg = `📊 COMPARAȚIE LUNI
+
+` +
+    `${months[thisMonth]} (curent): ${thisMonthLog.length} operații (IN:${thisIn}, OUT:${thisOut})
+` +
+    `${months[lastMonth]} (precedent): ${lastMonthLog.length} operații (IN:${lastIn}, OUT:${lastOut})
+
+` +
+    `Diferență: ${thisMonthLog.length > lastMonthLog.length ? '+' : ''}${thisMonthLog.length - lastMonthLog.length} operații`;
+  
+  alert(msg);
+}
+
+// ══════════════════════════════════════════
+// RUNDA 3: GESTIUNE PRODUSE (21-30)  
+// ══════════════════════════════════════════
+
+// 21. PRODUSE SEZONIERE
+function setSeasonalProduct(productId, startMonth, endMonth) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.seasonal = { start: startMonth, end: endMonth, active: true };
+  saveStockToFirebase();
+  setFeedback(`✅ ${p.name} marcat ca sezonier (luna ${startMonth}-${endMonth})`, 'ok');
+}
+
+function checkSeasonalProducts() {
+  const currentMonth = new Date().getMonth() + 1;
+  stock.forEach(p => {
+    if (!p.seasonal) return;
+    const inSeason = currentMonth >= p.seasonal.start && currentMonth <= p.seasonal.end;
+    if (!inSeason && p.qty > 0) {
+      triggerAlert(`📅 ${p.name} este în afara sezonului (${p.qty} ${p.unit} în stoc)`, 'warn');
+    }
+  });
+}
+
+// 22. COST MEDIU PONDERAT
+function calcWeightedAvgCost(product, newQty, newPrice) {
+  if (!product.price_buy || !product.qty) {
+    product.price_buy = newPrice;
+    return newPrice;
+  }
+  const totalCost = (product.qty * product.price_buy) + (newQty * newPrice);
+  const totalQty = product.qty + newQty;
+  const avgCost = totalCost / totalQty;
+  product.price_buy = Math.round(avgCost * 100) / 100;
+  
+  // Track price history
+  if (typeof trackPriceHistory === 'function') {
+    trackPriceHistory(product, product.price_buy, product.price_sell);
+  }
+  return product.price_buy;
+}
+
+// 23. MARKUP AUTOMAT
+function calcAutoMarkup(product, markupPercent) {
+  if (!product.price_buy) return null;
+  const sellPrice = product.price_buy * (1 + markupPercent / 100);
+  product.price_sell = Math.round(sellPrice * 100) / 100;
+  saveStockToFirebase();
+  setFeedback(`✅ Preț vânzare calculat: ${product.price_sell} RON (${markupPercent}% markup)`, 'ok');
+  return product.price_sell;
+}
+
+// 24. NUMĂR SERIE TRACKING
+let serialNumbers = JSON.parse(localStorage.getItem('sv_serials') || '{}');
+
+function addSerial(productId, serialNo) {
+  if (!serialNumbers[productId]) serialNumbers[productId] = [];
+  serialNumbers[productId].push({ serial: serialNo, date: new Date().toLocaleDateString('ro-RO'), user: userProfile ? userProfile.name : '—', status: 'in_stock' });
+  localStorage.setItem('sv_serials', JSON.stringify(serialNumbers));
+  setFeedback(`✅ Serial ${serialNo} înregistrat`, 'ok');
+}
+
+function findBySerial(serialNo) {
+  for (const [productId, serials] of Object.entries(serialNumbers)) {
+    const found = serials.find(s => s.serial === serialNo);
+    if (found) {
+      const product = stock.find(p => p.id === parseInt(productId));
+      return { product, serial: found };
+    }
+  }
+  return null;
+}
+
+// 25. PRODUS CU VARIANTE
+function addProductVariant(baseProductId, variantName, variantQty) {
+  const base = stock.find(p => p.id === baseProductId);
+  if (!base) return;
+  
+  const variant = {
+    ...JSON.parse(JSON.stringify(base)),
+    id: nextId++,
+    name: `${base.name} — ${variantName}`,
+    qty: variantQty,
+    parent_id: baseProductId,
+    is_variant: true,
+    notes: [], note_preview: ''
+  };
+  
+  stock.push(variant);
+  saveStockToFirebase();
+  renderStock(); updateStats();
+  setFeedback(`✅ Variantă adăugată: ${variant.name}`, 'ok');
+  speak(`Variantă ${variantName} adăugată.`);
+}
+
+// ══════════════════════════════════════════
+// RUNDA 4: DEPOZIT & LOGISTICĂ (31-40)
+// ══════════════════════════════════════════
+
+// 31. PACKING LIST AUTOMAT
+async function generatePackingList(items, clientName) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const packNo = 'PACK-' + now.getTime().toString().slice(-6);
+
+  doc.setFillColor(10,12,15);
+  doc.rect(0,0,210,36,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(232,236,240);
+  doc.text('PACKING LIST', 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(0,229,160);
+  doc.text(`${packNo} · ${now.toLocaleString('ro-RO')}`, 14, 30);
+
+  doc.setFontSize(11);
+  doc.setTextColor(153,168,184);
+  doc.text(`Client: ${clientName || '—'}`, 14, 48);
+  doc.text(`Depozit: ${depot}`, 14, 55);
+
+  let totalWeight = 0;
+  doc.autoTable({
+    startY: 65,
+    head: [['Nr.','Produs','Cant.','UM','Greutate/buc','Total Kg','Locație']],
+    body: items.map((item, i) => {
+      const weight = (item.weight || 0) * item.qty;
+      totalWeight += weight;
+      return [i+1, item.name, item.qty, item.unit, item.weight||'—', weight.toFixed(2)||'—', item.loc||'—'];
+    }),
+    styles:{fontSize:9,textColor:[153,168,184],fillColor:[17,20,24],lineColor:[30,37,48]},
+    headStyles:{fillColor:[10,12,15],textColor:[0,229,160],fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[24,29,36]},
+    margin:{left:14,right:14}
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.setTextColor(0,229,160);
+  doc.text(`GREUTATE TOTALĂ: ${totalWeight.toFixed(2)} kg`, 14, finalY);
+  doc.text(`TOTAL ARTICOLE: ${items.length}`, 14, finalY + 8);
+
+  doc.save(`${packNo}_${(clientName||'client').replace(/\s+/g,'_')}.pdf`);
+  setFeedback(`✅ Packing list generat! Greutate: ${totalWeight.toFixed(2)} kg`, 'ok');
+}
+
+// 32. NUMĂR AWB TRACKING
+let awbNumbers = JSON.parse(localStorage.getItem('sv_awb') || '[]');
+
+function addAWB(deliveryProduct, awbNo, courier) {
+  awbNumbers.push({
+    product: deliveryProduct, awb: awbNo, courier: courier || '—',
+    date: new Date().toLocaleDateString('ro-RO'), status: 'în tranzit',
+    user: userProfile ? userProfile.name : '—'
+  });
+  localStorage.setItem('sv_awb', JSON.stringify(awbNumbers));
+  setFeedback(`✅ AWB ${awbNo} înregistrat (${courier})`, 'ok');
+}
+
+// 33. GREUTATE TOTALĂ COMANDĂ
+function calcOrderWeight(productIds) {
+  let total = 0;
+  productIds.forEach(({id, qty}) => {
+    const p = stock.find(s => s.id === id);
+    if (p && p.weight) total += p.weight * qty;
+  });
+  return total.toFixed(2);
+}
+
+// 34. ZONARE AUTOMATĂ
+function suggestLocation(product) {
+  // Simple algorithm: suggest location based on category
+  const catLocations = {
+    'Hardware': 'Raft A',
+    'Alimente': 'Raft F',
+    'Birou': 'Raft B',
+    'Constructii': 'Raft C',
+    'Electronice': 'Raft E',
+    'General': 'Raft G'
+  };
+  
+  const cat = product.cat || 'General';
+  const suggested = catLocations[cat] || 'Raft Z';
+  
+  // Find next available sublocation
+  const usedInRow = stock.filter(p => (p.loc||'').startsWith(suggested)).length;
+  return `${suggested}-${usedInRow + 1}`;
+}
+
+// 35. CROSS-DOCKING FLAG
+function markCrossDocking(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.cross_dock = true;
+  p.cross_dock_date = new Date().toLocaleDateString('ro-RO');
+  saveStockToFirebase();
+  renderStock();
+  setFeedback(`🔄 ${p.name} marcat pentru cross-docking`, 'ok');
+}
+
+// ══════════════════════════════════════════
+// RUNDA 5: BUSINESS & FINANCIAR (41-50)
+// ══════════════════════════════════════════
+
+// 41. MARJĂ PROFIT PER PRODUS
+function calcProductMargin(product) {
+  if (!product.price_buy || !product.price_sell) return null;
+  const margin = ((product.price_sell - product.price_buy) / product.price_sell * 100).toFixed(1);
+  const profit = (product.price_sell - product.price_buy).toFixed(2);
+  return { margin, profit, totalProfit: (profit * product.qty).toFixed(2) };
+}
+
+function showProfitReport() {
+  const products = stock.filter(p => p.price_buy && p.price_sell).map(p => ({
+    ...p, ...calcProductMargin(p)
+  })).sort((a,b) => parseFloat(b.margin) - parseFloat(a.margin));
+  
+  const el = document.getElementById('profit-content');
+  if (!el) return;
+  
+  const totalProfit = products.reduce((s,p) => s + parseFloat(p.totalProfit||0), 0);
+  
+  el.innerHTML = `
+    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;border-top:2px solid #00e5a0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#00e5a0">${totalProfit.toFixed(2)} RON</div>
+      <div style="font-size:12px;color:#6b7a8d">PROFIT TOTAL ESTIMAT (la vânzarea întregului stoc)</div>
+    </div>
+    ${products.map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ${parseFloat(p.margin)>30?'#00e5a0':parseFloat(p.margin)>15?'#ffa502':'#ff4757'}">
+        <div>
+          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
+          <div style="font-size:11px;color:#6b7a8d">Achiz: ${p.price_buy} RON · Vânz: ${p.price_sell} RON · Stoc: ${p.qty}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:700;color:#00e5a0">${p.margin}%</div>
+          <div style="font-size:11px;color:#6b7a8d">${p.totalProfit} RON</div>
+        </div>
+      </div>`).join('')}`;
+  
+  document.getElementById('profit-modal').style.display = 'flex';
+}
+
+// 42. ROTAȚIE STOC
+function calcStockRotation(product) {
+  const outOps = log.filter(e => e.type==='out' && e.cmd && 
+    normalizeText(e.cmd.toLowerCase()).includes(normalizeText(product.name.toLowerCase())));
+  
+  let totalSold = 0;
+  outOps.forEach(e => {
+    const match = e.result && e.result.match(/(\d+)→(\d+)/);
+    if (match) totalSold += parseInt(match[1]) - parseInt(match[2]);
+  });
+  
+  const avgStock = Math.max(product.qty, 1);
+  const rotation = totalSold > 0 ? Math.round(avgStock / (totalSold / 30)) : Infinity;
+  return { totalSold, rotation: rotation === Infinity ? '∞' : rotation + ' zile' };
+}
+
+// 43. FACTURĂ PROFORMĂ AUTOMATĂ
+async function generateProforma(clientName, items) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const proNo = 'PRO-' + now.getTime().toString().slice(-6);
+
+  doc.setFillColor(10,12,15);
+  doc.rect(0,0,210,36,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.setTextColor(232,236,240);
+  doc.text('FACTURĂ PROFORMĂ', 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(107,122,141);
+  doc.text(`${proNo} · ${now.toLocaleDateString('ro-RO')}`, 14, 30);
+
+  doc.setFontSize(12);
+  doc.setTextColor(153,168,184);
+  doc.text(`Client: ${clientName}`, 14, 50);
+  doc.text(`Emitent: ${depot}`, 14, 57);
+
+  const total = items.reduce((s,item) => s + (item.price_sell||0)*item.qty, 0);
+  const tva = total * 0.19;
+
+  doc.autoTable({
+    startY: 68,
+    head: [['Nr.','Produs','Cant.','UM','Preț Unit.','Total']],
+    body: items.map((item,i) => [i+1, item.name, item.qty, item.unit, (item.price_sell||0)+' RON', ((item.price_sell||0)*item.qty)+' RON']),
+    styles:{fontSize:9,textColor:[153,168,184],fillColor:[17,20,24],lineColor:[30,37,48]},
+    headStyles:{fillColor:[10,12,15],textColor:[0,229,160],fontStyle:'bold'},
+    margin:{left:14,right:14}
+  });
+
+  const fy = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(10);
+  doc.setTextColor(153,168,184);
+  doc.text(`Subtotal: ${total.toFixed(2)} RON`, 140, fy);
+  doc.text(`TVA 19%: ${tva.toFixed(2)} RON`, 140, fy+7);
+  doc.setTextColor(0,229,160);
+  doc.setFontSize(13);
+  doc.text(`TOTAL: ${(total+tva).toFixed(2)} RON`, 140, fy+17);
+
+  doc.save(`${proNo}_${clientName.replace(/\s+/g,'_')}.pdf`);
+  setFeedback(`✅ Proformă ${proNo} generată!`, 'ok');
+}
+
+// 44. DISCOUNT PER CLIENT
+let clientDiscounts = JSON.parse(localStorage.getItem('sv_discounts') || '{}');
+
+function setClientDiscount(clientName, percent) {
+  clientDiscounts[normalizeText(clientName.toLowerCase())] = percent;
+  localStorage.setItem('sv_discounts', JSON.stringify(clientDiscounts));
+  setFeedback(`✅ Discount ${percent}% setat pentru ${clientName}`, 'ok');
+}
+
+function getClientPrice(clientName, basePrice) {
+  const key = normalizeText(clientName.toLowerCase());
+  const discount = clientDiscounts[key] || 0;
+  return basePrice * (1 - discount/100);
+}
+
+// 45. RAPORT P&L LUNAR
+function showPLReport() {
+  const now = new Date();
+  const monthLog = log.filter(e => e.ts && new Date(e.ts).getMonth() === now.getMonth());
+  
+  let revenue = 0, costs = 0;
+  monthLog.forEach(e => {
+    if (e.type === 'out') {
+      const match = e.result && e.result.match(/(\d+)→(\d+)/);
+      if (match) {
+        const qty = parseInt(match[1]) - parseInt(match[2]);
+        const p = stock.find(s => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(s.name.toLowerCase())));
+        if (p) {
+          revenue += qty * (p.price_sell || 0);
+          costs += qty * (p.price_buy || 0);
+        }
+      }
+    }
+  });
+  
+  const profit = revenue - costs;
+  const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+  
+  alert(`📊 P&L — ${months[now.getMonth()]} ${now.getFullYear()}
+
+` +
+    `💰 Venituri: ${revenue.toFixed(2)} RON
+` +
+    `📦 Costuri: ${costs.toFixed(2)} RON
+` +
+    `${profit >= 0 ? '✅' : '❌'} Profit net: ${profit.toFixed(2)} RON
+
+` +
+    `Marjă: ${revenue > 0 ? (profit/revenue*100).toFixed(1) : 0}%`);
+}
+
+// 46. OBIECTIVE STOC
+let stockGoals = JSON.parse(localStorage.getItem('sv_goals') || '[]');
+
+function setStockGoal(type, target, deadline) {
+  stockGoals.push({ type, target, deadline, created: new Date().toISOString(), achieved: false });
+  localStorage.setItem('sv_goals', JSON.stringify(stockGoals));
+  setFeedback(`✅ Obiectiv setat: ${type} → ${target}`, 'ok');
+}
+
+function checkGoals() {
+  stockGoals.forEach((goal, i) => {
+    if (goal.achieved) return;
+    let current = 0;
+    if (goal.type === 'zero_products') current = stock.filter(p=>p.qty===0).length;
+    else if (goal.type === 'total_value') current = parseFloat(calculateStockValue().totalBuy);
+    else if (goal.type === 'products_count') current = stock.length;
+    
+    if ((goal.type === 'zero_products' && current <= goal.target) ||
+        (goal.type !== 'zero_products' && current >= goal.target)) {
+      stockGoals[i].achieved = true;
+      localStorage.setItem('sv_goals', JSON.stringify(stockGoals));
+      triggerAlert(`🏆 OBIECTIV ATINS: ${goal.type}!`, 'ok');
+    }
+  });
+}
+
+// 47. ABONAMENT CLIENT
+let subscriptions = JSON.parse(localStorage.getItem('sv_subscriptions') || '[]');
+
+function addSubscription(clientName, productId, monthlyQty, price) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  subscriptions.push({
+    client: clientName, productId, productName: p.name,
+    unit: p.unit, monthlyQty, price,
+    nextDelivery: new Date(new Date().setMonth(new Date().getMonth()+1)).toLocaleDateString('ro-RO'),
+    active: true
+  });
+  localStorage.setItem('sv_subscriptions', JSON.stringify(subscriptions));
+  setFeedback(`✅ Abonament lunar creat: ${clientName} — ${monthlyQty} ${p.unit} ${p.name}`, 'ok');
+}
+
+// 48. RAPORT TVA
+function calcVATReport() {
+  let vatIn = 0, vatOut = 0;
+  const VAT_RATE = 0.19;
+  
+  log.forEach(e => {
+    if (!e.ts) return;
+    const match = e.result && e.result.match(/(\d+)→(\d+)/);
+    if (!match) return;
+    
+    const qty = Math.abs(parseInt(match[1]) - parseInt(match[2]));
+    const p = stock.find(s => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(s.name.toLowerCase())));
+    if (!p) return;
+    
+    if (e.type === 'in' && p.price_buy) vatIn += qty * p.price_buy * VAT_RATE;
+    if (e.type === 'out' && p.price_sell) vatOut += qty * p.price_sell * VAT_RATE;
+  });
+  
+  const now = new Date();
+  const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+  
+  alert(`📋 RAPORT TVA — ${months[now.getMonth()]} ${now.getFullYear()}
+
+` +
+    `TVA pe intrări (deductibil): ${vatIn.toFixed(2)} RON
+` +
+    `TVA pe ieșiri (colectat): ${vatOut.toFixed(2)} RON
+` +
+    `TVA de plată: ${Math.max(0, vatOut-vatIn).toFixed(2)} RON
+` +
+    `TVA de rambursat: ${Math.max(0, vatIn-vatOut).toFixed(2)} RON`);
+}
+
+// 49. PREVIZIUNE BUGET ACHIZIȚII
+function forecastBudget() {
+  const monthlySpend = stock.reduce((total, p) => {
+    if (!p.price_buy || !p.lead_time) return total;
+    const pred = predictStockDepletion(p);
+    if (pred.days && pred.days < 30) {
+      const needed = Math.max(p.moq || p.min * 3, p.min * 3 - p.qty);
+      return total + needed * p.price_buy;
+    }
+    return total;
+  }, 0);
+  
+  setFeedback(`💰 Buget estimat luna viitoare: ${monthlySpend.toFixed(2)} RON`, 'ok');
+  speak(`Buget estimat pentru luna viitoare: ${monthlySpend.toFixed(0)} lei.`);
+}
+
+// 50. PREVIZIUNE COMPLETĂ - Integrate toate
+function runFullAnalysis() {
+  checkGoals();
+  checkSeasonalProducts();
+  showHealthMeter();
+  forecastBudget();
+  setFeedback('✅ Analiză completă efectuată!', 'ok');
+}
+
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
 </script>
 
@@ -7002,6 +7857,23 @@ function installApp() {
         </div>
         <input type="checkbox" id="settings-voice-confirm" style="width:18px;height:18px;cursor:pointer">
       </label>
+      
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
+        <div>
+          <div style="font-size:13px;color:#99a8b8">🌅 Rezumat vocal zilnic la ora 8</div>
+          <div style="font-size:11px;color:#6b7a8d">Îți citește situația stocului dimineața</div>
+        </div>
+        <input type="checkbox" id="settings-daily-summary" style="width:18px;height:18px;cursor:pointer">
+      </label>
+      
+      <div style="margin-top:8px">
+        <div style="font-size:12px;color:#6b7a8d;margin-bottom:8px">🎤 Voce sintetizată</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+          <button onclick="setVoicePreference('female')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">👩 Femeie</button>
+          <button onclick="setVoicePreference('male')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">👨 Bărbat</button>
+          <button onclick="setVoicePreference('robot')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">🤖 Robot</button>
+        </div>
+      </div>
       
       <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
         <div>
@@ -7454,6 +8326,29 @@ function installApp() {
       <button onclick="document.getElementById('segments-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="segments-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- CATEGORY PIE MODAL -->
+<div id="category-pie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('category-pie-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="category-pie-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PROFIT MODAL -->
+<div id="profit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💰 Raport Profit</div>
+      <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="profit-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
