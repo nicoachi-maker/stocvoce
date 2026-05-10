@@ -447,6 +447,7 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="sortStock('qty')" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive(90)" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
         <button class="add-btn" onclick="openReceptionModal()" style="border-color:#00e5a0;color:#00e5a0">📥 Recepție</button>
+        <button class="add-btn" onclick="toggleAIVoice()" style="border-color:#a78bfa;color:#a78bfa" id="ai-voice-btn">🤖 Voce AI</button>
         <button class="add-btn" onclick="openDeliveryCartModal()" style="border-color:#a78bfa;color:#a78bfa">🛒 Livrare</button>
         <button class="add-btn" onclick="openPartialInventory(null)" style="border-color:#ffa502;color:#ffa502">🔢 Inventar Rapid</button>
         <button class="add-btn" onclick="openReturnToSupplierModal()" style="border-color:#ff4757;color:#ff4757">↩️ Retur</button>
@@ -502,6 +503,7 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="exportForAccountant()" style="border-color:#00e5a0;color:#00e5a0">📊 Contabil</button>
         <button class="add-btn" onclick="showBossDashboard()" style="border-color:#a78bfa;color:#a78bfa">👔 Dashboard Șef</button>
         <button class="add-btn" onclick="generateSupplierOrder()" style="border-color:#ffa502;color:#ffa502">📋 Cmd Furnizor</button>
+        <button class="add-btn" onclick="generateAIPredictionReport()" style="border-color:#ff4757;color:#ff4757">🔮 Raport AI</button>
         <button class="add-btn" onclick="exportClientsExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Clienți</button>
         <button class="add-btn" onclick="showTopClientsThisMonth()" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
         <button class="add-btn" onclick="showLocationMovements()" style="border-color:#00e5a0;color:#00e5a0">📍 Locații</button>
@@ -530,6 +532,8 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="showClientSegments()" style="border-color:#a78bfa;color:#a78bfa">⭐ Segmente</button>
         <button class="add-btn" onclick="document.getElementById('chatbot-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🤖 AI Chat</button>
         <button class="add-btn" onclick="document.getElementById('invoice-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">📄 Import Factură</button>
+        <button class="add-btn" onclick="document.getElementById('invoice-photo-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">📸 Factură Foto AI</button>
+        <button class="add-btn" onclick="document.getElementById('advanced-chat-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🤖 AI Asistent</button>
         <button class="add-btn" onclick="syncToEcommerce('WooCommerce')" style="border-color:#6b7a8d;color:#6b7a8d">🛒 WooCommerce</button>
         <button class="add-btn" onclick="exportClientsExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Excel</button>
       </div>
@@ -798,6 +802,75 @@ function closeAdjustModal() {
       <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
     </div>
     <div id="boss-dashboard-content"></div>
+  </div>
+</div>
+
+
+<!-- INVOICE PHOTO MODAL -->
+<div id="invoice-photo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📸 Import Factură Foto AI</div>
+      <button onclick="document.getElementById('invoice-photo-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div onclick="document.getElementById('invoice-photo-file').click()" style="border:2px dashed #a78bfa;border-radius:12px;padding:30px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s" onmouseover="this.style.background='rgba(167,139,250,0.05)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:40px;margin-bottom:8px">📷</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#a78bfa;font-weight:700">Click sau drag &amp; drop</div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:4px">Poză factură, bon, aviz — AI extrage produsele automat</div>
+        <input type="file" id="invoice-photo-file" accept="image/*,.pdf" style="display:none" onchange="processInvoicePhoto(this.files[0])">
+      </div>
+      <div id="invoice-photo-status" style="text-align:center;font-size:13px;color:#6b7a8d;margin-bottom:10px"></div>
+      <div id="invoice-photo-preview" style="margin-bottom:10px"></div>
+      <button id="invoice-photo-import-btn" onclick="importDetectedInvoice()" style="display:none;width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ IMPORTĂ ÎN STOC →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED CHATBOT MODAL -->
+<div id="advanced-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🤖 Asistent AI Depozit</div>
+        <div style="font-size:11px;color:#6b7a8d">Știe tot despre stocul tău. Întreabă orice.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="advancedChatHistory=[];document.getElementById('advanced-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️ Clear</button>
+        <button onclick="document.getElementById('advanced-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="advanced-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px">
+      <div style="text-align:center;color:#6b7a8d;font-size:13px;padding:20px">
+        Bună! Sunt asistentul tău AI. Știu tot despre depozitul tău.<br><br>
+        Exemple: <i>"Care e cel mai profitabil produs?"</i><br>
+        <i>"Ce produse se epuizează săptămâna viitoare?"</i><br>
+        <i>"Compară consumul pe categorii"</i>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;gap:8px">
+        <input id="advanced-chat-input" placeholder="Întreabă orice despre depozit..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askAdvancedBot(this.value)}">
+        <button onclick="askAdvancedBot(document.getElementById('advanced-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">SEND →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button onclick="askAdvancedBot('Care sunt produsele cu stoc critic?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Stoc critic</button>
+        <button onclick="askAdvancedBot('Care e cel mai profitabil produs?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Top profit</button>
+        <button onclick="askAdvancedBot('Ce ar trebui să comand săptămâna viitoare?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Ce să comand?</button>
+        <button onclick="askAdvancedBot('Rezumă activitatea din ultima săptămână')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Rezumat săptămână</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI PREDICTION REPORT MODAL -->
+<div id="ai-prediction-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Raport Predicții AI</div>
+      <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
@@ -1507,6 +1580,330 @@ async function handleFullAIStatus(text) {
 const _origExecForAlerts = executeOperation;
 
 
+
+// ══════════════════════════════════════════
+// MODULE AI COMPLETE
+// ══════════════════════════════════════════
+
+// ── MODULE 1: COMENZI VOCALE COMPLEXE CU AI ──
+let aiVoiceEnabled = JSON.parse(localStorage.getItem('sv_ai_voice') || 'false');
+
+async function processCommandWithAI(text) {
+  if (!aiVoiceEnabled) return false;
+  
+  // Build context about current stock
+  const stockContext = stock.slice(0, 30).map(p => ({
+    id: p.id, name: p.name, qty: p.qty, unit: p.unit, min: p.min, loc: p.loc || ''
+  }));
+  
+  const clientsContext = [...new Set(clients.slice(-50).map(c => c.name))].slice(0, 10);
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: 'Esti un sistem de gestiune depozit. Analizeaza comanda vocala si extrage operatiile necesare. Raspunde DOAR cu JSON valid, fara text extra.
+
+Stoc disponibil: ' + JSON.stringify(stockContext) + '
+Clienti recenti: ' + clientsContext.join(', '),
+        messages: [{ role: 'user', content: 'Comanda vocala: "' + text + '"
+
+Extrage operatiile si raspunde cu JSON:
+{"operations":[{"type":"in|out|query|transfer|none","productId":0,"productName":"","qty":0,"unit":"","client":"","location":"","message":""}],"response":"mesaj vocal de confirmare"}' }]
+      })
+    });
+    
+    const data = await resp.json();
+    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(raw);
+    
+    if (!result.operations || !result.operations.length) return false;
+    
+    let processed = 0;
+    for (const op of result.operations) {
+      if (op.type === 'none' || op.type === 'query') continue;
+      
+      const product = op.productId ? stock.find(p => p.id === op.productId) :
+        stock.find(p => normalizeText(p.name.toLowerCase()).includes(normalizeText((op.productName||'').toLowerCase())));
+      
+      if (!product) continue;
+      
+      if (op.type === 'in') {
+        product.qty += op.qty || 1;
+        addLog(text, 'AI IN ' + (op.qty||1) + ' ' + product.unit + ' ' + product.name, 'in', op.client||null);
+      } else if (op.type === 'out') {
+        product.qty = Math.max(0, product.qty - (op.qty || 1));
+        addLog(text, 'AI OUT ' + (op.qty||1) + ' ' + product.unit + ' ' + product.name, 'out', op.client||null);
+        if (op.client) clients.push({ name: op.client, product: product.name, qty: op.qty||1, unit: product.unit, time: new Date().toLocaleString('ro-RO'), user: userProfile ? userProfile.name : '', depot: userProfile ? userProfile.depot : '' });
+      } else if (op.type === 'transfer' && op.location) {
+        product.loc = op.location;
+        addLog(text, 'AI TRANSFER ' + product.name + ' → ' + op.location, 'in');
+      }
+      processed++;
+    }
+    
+    if (processed > 0) {
+      saveStockToFirebase(); renderStock(); updateStats();
+    }
+    
+    // Speak AI response
+    const response = result.response || (processed > 0 ? processed + ' operatii procesate.' : 'Comanda inteleasa.');
+    speak(response);
+    setFeedback('🤖 AI: ' + response, 'ok');
+    
+    return true;
+  } catch(e) {
+    console.error('AI voice error:', e);
+    return false;
+  }
+}
+
+function toggleAIVoice() {
+  aiVoiceEnabled = !aiVoiceEnabled;
+  localStorage.setItem('sv_ai_voice', JSON.stringify(aiVoiceEnabled));
+  setFeedback((aiVoiceEnabled ? '🤖 Voce AI ACTIVATĂ! Acum înțeleg orice frază.' : '🎤 Voce AI dezactivată. Mod comenzi simple.'), 'ok');
+  speak(aiVoiceEnabled ? 'Modul AI vocal este activ. Pot intelege orice comanda.' : 'Modul AI vocal dezactivat.');
+}
+
+// ── MODULE 2: PROCESARE FACTURI FOTO ──
+async function processInvoicePhoto(file) {
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    const mediaType = file.type || 'image/jpeg';
+    
+    setFeedback('🤖 AI analizează factura...', 'ok');
+    document.getElementById('invoice-photo-status').textContent = '⏳ AI procesează imaginea...';
+    
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 800,
+          messages: [{ role: 'user', content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: 'Aceasta este o factura sau bon de la un furnizor. Extrage TOATE produsele/articolele cu cantitatile si preturile. Raspunde DOAR cu JSON valid: {"supplier":"","products":[{"name":"","qty":0,"unit":"buc","price":0}]}' }
+          ]}]
+        })
+      });
+      
+      const data = await resp.json();
+      const raw = data.content[0].text.replace(/```json|```/g, '').trim();
+      const invoice = JSON.parse(raw);
+      
+      // Show preview
+      const el = document.getElementById('invoice-photo-preview');
+      if (el) {
+        el.innerHTML = '<div style="font-weight:700;color:#00e5a0;margin-bottom:10px">Furnizor: ' + (invoice.supplier || '—') + '</div>' +
+          invoice.products.map((p, i) => '<div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">' +
+            '<span style="color:#e8ecf0">' + p.name + '</span>' +
+            '<span style="color:#00e5a0">' + p.qty + ' ' + p.unit + (p.price ? ' · ' + p.price + ' RON' : '') + '</span>' +
+            '</div>').join('');
+        el.dataset.invoice = JSON.stringify(invoice);
+      }
+      
+      document.getElementById('invoice-photo-status').textContent = invoice.products.length + ' produse detectate. Verificați și importați!';
+      document.getElementById('invoice-photo-import-btn').style.display = 'block';
+      setFeedback('✅ ' + invoice.products.length + ' produse detectate din factură!', 'ok');
+      
+    } catch(e) {
+      document.getElementById('invoice-photo-status').textContent = '❌ Eroare procesare. Asigurați-vă că imaginea e clară.';
+      setFeedback('❌ Eroare AI procesare factură.', 'err');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function importDetectedInvoice() {
+  const el = document.getElementById('invoice-photo-preview');
+  if (!el || !el.dataset.invoice) return;
+  
+  const invoice = JSON.parse(el.dataset.invoice);
+  let added = 0, updated = 0;
+  
+  invoice.products.forEach(item => {
+    if (!item.name || !item.qty) return;
+    const existing = stock.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(item.name.toLowerCase()));
+    if (existing) {
+      existing.qty += item.qty;
+      if (item.price) existing.price_buy = item.price;
+      if (invoice.supplier) existing.supplier = invoice.supplier;
+      updated++;
+    } else {
+      stock.push({
+        id: nextId++, name: item.name, qty: item.qty, unit: item.unit || 'buc',
+        cat: 'Import Factură', min: Math.max(1, Math.floor(item.qty * 0.2)),
+        maxQty: item.qty * 3, price_buy: item.price || null,
+        supplier: invoice.supplier || '', notes: [], note_preview: ''
+      });
+      added++;
+    }
+  });
+  
+  saveStockToFirebase(); renderStock(); updateStats();
+  document.getElementById('invoice-photo-modal').style.display = 'none';
+  setFeedback('✅ Import factură: ' + added + ' adăugate, ' + updated + ' actualizate!', 'ok');
+  speak(invoice.products.length + ' produse importate din factura.');
+}
+
+// ── MODULE 3: CHATBOT AVANSAT ──
+let advancedChatHistory = [];
+
+async function askAdvancedBot(question) {
+  if (!question.trim()) return;
+  
+  advancedChatHistory.push({ role: 'user', content: question });
+  
+  const chatEl = document.getElementById('advanced-chat-messages');
+  if (chatEl) {
+    chatEl.innerHTML += '<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><div style="background:#1e2530;border-radius:12px 12px 4px 12px;padding:10px 14px;max-width:80%;color:#e8ecf0;font-size:13px">' + question + '</div></div>';
+    chatEl.innerHTML += '<div style="display:flex;margin-bottom:8px" id="ai-typing"><div style="background:#181d24;border-radius:4px 12px 12px 12px;padding:10px 14px;color:#6b7a8d;font-size:13px">⏳ AI gândește...</div></div>';
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+  
+  const stockSummary = {
+    total: stock.length,
+    zero: stock.filter(p => p.qty === 0).length,
+    low: stock.filter(p => p.qty > 0 && p.qty <= p.min).length,
+    value: calculateStockValue().totalBuy,
+    topProducts: stock.sort((a,b) => b.qty*( b.price_buy||0) - a.qty*(a.price_buy||0)).slice(0, 10).map(p => ({ name: p.name, qty: p.qty, unit: p.unit, loc: p.loc })),
+    categories: [...new Set(stock.map(p => p.cat||'General'))],
+    recentLog: log.slice(0, 20).map(e => ({ time: e.time, cmd: e.cmd, type: e.type, user: e.user })),
+    clients: [...new Set(clients.slice(-30).map(c => c.name))]
+  };
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: 'Esti asistentul AI al depozitului "' + (userProfile ? userProfile.depot : 'Depozit') + '". Raspunzi in romana, concis si util. Ai acces la datele depozitului: ' + JSON.stringify(stockSummary),
+        messages: advancedChatHistory.slice(-8)
+      })
+    });
+    
+    const data = await resp.json();
+    const answer = data.content[0].text;
+    advancedChatHistory.push({ role: 'assistant', content: answer });
+    
+    const typing = document.getElementById('ai-typing');
+    if (typing) typing.remove();
+    
+    if (chatEl) {
+      chatEl.innerHTML += '<div style="display:flex;margin-bottom:8px"><div style="background:#181d24;border:1px solid #1e2530;border-radius:4px 12px 12px 12px;padding:10px 14px;max-width:85%;color:#e8ecf0;font-size:13px;line-height:1.6">' + answer.replace(/
+/g, '<br>') + '</div></div>';
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+    
+  } catch(e) {
+    const typing = document.getElementById('ai-typing');
+    if (typing) typing.innerHTML = '<div style="color:#ff4757;font-size:13px">❌ Eroare conexiune AI.</div>';
+  }
+  
+  document.getElementById('advanced-chat-input').value = '';
+}
+
+// ── MODULE 4: PREDICȚII ȘI RAPOARTE AI AUTOMATE ──
+async function generateAIWeeklyReport() {
+  if (!appSettings.ai_weekly_report) return;
+  
+  const now = new Date();
+  if (now.getDay() !== 1 || now.getHours() !== 9) return;
+  
+  const today = now.toISOString().slice(0, 10);
+  if (localStorage.getItem('sv_ai_report_' + today)) return;
+  localStorage.setItem('sv_ai_report_' + today, '1');
+  
+  if (!userProfile || !userProfile.telegram_id) return;
+  
+  const weekLog = log.filter(e => e.ts && (Date.now() - new Date(e.ts).getTime()) < 7 * 86400000);
+  const prevWeek = log.filter(e => e.ts && (Date.now() - new Date(e.ts).getTime()) >= 7 * 86400000 && (Date.now() - new Date(e.ts).getTime()) < 14 * 86400000);
+  
+  const predictions = stock.map(p => {
+    const pred = typeof predictStockDepletion === 'function' ? predictStockDepletion(p) : null;
+    return pred && pred.days < 14 ? { name: p.name, days: pred.days } : null;
+  }).filter(Boolean).slice(0, 5);
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: 'Genereaza un raport saptamanal pentru depozitul ' + userProfile.depot + '.
+Date:
+- Operatii saptamana curenta: ' + weekLog.length + '
+- Operatii saptamana precedenta: ' + prevWeek.length + '
+- Produse epuizate: ' + stock.filter(p=>p.qty===0).length + '
+- Produse critice: ' + stock.filter(p=>p.qty>0&&p.qty<=p.min).length + '
+- Produse ce se epuizeaza curand: ' + JSON.stringify(predictions) + '
+
+Scrie un raport profesional in romana, maxim 300 cuvinte, cu sectiuni clare: Rezumat, Alerte, Recomandari.' }]
+      })
+    });
+    
+    const data = await resp.json();
+    const report = data.content[0].text;
+    
+    await sendTelegramAlert('RAPORT AI SAPTAMANAL:
+
+' + report.substring(0, 800), userProfile.telegram_id);
+    console.log('AI weekly report sent!');
+    
+  } catch(e) {
+    console.error('AI report error:', e);
+  }
+}
+setInterval(generateAIWeeklyReport, 3600000);
+
+async function generateAIPredictionReport() {
+  const el = document.getElementById('ai-prediction-report-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">⏳ AI generează raport complet...</div>';
+  document.getElementById('ai-prediction-report-modal').style.display = 'flex';
+  
+  const predictions = stock.map(p => {
+    const pred = typeof predictStockDepletion === 'function' ? predictStockDepletion(p) : null;
+    return { name: p.name, qty: p.qty, unit: p.unit, min: p.min, daysLeft: pred ? pred.days : 999, dailyAvg: pred ? pred.dailyAvg : 0 };
+  }).sort((a, b) => a.daysLeft - b.daysLeft).slice(0, 20);
+  
+  const margin = typeof calcMonthlyMargin === 'function' ? calcMonthlyMargin() : { margin: 0, profit: 0, revenue: 0 };
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 700,
+        messages: [{ role: 'user', content: 'Analizeaza datele depozitului si ofera predictii si recomandari actionabile.
+
+Date:
+- Predictii epuizare: ' + JSON.stringify(predictions.slice(0,10)) + '
+- Profit luna: ' + margin.profit + ' RON (marja ' + margin.margin + '%)
+- Total produse: ' + stock.length + '
+- Epuizate: ' + stock.filter(p=>p.qty===0).length + '
+
+Ofera: 1) Top 5 riscuri imediate 2) Recomandari achizitii 3) Optimizari posibile. Raspunde in romana, cu bullets.' }]
+      })
+    });
+    
+    const data = await resp.json();
+    el.innerHTML = '<div style="font-size:13px;color:#e8ecf0;line-height:1.8;white-space:pre-wrap">' + data.content[0].text + '</div>';
+    
+  } catch(e) {
+    el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la generarea raportului AI.</div>';
+  }
+}
+
 </script>
 
 <script>
@@ -2125,6 +2522,11 @@ function processCommand(text){
   // Check full status command
   if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
   if(typeof handleFullAIStatus==='function'&&handleFullAIStatus(text))return;
+  // Try AI voice processing if enabled
+  if(typeof processCommandWithAI==='function'&&aiVoiceEnabled){
+    processCommandWithAI(text).then(handled => { if(!handled) {} });
+    return; // AI handles it
+  }
   // Check category query
   if(typeof handleCategoryQuery==='function'&&handleCategoryQuery(text))return;
   // Check stats voice
@@ -9065,6 +9467,75 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- INVOICE PHOTO MODAL -->
+<div id="invoice-photo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📸 Import Factură Foto AI</div>
+      <button onclick="document.getElementById('invoice-photo-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div onclick="document.getElementById('invoice-photo-file').click()" style="border:2px dashed #a78bfa;border-radius:12px;padding:30px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s" onmouseover="this.style.background='rgba(167,139,250,0.05)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:40px;margin-bottom:8px">📷</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#a78bfa;font-weight:700">Click sau drag &amp; drop</div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:4px">Poză factură, bon, aviz — AI extrage produsele automat</div>
+        <input type="file" id="invoice-photo-file" accept="image/*,.pdf" style="display:none" onchange="processInvoicePhoto(this.files[0])">
+      </div>
+      <div id="invoice-photo-status" style="text-align:center;font-size:13px;color:#6b7a8d;margin-bottom:10px"></div>
+      <div id="invoice-photo-preview" style="margin-bottom:10px"></div>
+      <button id="invoice-photo-import-btn" onclick="importDetectedInvoice()" style="display:none;width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ IMPORTĂ ÎN STOC →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED CHATBOT MODAL -->
+<div id="advanced-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🤖 Asistent AI Depozit</div>
+        <div style="font-size:11px;color:#6b7a8d">Știe tot despre stocul tău. Întreabă orice.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="advancedChatHistory=[];document.getElementById('advanced-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️ Clear</button>
+        <button onclick="document.getElementById('advanced-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="advanced-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px">
+      <div style="text-align:center;color:#6b7a8d;font-size:13px;padding:20px">
+        Bună! Sunt asistentul tău AI. Știu tot despre depozitul tău.<br><br>
+        Exemple: <i>"Care e cel mai profitabil produs?"</i><br>
+        <i>"Ce produse se epuizează săptămâna viitoare?"</i><br>
+        <i>"Compară consumul pe categorii"</i>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;gap:8px">
+        <input id="advanced-chat-input" placeholder="Întreabă orice despre depozit..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askAdvancedBot(this.value)}">
+        <button onclick="askAdvancedBot(document.getElementById('advanced-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">SEND →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button onclick="askAdvancedBot('Care sunt produsele cu stoc critic?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Stoc critic</button>
+        <button onclick="askAdvancedBot('Care e cel mai profitabil produs?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Top profit</button>
+        <button onclick="askAdvancedBot('Ce ar trebui să comand săptămâna viitoare?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Ce să comand?</button>
+        <button onclick="askAdvancedBot('Rezumă activitatea din ultima săptămână')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Rezumat săptămână</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI PREDICTION REPORT MODAL -->
+<div id="ai-prediction-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Raport Predicții AI</div>
+      <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -9488,6 +9959,75 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- INVOICE PHOTO MODAL -->
+<div id="invoice-photo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📸 Import Factură Foto AI</div>
+      <button onclick="document.getElementById('invoice-photo-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div onclick="document.getElementById('invoice-photo-file').click()" style="border:2px dashed #a78bfa;border-radius:12px;padding:30px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s" onmouseover="this.style.background='rgba(167,139,250,0.05)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:40px;margin-bottom:8px">📷</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#a78bfa;font-weight:700">Click sau drag &amp; drop</div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:4px">Poză factură, bon, aviz — AI extrage produsele automat</div>
+        <input type="file" id="invoice-photo-file" accept="image/*,.pdf" style="display:none" onchange="processInvoicePhoto(this.files[0])">
+      </div>
+      <div id="invoice-photo-status" style="text-align:center;font-size:13px;color:#6b7a8d;margin-bottom:10px"></div>
+      <div id="invoice-photo-preview" style="margin-bottom:10px"></div>
+      <button id="invoice-photo-import-btn" onclick="importDetectedInvoice()" style="display:none;width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ IMPORTĂ ÎN STOC →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED CHATBOT MODAL -->
+<div id="advanced-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🤖 Asistent AI Depozit</div>
+        <div style="font-size:11px;color:#6b7a8d">Știe tot despre stocul tău. Întreabă orice.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="advancedChatHistory=[];document.getElementById('advanced-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️ Clear</button>
+        <button onclick="document.getElementById('advanced-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="advanced-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px">
+      <div style="text-align:center;color:#6b7a8d;font-size:13px;padding:20px">
+        Bună! Sunt asistentul tău AI. Știu tot despre depozitul tău.<br><br>
+        Exemple: <i>"Care e cel mai profitabil produs?"</i><br>
+        <i>"Ce produse se epuizează săptămâna viitoare?"</i><br>
+        <i>"Compară consumul pe categorii"</i>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;gap:8px">
+        <input id="advanced-chat-input" placeholder="Întreabă orice despre depozit..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askAdvancedBot(this.value)}">
+        <button onclick="askAdvancedBot(document.getElementById('advanced-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">SEND →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button onclick="askAdvancedBot('Care sunt produsele cu stoc critic?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Stoc critic</button>
+        <button onclick="askAdvancedBot('Care e cel mai profitabil produs?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Top profit</button>
+        <button onclick="askAdvancedBot('Ce ar trebui să comand săptămâna viitoare?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Ce să comand?</button>
+        <button onclick="askAdvancedBot('Rezumă activitatea din ultima săptămână')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Rezumat săptămână</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI PREDICTION REPORT MODAL -->
+<div id="ai-prediction-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Raport Predicții AI</div>
+      <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -9685,6 +10225,75 @@ function showNoMovementReport() {
       <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
     </div>
     <div id="boss-dashboard-content"></div>
+  </div>
+</div>
+
+
+<!-- INVOICE PHOTO MODAL -->
+<div id="invoice-photo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📸 Import Factură Foto AI</div>
+      <button onclick="document.getElementById('invoice-photo-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div onclick="document.getElementById('invoice-photo-file').click()" style="border:2px dashed #a78bfa;border-radius:12px;padding:30px;text-align:center;cursor:pointer;margin-bottom:14px;transition:all .2s" onmouseover="this.style.background='rgba(167,139,250,0.05)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:40px;margin-bottom:8px">📷</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#a78bfa;font-weight:700">Click sau drag &amp; drop</div>
+        <div style="font-size:12px;color:#6b7a8d;margin-top:4px">Poză factură, bon, aviz — AI extrage produsele automat</div>
+        <input type="file" id="invoice-photo-file" accept="image/*,.pdf" style="display:none" onchange="processInvoicePhoto(this.files[0])">
+      </div>
+      <div id="invoice-photo-status" style="text-align:center;font-size:13px;color:#6b7a8d;margin-bottom:10px"></div>
+      <div id="invoice-photo-preview" style="margin-bottom:10px"></div>
+      <button id="invoice-photo-import-btn" onclick="importDetectedInvoice()" style="display:none;width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ IMPORTĂ ÎN STOC →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED CHATBOT MODAL -->
+<div id="advanced-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🤖 Asistent AI Depozit</div>
+        <div style="font-size:11px;color:#6b7a8d">Știe tot despre stocul tău. Întreabă orice.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="advancedChatHistory=[];document.getElementById('advanced-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️ Clear</button>
+        <button onclick="document.getElementById('advanced-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="advanced-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px">
+      <div style="text-align:center;color:#6b7a8d;font-size:13px;padding:20px">
+        Bună! Sunt asistentul tău AI. Știu tot despre depozitul tău.<br><br>
+        Exemple: <i>"Care e cel mai profitabil produs?"</i><br>
+        <i>"Ce produse se epuizează săptămâna viitoare?"</i><br>
+        <i>"Compară consumul pe categorii"</i>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;gap:8px">
+        <input id="advanced-chat-input" placeholder="Întreabă orice despre depozit..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();askAdvancedBot(this.value)}">
+        <button onclick="askAdvancedBot(document.getElementById('advanced-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">SEND →</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button onclick="askAdvancedBot('Care sunt produsele cu stoc critic?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Stoc critic</button>
+        <button onclick="askAdvancedBot('Care e cel mai profitabil produs?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Top profit</button>
+        <button onclick="askAdvancedBot('Ce ar trebui să comand săptămâna viitoare?')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Ce să comand?</button>
+        <button onclick="askAdvancedBot('Rezumă activitatea din ultima săptămână')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">Rezumat săptămână</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI PREDICTION REPORT MODAL -->
+<div id="ai-prediction-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Raport Predicții AI</div>
+      <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
