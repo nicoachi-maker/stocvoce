@@ -446,6 +446,10 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="filterFavorites()" style="border-color:#ffa502;color:#ffa502">⭐ Favorite</button>
         <button class="add-btn" onclick="sortStock('qty')" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive(90)" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
+        <button class="add-btn" onclick="openReceptionModal()" style="border-color:#00e5a0;color:#00e5a0">📥 Recepție</button>
+        <button class="add-btn" onclick="openDeliveryCartModal()" style="border-color:#a78bfa;color:#a78bfa">🛒 Livrare</button>
+        <button class="add-btn" onclick="openPartialInventory(null)" style="border-color:#ffa502;color:#ffa502">🔢 Inventar Rapid</button>
+        <button class="add-btn" onclick="openReturnToSupplierModal()" style="border-color:#ff4757;color:#ff4757">↩️ Retur</button>
         <button class="add-btn" onclick="openTextImportModal()" style="border-color:#00e5a0;color:#00e5a0">📋 Import Text</button>
         <button class="add-btn" onclick="updateAllSafetyStocks()" style="border-color:#ffa502;color:#ffa502">🛡️ Stoc Sigur</button>
         <button class="add-btn" onclick="sortByExpiry()" style="border-color:#ffa502;color:#ffa502">📅 FEFO</button>
@@ -493,6 +497,11 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="showCategoryMarginReport()" style="border-color:#00e5a0;color:#00e5a0">💰 Marjă Cat.</button>
         <button class="add-btn" onclick="calcCategoryRotation();alert(JSON.stringify(calcCategoryRotation().slice(0,5).map(c=>c.cat+': '+c.rotation+'/luna'),null,2))" style="border-color:#ffa502;color:#ffa502">🔄 Rotație Cat.</button>
         <button class="add-btn" onclick="showLostRevenueAlert()" style="border-color:#ff4757;color:#ff4757">💸 Pierderi</button>
+        <button class="add-btn" onclick="showTop10Chart()" style="border-color:#ffa502;color:#ffa502">🏆 Top 10</button>
+        <button class="add-btn" onclick="showSupplierEvaluation()" style="border-color:#ffa502;color:#ffa502">⭐ Furnizori</button>
+        <button class="add-btn" onclick="exportForAccountant()" style="border-color:#00e5a0;color:#00e5a0">📊 Contabil</button>
+        <button class="add-btn" onclick="showBossDashboard()" style="border-color:#a78bfa;color:#a78bfa">👔 Dashboard Șef</button>
+        <button class="add-btn" onclick="generateSupplierOrder()" style="border-color:#ffa502;color:#ffa502">📋 Cmd Furnizor</button>
         <button class="add-btn" onclick="exportClientsExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Clienți</button>
         <button class="add-btn" onclick="showTopClientsThisMonth()" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
         <button class="add-btn" onclick="showLocationMovements()" style="border-color:#00e5a0;color:#00e5a0">📍 Locații</button>
@@ -534,6 +543,7 @@ function closeAdjustModal() {
         <button class="add-btn" onclick="showHealthMeter()" style="border-color:#00e5a0;color:#00e5a0">💚 Sănătate</button>
         <button class="add-btn" onclick="checkReplenishPoints()" style="border-color:#ffa502;color:#ffa502">🔔 Reaproviz.</button>
         <button class="add-btn" onclick="toggleDailyReport()" style="border-color:#6b7a8d;color:#6b7a8d">📄 Raport Auto</button>
+        <button class="add-btn" onclick="toggleAutoOrder()" style="border-color:#00e5a0;color:#00e5a0">🤖 Auto-Cmd</button>
         <button class="add-btn" onclick="doManualBackup()" style="border-color:#00e5a0;color:#00e5a0">💾 Backup</button>
         <button class="add-btn" onclick="openRestoreModal()" style="border-color:#ff4757;color:#ff4757">♻️ Restore</button>
         <button class="add-btn" onclick="toggleDemoMode()" style="border-color:#a78bfa;color:#a78bfa">🧪 Demo</button>
@@ -678,9 +688,825 @@ function closeAdjustModal() {
   </div>
 </div>
 
+
+<!-- RECEPTION MODAL -->
+<div id="reception-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📥 Recepție Marfă</div>
+      <button onclick="closeReceptionModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="reception-supplier" placeholder="Furnizor (opțional)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:10px">
+        <input id="reception-name" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-unit" placeholder="UM" value="buc" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addReceptionItem()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="reception-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmReception()" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ CONFIRMĂ RECEPȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY CART MODAL -->
+<div id="delivery-cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🛒 Livrare Completă</div>
+      <button onclick="closeDeliveryCartModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="delivery-cart-client" placeholder="Nume client *" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-bottom:10px">
+        <select id="delivery-cart-product" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;cursor:pointer"></select>
+        <input id="delivery-cart-qty" type="number" placeholder="Cant." value="1" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addToDeliveryCart()" style="background:#a78bfa;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="delivery-cart-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmDeliveryCart()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">🚚 FINALIZEAZĂ LIVRAREA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIAL INVENTORY MODAL -->
+<div id="partial-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🔢 Inventar Rapid</div>
+      <button onclick="document.getElementById('partial-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:10px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="openPartialInventory(null)" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:5px 10px;cursor:pointer">📦 Tot</button>
+        ${[...new Set(stock.map(p=>p.cat||'General'))].map(c=>'<button onclick="openPartialInventory(''+c+'')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:5px 10px;cursor:pointer">'+c+'</button>').join('')}
+      </div>
+    </div>
+    <div id="partial-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmPartialInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ SALVEAZĂ INVENTARUL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN TO SUPPLIER MODAL -->
+<div id="return-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">↩️ Retur Furnizor</div>
+      <button onclick="closeReturnToSupplierModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <select id="return-supplier-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="return-supplier-qty" type="number" placeholder="Cantitate de returnat" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:10px">
+    <input id="return-supplier-reason" placeholder="Motiv retur (defect, surplus...)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:16px">
+    <button onclick="confirmReturnToSupplier()" style="width:100%;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">CONFIRMĂ RETURUL →</button>
+  </div>
+</div>
+
+<!-- TOP 10 CHART MODAL -->
+<div id="top10-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top 10 Vândute</div>
+      <button onclick="document.getElementById('top10-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top10-chart-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER EVAL MODAL -->
+<div id="supplier-eval-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⭐ Evaluare Furnizori</div>
+      <button onclick="document.getElementById('supplier-eval-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-eval-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BOSS DASHBOARD MODAL -->
+<div id="boss-dashboard-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Dashboard Șef</div>
+      <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="boss-dashboard-content"></div>
+  </div>
+</div>
+
 </body></html>');
   pw.document.close();
 }
+
+// ══════════════════════════════════════════
+// BLOC A: OPERAȚIUNI ZILNICE (1-6)
+// ══════════════════════════════════════════
+
+// 1. RECEPȚIE MARFĂ COMPLETĂ
+let receptionItems = [];
+
+function openReceptionModal() {
+  receptionItems = [];
+  renderReceptionItems();
+  document.getElementById('reception-modal').style.display = 'flex';
+}
+function closeReceptionModal() {
+  document.getElementById('reception-modal').style.display = 'none';
+}
+
+function addReceptionItem() {
+  const name = document.getElementById('reception-name').value.trim();
+  const qty = parseInt(document.getElementById('reception-qty').value) || 0;
+  const unit = document.getElementById('reception-unit').value.trim() || 'buc';
+  if (!name || !qty) { setFeedback('Completati numele si cantitatea!', 'warn'); return; }
+  receptionItems.push({ name, qty, unit });
+  document.getElementById('reception-name').value = '';
+  document.getElementById('reception-qty').value = '';
+  renderReceptionItems();
+}
+
+function renderReceptionItems() {
+  const el = document.getElementById('reception-list');
+  if (!el) return;
+  el.innerHTML = receptionItems.length === 0
+    ? '<div style="color:#6b7a8d;text-align:center;padding:10px">Adaugati produse...</div>'
+    : receptionItems.map((item, i) => '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">' +
+        '<span style="color:#e8ecf0">' + item.name + ' — <b style="color:#00e5a0">' + item.qty + ' ' + item.unit + '</b></span>' +
+        '<button onclick="receptionItems.splice(' + i + ',1);renderReceptionItems()" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:16px">✕</button>' +
+        '</div>').join('');
+}
+
+function confirmReception() {
+  if (!receptionItems.length) { setFeedback('Adaugati cel putin un produs!', 'warn'); return; }
+  const supplier = document.getElementById('reception-supplier').value.trim();
+  let added = 0, updated = 0;
+  receptionItems.forEach(item => {
+    const existing = stock.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(item.name.toLowerCase()));
+    if (existing) {
+      existing.qty += item.qty;
+      addLog('Receptie: ' + item.name, 'IN ' + item.qty + ' ' + item.unit + (supplier ? ' de la ' + supplier : ''), 'in');
+      updated++;
+    } else {
+      stock.push({ id: nextId++, name: item.name, qty: item.qty, unit: item.unit, cat: 'Receptie', min: 5, maxQty: item.qty * 3, supplier: supplier, notes: [], note_preview: '' });
+      added++;
+    }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  closeReceptionModal();
+  setFeedback('Receptie finalizata! ' + updated + ' actualizate, ' + added + ' adaugate.', 'ok');
+  speak('Receptie finalizata. ' + (added + updated) + ' produse procesate.');
+  addAuditLog('RECEPTIE MARFA', (added + updated) + ' produse de la ' + (supplier || 'furnizor'), '');
+}
+
+// 2. LIVRARE COMPLETĂ CU BON
+let deliveryCartItems = [];
+
+function openDeliveryCartModal() {
+  deliveryCartItems = [];
+  const sel = document.getElementById('delivery-cart-product');
+  if (sel) sel.innerHTML = stock.map(p => '<option value="' + p.id + '">' + p.name + ' (' + p.qty + ' ' + p.unit + ')</option>').join('');
+  renderDeliveryCart();
+  document.getElementById('delivery-cart-modal').style.display = 'flex';
+}
+function closeDeliveryCartModal() { document.getElementById('delivery-cart-modal').style.display = 'none'; }
+
+function addToDeliveryCart() {
+  const productId = parseInt(document.getElementById('delivery-cart-product').value);
+  const qty = parseInt(document.getElementById('delivery-cart-qty').value) || 0;
+  const p = stock.find(s => s.id === productId);
+  if (!p || !qty) return;
+  if (qty > p.qty) { setFeedback('Stoc insuficient: ' + p.qty + ' ' + p.unit + ' disponibil!', 'err'); return; }
+  const existing = deliveryCartItems.find(i => i.productId === productId);
+  if (existing) existing.qty += qty;
+  else deliveryCartItems.push({ productId, name: p.name, qty, unit: p.unit, price: p.price_sell || 0 });
+  renderDeliveryCart();
+}
+
+function renderDeliveryCart() {
+  const el = document.getElementById('delivery-cart-list');
+  if (!el) return;
+  const total = deliveryCartItems.reduce((s, i) => s + i.qty * i.price, 0);
+  el.innerHTML = deliveryCartItems.map((item, i) => '<div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">' +
+    '<span style="color:#e8ecf0">' + item.name + ' x' + item.qty + '</span>' +
+    '<span style="color:#00e5a0">' + (item.qty * item.price).toFixed(0) + ' RON</span>' +
+    '<button onclick="deliveryCartItems.splice(' + i + ',1);renderDeliveryCart()" style="background:none;border:none;color:#ff4757;cursor:pointer">✕</button>' +
+    '</div>').join('') +
+    (total > 0 ? '<div style="text-align:right;padding:8px;color:#ffa502;font-weight:700;font-family:Barlow Condensed,sans-serif;font-size:18px">TOTAL: ' + total.toFixed(2) + ' RON</div>' : '');
+}
+
+async function confirmDeliveryCart() {
+  const clientName = document.getElementById('delivery-cart-client').value.trim();
+  if (!clientName) { setFeedback('Introduceti numele clientului!', 'warn'); return; }
+  if (!deliveryCartItems.length) { setFeedback('Adaugati produse in cos!', 'warn'); return; }
+  
+  deliveryCartItems.forEach(item => {
+    const p = stock.find(s => s.id === item.productId);
+    if (p) {
+      p.qty = Math.max(0, p.qty - item.qty);
+      addLog('Livrare: ' + clientName, 'OUT ' + item.qty + ' ' + item.unit + ' ' + item.name, 'out', clientName);
+      clients.push({ name: clientName, product: item.name, qty: item.qty, unit: item.unit, time: new Date().toLocaleString('ro-RO'), user: userProfile ? userProfile.name : '', depot: userProfile ? userProfile.depot : '' });
+    }
+  });
+  
+  saveStockToFirebase(); renderStock(); updateStats();
+  await generateBonFiscal(clientName, deliveryCartItems);
+  closeDeliveryCartModal();
+  setFeedback('Livrare finalizata pentru ' + clientName + '!', 'ok');
+  speak('Livrare finalizata. Bon generat pentru ' + clientName + '.');
+}
+
+// 3. INVENTAR RAPID PARȚIAL
+function openPartialInventory(filterBy) {
+  const filtered = filterBy ? stock.filter(p => (p.cat || 'General') === filterBy || (p.loc || '') === filterBy) : stock;
+  const el = document.getElementById('partial-inv-list');
+  if (!el) return;
+  
+  el.innerHTML = filtered.map(p => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+    '<div><div style="color:#e8ecf0;font-weight:700">' + p.name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">Sistem: ' + p.qty + ' ' + p.unit + '</div></div>' +
+    '<input type="number" value="' + p.qty + '" data-id="' + p.id + '" style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#00e5a0;font-size:16px;font-weight:700;padding:6px;text-align:center;outline:none">' +
+    '</div>').join('');
+  
+  document.getElementById('partial-inv-modal').style.display = 'flex';
+}
+
+function confirmPartialInventory() {
+  const inputs = document.querySelectorAll('#partial-inv-list input[data-id]');
+  let adjusted = 0;
+  inputs.forEach(input => {
+    const id = parseInt(input.dataset.id);
+    const newQty = parseInt(input.value);
+    const p = stock.find(s => s.id === id);
+    if (p && !isNaN(newQty) && newQty !== p.qty) {
+      const diff = newQty - p.qty;
+      addLog('Inventar partial: ' + p.name, (diff > 0 ? '+' : '') + diff + ' ' + p.unit + ' ajustare inventar', diff > 0 ? 'in' : 'out');
+      p.qty = newQty;
+      adjusted++;
+    }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  document.getElementById('partial-inv-modal').style.display = 'none';
+  setFeedback(adjusted + ' produse ajustate la inventar!', 'ok');
+  speak(adjusted + ' produse ajustate la inventar partial.');
+}
+
+// 4. TRANSFER ÎNTRE RAFTURI
+function transferBetweenRacks(productId, fromRack, toRack) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const oldLoc = p.loc || 'Nedefinit';
+  p.loc = toRack;
+  if (typeof trackLocationChange === 'function') trackLocationChange(p, toRack);
+  saveStockToFirebase(); renderStock();
+  addLog('Transfer raft: ' + p.name, oldLoc + ' → ' + toRack, 'in');
+  setFeedback(p.name + ' mutat: ' + oldLoc + ' → ' + toRack, 'ok');
+  speak(p.name + ' mutat in raftul ' + toRack + '.');
+}
+
+// 5. COMANDĂ FURNIZOR PDF PROFESIONAL
+async function generateSupplierOrder() {
+  const lowProducts = stock.filter(p => p.qty <= p.min && p.supplier);
+  if (!lowProducts.length) { setFeedback('Niciun produs sub minim cu furnizor definit!', 'warn'); return; }
+  
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const orderNo = 'CMD-' + now.getTime().toString().slice(-6);
+  
+  doc.setFillColor(10, 12, 15);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(232, 236, 240);
+  doc.text('COMANDĂ FURNIZOR', 14, 22);
+  doc.setFontSize(10);
+  doc.setTextColor(0, 229, 160);
+  doc.text(orderNo + '  ·  ' + now.toLocaleDateString('ro-RO') + '  ·  ' + depot, 14, 32);
+  
+  const grouped = {};
+  lowProducts.forEach(p => {
+    const sup = p.supplier || 'Necunoscut';
+    if (!grouped[sup]) grouped[sup] = [];
+    const toOrder = Math.max(p.moq || p.min * 3, p.min * 3 - p.qty);
+    grouped[sup].push({ ...p, toOrder });
+  });
+  
+  let yPos = 50;
+  Object.entries(grouped).forEach(([supplier, products]) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(255, 165, 2);
+    doc.text('Furnizor: ' + supplier, 14, yPos);
+    if (products[0].supplier_contact) {
+      doc.setFontSize(9);
+      doc.setTextColor(107, 122, 141);
+      doc.text('Contact: ' + products[0].supplier_contact, 14, yPos + 6);
+      yPos += 4;
+    }
+    yPos += 8;
+    
+    doc.autoTable({
+      startY: yPos,
+      head: [['Produs', 'Stoc Actual', 'Stoc Min', 'De Comandat', 'UM', 'MOQ']],
+      body: products.map(p => [p.name, p.qty, p.min, p.toOrder, p.unit, p.moq || '-']),
+      styles: { fontSize: 9, textColor: [153, 168, 184], fillColor: [17, 20, 24] },
+      headStyles: { fillColor: [10, 12, 15], textColor: [0, 229, 160], fontStyle: 'bold' },
+      margin: { left: 14, right: 14 }
+    });
+    yPos = doc.lastAutoTable.finalY + 12;
+  });
+  
+  doc.save(orderNo + '_Comanda_Furnizor.pdf');
+  setFeedback('Comanda furnizor generata: ' + orderNo, 'ok');
+  speak('Comanda furnizor generata cu succes.');
+}
+
+// 6. RETUR FURNIZOR
+function openReturnToSupplierModal() {
+  const el = document.getElementById('return-supplier-product');
+  if (el) el.innerHTML = stock.map(p => '<option value="' + p.id + '">' + p.name + ' (' + p.qty + ' ' + p.unit + ')</option>').join('');
+  document.getElementById('return-supplier-modal').style.display = 'flex';
+}
+function closeReturnToSupplierModal() { document.getElementById('return-supplier-modal').style.display = 'none'; }
+
+function confirmReturnToSupplier() {
+  const productId = parseInt(document.getElementById('return-supplier-product').value);
+  const qty = parseInt(document.getElementById('return-supplier-qty').value) || 0;
+  const reason = document.getElementById('return-supplier-reason').value.trim() || 'Retur furnizor';
+  const p = stock.find(s => s.id === productId);
+  if (!p || !qty) { setFeedback('Completati toate campurile!', 'warn'); return; }
+  if (qty > p.qty) { setFeedback('Stoc insuficient pentru retur!', 'err'); return; }
+  p.qty -= qty;
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog('Retur furnizor: ' + p.name, 'OUT ' + qty + ' ' + p.unit + ' · Motiv: ' + reason, 'out');
+  closeReturnToSupplierModal();
+  setFeedback(p.name + ': ' + qty + ' ' + p.unit + ' returnate furnizorului.', 'ok');
+  speak(qty + ' ' + p.unit + ' din ' + p.name + ' returnate furnizorului.');
+}
+
+
+// ══════════════════════════════════════════
+// BLOC B: ALERTE + CLIENȚI + RAPOARTE (7-19)
+// ══════════════════════════════════════════
+
+// 7. ALERTĂ STOC SUB MINIM PE TELEGRAM INSTANT
+function checkAndAlertLowStock(product) {
+  if (!userProfile || !userProfile.telegram_id) return;
+  if (product.qty === 0) {
+    sendTelegramAlert('EPUIZAT: ' + product.name + ' — stoc zero! Depozit: ' + userProfile.depot, userProfile.telegram_id);
+  } else if (product.qty <= product.min) {
+    sendTelegramAlert('SCAZUT: ' + product.name + ' — ' + product.qty + ' ' + product.unit + ' (min ' + product.min + '). Depozit: ' + userProfile.depot, userProfile.telegram_id);
+  }
+}
+
+// 8. ALERTĂ PRODUS FĂRĂ MIȘCARE 60 ZILE
+function checkStalenessWeekly() {
+  const lastCheck = localStorage.getItem('sv_staleness_check');
+  const today = new Date().toISOString().slice(0, 10);
+  if (lastCheck === today) return;
+  localStorage.setItem('sv_staleness_check', today);
+  if (new Date().getDay() !== 1) return; // Only Monday
+  
+  const cutoff = new Date(Date.now() - 60 * 86400000);
+  const stale = stock.filter(p => {
+    const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    return !lastMove && p.qty > 0;
+  });
+  
+  if (stale.length > 0 && userProfile && userProfile.telegram_id) {
+    const msg = 'PRODUSE FARA MISCARE 60 ZILE:
+' + stale.slice(0, 10).map(p => '- ' + p.name + ': ' + p.qty + ' ' + p.unit).join('
+');
+    sendTelegramAlert(msg, userProfile.telegram_id);
+  }
+}
+setInterval(checkStalenessWeekly, 3600000);
+
+// 9. ALERTĂ VALOARE STOC SCĂZUTĂ
+let stockValueThreshold = parseFloat(localStorage.getItem('sv_value_threshold') || '0');
+
+function setStockValueThreshold(value) {
+  stockValueThreshold = value;
+  localStorage.setItem('sv_value_threshold', String(value));
+  setFeedback('Prag valoare stoc setat: ' + value + ' RON', 'ok');
+}
+
+function checkStockValueThreshold() {
+  if (!stockValueThreshold) return;
+  const val = parseFloat(calculateStockValue().totalBuy || 0);
+  if (val < stockValueThreshold) {
+    triggerAlert('VALOARE STOC SCAZUTA: ' + val.toFixed(0) + ' RON (prag: ' + stockValueThreshold + ' RON)!', 'warn');
+    if (userProfile && userProfile.telegram_id) {
+      sendTelegramAlert('ATENTIE! Valoarea stocului a scazut sub ' + stockValueThreshold + ' RON. Valoare actuala: ' + val.toFixed(0) + ' RON.', userProfile.telegram_id);
+    }
+  }
+}
+
+// 10. NOTIFICARE ZILNICĂ TOP 5 CRITICE
+function sendDailyTop5Critical() {
+  const hour = new Date().getHours();
+  const reportHour = appSettings.daily_hour || 8;
+  if (hour !== reportHour) return;
+  
+  const today = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem('sv_top5_sent') === today) return;
+  localStorage.setItem('sv_top5_sent', today);
+  
+  if (!userProfile || !userProfile.telegram_id) return;
+  
+  const critical = stock.filter(p => p.qty <= p.min).sort((a, b) => a.qty - b.qty).slice(0, 5);
+  if (!critical.length) return;
+  
+  const msg = 'TOP CRITICE AZI - ' + userProfile.depot + ':
+' +
+    critical.map((p, i) => (i + 1) + '. ' + p.name + ': ' + (p.qty === 0 ? 'EPUIZAT' : p.qty + ' ' + p.unit) + ' (min ' + p.min + ')').join('
+');
+  sendTelegramAlert(msg, userProfile.telegram_id);
+}
+setInterval(sendDailyTop5Critical, 3600000);
+
+// 11. FIDELITATE CLIENT — PUNCTE
+let loyaltyPoints = JSON.parse(localStorage.getItem('sv_loyalty') || '{}');
+
+function addLoyaltyPoints(clientName, value) {
+  const key = normalizeText(clientName.toLowerCase());
+  const pts = Math.floor(value / 10); // 1 punct la 10 RON
+  if (!loyaltyPoints[key]) loyaltyPoints[key] = { points: 0, total: 0 };
+  loyaltyPoints[key].points += pts;
+  loyaltyPoints[key].total += value;
+  localStorage.setItem('sv_loyalty', JSON.stringify(loyaltyPoints));
+  if (pts > 0) setFeedback(clientName + ' a acumulat ' + pts + ' puncte! Total: ' + loyaltyPoints[key].points, 'ok');
+}
+
+function getLoyaltyPoints(clientName) {
+  const key = normalizeText(clientName.toLowerCase());
+  return loyaltyPoints[key] || { points: 0, total: 0 };
+}
+
+// 12. COMANDĂ VIITOARE PLANIFICATĂ
+let plannedOrders = JSON.parse(localStorage.getItem('sv_planned_orders') || '[]');
+
+function addPlannedOrder(clientName, productId, qty, deliveryDate) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  plannedOrders.push({ id: Date.now(), clientName, productId, productName: p.name, unit: p.unit, qty, deliveryDate, status: 'planificat', created: new Date().toISOString() });
+  localStorage.setItem('sv_planned_orders', JSON.stringify(plannedOrders));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/planned_orders').set(plannedOrders);
+  setFeedback('Comanda planificata pentru ' + clientName + ' pe ' + deliveryDate, 'ok');
+}
+
+function checkPlannedOrders() {
+  const today = new Date().toISOString().slice(0, 10);
+  plannedOrders.filter(o => o.deliveryDate === today && o.status === 'planificat').forEach(order => {
+    triggerAlert('LIVRARE AZI: ' + order.clientName + ' — ' + order.qty + ' ' + order.unit + ' ' + order.productName, 'warn');
+    if (userProfile && userProfile.telegram_id) {
+      sendTelegramAlert('LIVRARE PLANIFICATA AZI: ' + order.clientName + ' asteapta ' + order.qty + ' ' + order.unit + ' ' + order.productName, userProfile.telegram_id);
+    }
+  });
+}
+setInterval(checkPlannedOrders, 3600000);
+
+// 13. SMS/WHATSAPP TEMPLATE COMANDĂ
+function generateOrderWhatsApp(clientName, items) {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  let msg = 'Buna ziua ' + clientName + '!
+
+Comanda dumneavoastra din ' + now + ':
+
+';
+  items.forEach((item, i) => { msg += (i + 1) + '. ' + item.name + ': ' + item.qty + ' ' + item.unit + '
+'; });
+  msg += '
+Va multumim! ' + depot;
+  navigator.clipboard.writeText(msg).then(() => {
+    setFeedback('Template WhatsApp copiat! Lipiti in WhatsApp.', 'ok');
+  });
+}
+
+// 14. RAPORT SĂPTĂMÂNAL AUTOMAT PDF
+function checkWeeklyReport() {
+  if (!appSettings.weekly_report) return;
+  const now = new Date();
+  if (now.getDay() !== 5 || now.getHours() !== 17) return;
+  const today = now.toISOString().slice(0, 10);
+  if (localStorage.getItem('sv_weekly_pdf_' + today)) return;
+  localStorage.setItem('sv_weekly_pdf_' + today, '1');
+  generatePDF();
+  if (userProfile && userProfile.telegram_id) screenshotDashboard();
+  setFeedback('Raport saptamanal generat automat!', 'ok');
+}
+setInterval(checkWeeklyReport, 60000);
+
+// 15. GRAFIC TOP 10 PRODUSE VÂNDUTE
+function showTop10Chart() {
+  const productMoves = stock.map(p => {
+    const outOps = log.filter(e => e.type === 'out' && e.ts && (Date.now() - new Date(e.ts).getTime()) < 30 * 86400000 && e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    let sold = 0;
+    outOps.forEach(e => { const m = e.result && e.result.match(/(\d+).(\d+)/); if (m) sold += parseInt(m[1]) - parseInt(m[2]); });
+    return { name: p.name.substring(0, 15), sold, unit: p.unit };
+  }).filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 10);
+  
+  const el = document.getElementById('top10-chart-content');
+  if (!el) return;
+  const maxSold = Math.max(...productMoves.map(p => p.sold), 1);
+  
+  el.innerHTML = '<div style="font-size:11px;color:#6b7a8d;margin-bottom:10px">Ultimele 30 zile</div>' +
+    productMoves.map((p, i) => '<div style="margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:3px">' +
+      '<span style="font-size:12px;color:#e8ecf0">' + (i + 1) + '. ' + p.name + '</span>' +
+      '<span style="font-size:12px;color:#00e5a0;font-weight:700">' + p.sold + ' ' + p.unit + '</span>' +
+      '</div>' +
+      '<div style="height:6px;background:#1e2530;border-radius:3px">' +
+      '<div style="height:100%;width:' + Math.round(p.sold / maxSold * 100) + '%;background:linear-gradient(90deg,#00e5a0,#a78bfa);border-radius:3px"></div>' +
+      '</div></div>').join('');
+  
+  document.getElementById('top10-chart-modal').style.display = 'flex';
+}
+
+// 16. RAPORT FURNIZORI CU EVALUARE
+function showSupplierEvaluation() {
+  const suppliers = {};
+  stock.forEach(p => {
+    const sup = p.supplier || 'Necunoscut';
+    if (!suppliers[sup]) suppliers[sup] = { products: 0, totalValue: 0, avgLeadTime: 0, leadCount: 0 };
+    suppliers[sup].products++;
+    suppliers[sup].totalValue += (p.price_buy || 0) * p.qty;
+    if (p.lead_time) { suppliers[sup].avgLeadTime += parseInt(p.lead_time); suppliers[sup].leadCount++; }
+  });
+  
+  const el = document.getElementById('supplier-eval-content');
+  if (!el) return;
+  
+  const sorted = Object.entries(suppliers).sort((a, b) => b[1].totalValue - a[1].totalValue);
+  el.innerHTML = sorted.map(([sup, d]) => {
+    const avgLT = d.leadCount ? Math.round(d.avgLeadTime / d.leadCount) : '?';
+    const score = Math.max(1, 5 - Math.floor((avgLT === '?' ? 7 : avgLT) / 3));
+    const stars = '★'.repeat(score) + '☆'.repeat(5 - score);
+    return '<div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #ffa502">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+      '<div style="font-weight:700;color:#e8ecf0">' + sup + '</div>' +
+      '<div style="color:#ffa502;font-size:14px">' + stars + '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:11px;color:#6b7a8d">' +
+      '<div>Produse: <b style="color:#99a8b8">' + d.products + '</b></div>' +
+      '<div>Valoare: <b style="color:#99a8b8">' + d.totalValue.toFixed(0) + ' RON</b></div>' +
+      '<div>Livrare: <b style="color:#99a8b8">' + avgLT + ' zile</b></div>' +
+      '</div></div>';
+  }).join('');
+  
+  document.getElementById('supplier-eval-modal').style.display = 'flex';
+}
+
+// 17. EXPORT COMPLET PENTRU CONTABIL
+function exportForAccountant() {
+  const wb = XLSX.utils.book_new();
+  const now = new Date();
+  const month = now.toLocaleDateString('ro-RO', { month: 'long', year: 'numeric' });
+  
+  // Sheet 1: Stoc
+  const stockRows = [['Cod', 'Produs', 'Categorie', 'Cantitate', 'UM', 'Pret Achizitie', 'Pret Vanzare', 'Valoare Stoc', 'TVA Stoc']];
+  stock.forEach((p, i) => {
+    const val = (p.price_buy || 0) * p.qty;
+    stockRows.push(['PRD-' + String(i + 1).padStart(4, '0'), p.name, p.cat || '', p.qty, p.unit, p.price_buy || '', p.price_sell || '', val.toFixed(2), (val * 0.19).toFixed(2)]);
+  });
+  const ws1 = XLSX.utils.aoa_to_sheet(stockRows);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Stoc ' + now.getMonth());
+  
+  // Sheet 2: Miscari luna
+  const logRows = [['Data', 'Tip', 'Comanda', 'Rezultat', 'Operator', 'Client', 'Valoare Est.']];
+  const monthLog = log.filter(e => e.ts && new Date(e.ts).getMonth() === now.getMonth());
+  monthLog.forEach(e => {
+    const m = e.result && e.result.match(/(\d+).(\d+)/);
+    const qty = m ? Math.abs(parseInt(m[1]) - parseInt(m[2])) : 0;
+    const p = stock.find(s => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(s.name.toLowerCase())));
+    const val = p ? qty * (e.type === 'out' ? (p.price_sell || 0) : (p.price_buy || 0)) : 0;
+    logRows.push([e.time || '', e.type || '', e.cmd || '', e.result || '', e.user || '', e.client || '', val.toFixed(2)]);
+  });
+  const ws2 = XLSX.utils.aoa_to_sheet(logRows);
+  XLSX.utils.book_append_sheet(wb, ws2, 'Miscari');
+  
+  XLSX.writeFile(wb, 'Contabilitate_' + (userProfile ? userProfile.depot : 'Depozit') + '_' + now.toISOString().slice(0, 7) + '.xlsx');
+  setFeedback('Export contabil generat!', 'ok');
+}
+
+// 18. DASHBOARD SIMPLIFICAT PENTRU ȘEF
+function showBossDashboard() {
+  const val = calculateStockValue();
+  const zero = stock.filter(p => p.qty === 0).length;
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
+  const margin = calcMonthlyMargin ? calcMonthlyMargin() : { margin: 0, profit: 0 };
+  const todayOps = log.filter(e => e.time && e.time.startsWith(new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit' }))).length;
+  
+  const el = document.getElementById('boss-dashboard-content');
+  if (!el) return;
+  
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+    [['Valoare Stoc', val.totalBuy + ' RON', '#00e5a0'],
+     ['Profit Luna', margin.profit + ' RON', '#ffa502'],
+     ['Produse Critice', (zero + low) + ' produse', zero + low > 5 ? '#ff4757' : '#ffa502'],
+     ['Operatii Azi', todayOps + ' ops', '#a78bfa']
+    ].map(([label, value, color]) =>
+      '<div style="background:#181d24;border-radius:12px;padding:20px;text-align:center;border-top:3px solid ' + color + '">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:' + color + '">' + value + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d;margin-top:4px;letter-spacing:1px;text-transform:uppercase">' + label + '</div>' +
+      '</div>').join('') + '</div>';
+  
+  document.getElementById('boss-dashboard-modal').style.display = 'flex';
+}
+
+
+// ══════════════════════════════════════════
+// BLOC C: AI & AUTOMATIZĂRI (19-25)
+// ══════════════════════════════════════════
+
+// 19. AI COMPLETARE AUTOMATĂ PRODUS
+async function aiAutoFillProduct(productName) {
+  if (!productName || productName.length < 3) return;
+  try {
+    const cats = [...new Set(stock.map(p => p.cat || 'General'))].slice(0, 10).join(', ');
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 150,
+        messages: [{ role: 'user', content: 'Pentru produsul "' + productName + '" dintr-un depozit, sugereaza: categorie (din: ' + cats + '), unitate masura, stoc minim recomandat. Raspunde STRICT cu JSON: {"cat":"...","unit":"...","min":0}' }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content[0].text.replace(/```json|```/g, '').trim();
+    const suggestion = JSON.parse(text);
+    const catEl = document.getElementById('new-cat');
+    const unitEl = document.getElementById('new-unit');
+    const minEl = document.getElementById('new-min');
+    if (catEl && !catEl.value && suggestion.cat) catEl.value = suggestion.cat;
+    if (unitEl && !unitEl.value && suggestion.unit) unitEl.value = suggestion.unit;
+    if (minEl && !minEl.value && suggestion.min) minEl.value = suggestion.min;
+    setFeedback('AI a completat automat: ' + suggestion.cat + ', ' + suggestion.unit + ', min ' + suggestion.min, 'ok');
+  } catch(e) {}
+}
+
+// 20. DETECTARE DUPLICAT LA ADĂUGARE (îmbunătățit)
+function checkDuplicateOnAdd(name) {
+  if (!name || name.length < 3) return;
+  const norm = normalizeText(name.toLowerCase());
+  const similar = stock.filter(p => {
+    const pNorm = normalizeText(p.name.toLowerCase());
+    if (pNorm === norm) return true;
+    const words = norm.split(' ').filter(w => w.length > 3);
+    return words.length >= 2 && words.filter(w => pNorm.includes(w)).length >= 2;
+  });
+  if (similar.length > 0) {
+    const names = similar.map(p => p.name + ' (' + p.qty + ' ' + p.unit + ')').join(', ');
+    setFeedback('ATENTIE! Produse similare exista: ' + names, 'warn');
+    triggerAlert('Duplicat posibil: ' + name + ' seamana cu: ' + names, 'warn');
+  }
+}
+
+// 21. AUTO-COMANDĂ LA ATINGEREA MINIMULUI
+let autoOrderEnabled = JSON.parse(localStorage.getItem('sv_auto_order') || 'false');
+
+function toggleAutoOrder() {
+  autoOrderEnabled = !autoOrderEnabled;
+  localStorage.setItem('sv_auto_order', JSON.stringify(autoOrderEnabled));
+  setFeedback((autoOrderEnabled ? 'Comanda automata ACTIVATA!' : 'Comanda automata dezactivata.'), 'ok');
+}
+
+async function checkAutoOrder(product) {
+  if (!autoOrderEnabled || !product.supplier || product.qty > product.min) return;
+  
+  const lastOrder = localStorage.getItem('sv_auto_ordered_' + product.id);
+  const today = new Date().toISOString().slice(0, 10);
+  if (lastOrder === today) return;
+  localStorage.setItem('sv_auto_ordered_' + product.id, today);
+  
+  const toOrder = Math.max(product.moq || product.min * 3, product.min * 3 - product.qty);
+  const msg = 'COMANDA AUTOMATA: ' + product.name + '
+Cantitate: ' + toOrder + ' ' + product.unit + '
+Furnizor: ' + product.supplier + (product.supplier_contact ? '
+Contact: ' + product.supplier_contact : '') + '
+Depozit: ' + (userProfile ? userProfile.depot : '');
+  
+  if (userProfile && userProfile.telegram_id) {
+    await sendTelegramAlert(msg, userProfile.telegram_id);
+    setFeedback('Comanda automata trimisa pe Telegram pentru ' + product.name + '!', 'ok');
+  }
+}
+
+// 22. LIVRARE RECURENTĂ
+let recurringDeliveries = JSON.parse(localStorage.getItem('sv_recurring') || '[]');
+
+function addRecurringDelivery(clientName, productId, qty, interval) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  recurringDeliveries.push({
+    id: Date.now(), clientName, productId, productName: p.name, unit: p.unit,
+    qty, interval, lastRun: null, active: true
+  });
+  localStorage.setItem('sv_recurring', JSON.stringify(recurringDeliveries));
+  setFeedback('Livrare recurenta creata: ' + clientName + ' — ' + qty + ' ' + p.unit + ' ' + p.name + ' la ' + interval + ' zile', 'ok');
+}
+
+function checkRecurringDeliveries() {
+  const today = new Date();
+  let processed = 0;
+  recurringDeliveries.forEach(rd => {
+    if (!rd.active) return;
+    const lastRun = rd.lastRun ? new Date(rd.lastRun) : new Date(0);
+    const daysSince = (today - lastRun) / 86400000;
+    if (daysSince >= rd.interval) {
+      const p = stock.find(s => s.id === rd.productId);
+      if (p && p.qty >= rd.qty) {
+        p.qty -= rd.qty;
+        rd.lastRun = today.toISOString();
+        addLog('Livrare recurenta: ' + rd.clientName, 'OUT ' + rd.qty + ' ' + rd.unit + ' ' + rd.productName, 'out', rd.clientName);
+        processed++;
+      }
+    }
+  });
+  if (processed > 0) {
+    localStorage.setItem('sv_recurring', JSON.stringify(recurringDeliveries));
+    saveStockToFirebase(); renderStock(); updateStats();
+    setFeedback(processed + ' livrari recurente procesate!', 'ok');
+  }
+}
+setInterval(checkRecurringDeliveries, 3600000);
+
+// 23. RAPORT ANOMALII AI SĂPTĂMÂNAL
+async function sendWeeklyAnomaliesAI() {
+  if (!appSettings.weekly_anomalies) return;
+  if (new Date().getDay() !== 1) return;
+  const today = new Date().toISOString().slice(0, 10);
+  if (localStorage.getItem('sv_weekly_anomaly_' + today)) return;
+  localStorage.setItem('sv_weekly_anomaly_' + today, '1');
+  
+  const weekLog = log.filter(e => e.ts && (Date.now() - new Date(e.ts).getTime()) < 7 * 86400000);
+  const prevWeekLog = log.filter(e => e.ts && (Date.now() - new Date(e.ts).getTime()) >= 7 * 86400000 && (Date.now() - new Date(e.ts).getTime()) < 14 * 86400000);
+  
+  if (!weekLog.length) return;
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 400,
+        messages: [{ role: 'user', content: 'Analizeaza aceste date de activitate depozit si identifica anomalii comparand saptamana curenta vs precedenta. Saptamana curenta: ' + weekLog.length + ' operatii. Saptamana precedenta: ' + prevWeekLog.length + ' operatii. Produse critice: ' + stock.filter(p => p.qty === 0).length + ' epuizate, ' + stock.filter(p => p.qty > 0 && p.qty <= p.min).length + ' scazute. Raspunde in romana, maxim 5 observatii.' }]
+      })
+    });
+    const data = await resp.json();
+    const answer = data.content[0].text;
+    if (userProfile && userProfile.telegram_id) {
+      await sendTelegramAlert('RAPORT AI SAPTAMANAL:
+' + answer.substring(0, 500), userProfile.telegram_id);
+    }
+  } catch(e) {}
+}
+setInterval(sendWeeklyAnomaliesAI, 3600000);
+
+// 24. ASISTENT VOCAL COMPLET AI
+async function handleFullAIStatus(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('situatie completa') && !norm.includes('situație completă') && !norm.includes('raport complet') && !norm.includes('cum sta depozitul')) return false;
+  
+  speak('Analizeaza. Un moment...');
+  
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const total = stock.length;
+  const zero = stock.filter(p => p.qty === 0).length;
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
+  const val = calculateStockValue();
+  const health = typeof calcDepotHealth === 'function' ? calcDepotHealth() : 100;
+  const todayOps = log.filter(e => e.time && e.time.startsWith(new Date().toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit' }))).length;
+  
+  const summary = 'Depozitul ' + depot + ' are ' + total + ' produse. ' +
+    zero + ' epuizate, ' + low + ' cu stoc scazut. ' +
+    'Valoare stoc: ' + val.totalBuy + ' lei. ' +
+    'Sanatate: ' + health + ' la suta. ' +
+    'Operatii astazi: ' + todayOps + '.';
+  
+  speak(summary);
+  setFeedback('AI: ' + summary, 'ok');
+  
+  if (userProfile && userProfile.telegram_id) {
+    sendTelegramAlert('SITUATIE VOCALA:
+' + summary, userProfile.telegram_id);
+  }
+  return true;
+}
+
+// 25. AUTO-HOOK ÎN EXECUTEOPERATION
+const _origExecForAlerts = executeOperation;
+
+
 </script>
 
 <script>
@@ -1298,6 +2124,7 @@ function processCommand(text){
   if(typeof handleVoiceQuery==='function'&&handleVoiceQuery(text))return;
   // Check full status command
   if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
+  if(typeof handleFullAIStatus==='function'&&handleFullAIStatus(text))return;
   // Check category query
   if(typeof handleCategoryQuery==='function'&&handleCategoryQuery(text))return;
   // Check stats voice
@@ -7909,6 +8736,8 @@ function setupAutocomplete() {
   // Auto-classify on blur
   input.addEventListener('blur', async function() {
     if (this.value.length > 3) {
+      checkDuplicateOnAdd(this.value);
+      if (typeof aiAutoFillProduct === 'function') await aiAutoFillProduct(this.value);
       const catInput = document.getElementById('new-cat');
       if (catInput && !catInput.value) {
         const suggested = await aiClassifyProduct(this.value);
@@ -8120,6 +8949,119 @@ function showNoMovementReport() {
       <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
     </div>
     <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- RECEPTION MODAL -->
+<div id="reception-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📥 Recepție Marfă</div>
+      <button onclick="closeReceptionModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="reception-supplier" placeholder="Furnizor (opțional)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:10px">
+        <input id="reception-name" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-unit" placeholder="UM" value="buc" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addReceptionItem()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="reception-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmReception()" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ CONFIRMĂ RECEPȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY CART MODAL -->
+<div id="delivery-cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🛒 Livrare Completă</div>
+      <button onclick="closeDeliveryCartModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="delivery-cart-client" placeholder="Nume client *" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-bottom:10px">
+        <select id="delivery-cart-product" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;cursor:pointer"></select>
+        <input id="delivery-cart-qty" type="number" placeholder="Cant." value="1" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addToDeliveryCart()" style="background:#a78bfa;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="delivery-cart-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmDeliveryCart()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">🚚 FINALIZEAZĂ LIVRAREA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIAL INVENTORY MODAL -->
+<div id="partial-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🔢 Inventar Rapid</div>
+      <button onclick="document.getElementById('partial-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:10px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="openPartialInventory(null)" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:5px 10px;cursor:pointer">📦 Tot</button>
+        ${[...new Set(stock.map(p=>p.cat||'General'))].map(c=>'<button onclick="openPartialInventory(''+c+'')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:5px 10px;cursor:pointer">'+c+'</button>').join('')}
+      </div>
+    </div>
+    <div id="partial-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmPartialInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ SALVEAZĂ INVENTARUL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN TO SUPPLIER MODAL -->
+<div id="return-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">↩️ Retur Furnizor</div>
+      <button onclick="closeReturnToSupplierModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <select id="return-supplier-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="return-supplier-qty" type="number" placeholder="Cantitate de returnat" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:10px">
+    <input id="return-supplier-reason" placeholder="Motiv retur (defect, surplus...)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:16px">
+    <button onclick="confirmReturnToSupplier()" style="width:100%;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">CONFIRMĂ RETURUL →</button>
+  </div>
+</div>
+
+<!-- TOP 10 CHART MODAL -->
+<div id="top10-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top 10 Vândute</div>
+      <button onclick="document.getElementById('top10-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top10-chart-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER EVAL MODAL -->
+<div id="supplier-eval-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⭐ Evaluare Furnizori</div>
+      <button onclick="document.getElementById('supplier-eval-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-eval-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BOSS DASHBOARD MODAL -->
+<div id="boss-dashboard-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Dashboard Șef</div>
+      <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="boss-dashboard-content"></div>
   </div>
 </div>
 
@@ -8433,6 +9375,119 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- RECEPTION MODAL -->
+<div id="reception-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📥 Recepție Marfă</div>
+      <button onclick="closeReceptionModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="reception-supplier" placeholder="Furnizor (opțional)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:10px">
+        <input id="reception-name" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-unit" placeholder="UM" value="buc" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addReceptionItem()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="reception-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmReception()" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ CONFIRMĂ RECEPȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY CART MODAL -->
+<div id="delivery-cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🛒 Livrare Completă</div>
+      <button onclick="closeDeliveryCartModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="delivery-cart-client" placeholder="Nume client *" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-bottom:10px">
+        <select id="delivery-cart-product" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;cursor:pointer"></select>
+        <input id="delivery-cart-qty" type="number" placeholder="Cant." value="1" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addToDeliveryCart()" style="background:#a78bfa;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="delivery-cart-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmDeliveryCart()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">🚚 FINALIZEAZĂ LIVRAREA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIAL INVENTORY MODAL -->
+<div id="partial-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🔢 Inventar Rapid</div>
+      <button onclick="document.getElementById('partial-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:10px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="openPartialInventory(null)" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:5px 10px;cursor:pointer">📦 Tot</button>
+        ${[...new Set(stock.map(p=>p.cat||'General'))].map(c=>'<button onclick="openPartialInventory(''+c+'')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:5px 10px;cursor:pointer">'+c+'</button>').join('')}
+      </div>
+    </div>
+    <div id="partial-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmPartialInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ SALVEAZĂ INVENTARUL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN TO SUPPLIER MODAL -->
+<div id="return-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">↩️ Retur Furnizor</div>
+      <button onclick="closeReturnToSupplierModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <select id="return-supplier-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="return-supplier-qty" type="number" placeholder="Cantitate de returnat" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:10px">
+    <input id="return-supplier-reason" placeholder="Motiv retur (defect, surplus...)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:16px">
+    <button onclick="confirmReturnToSupplier()" style="width:100%;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">CONFIRMĂ RETURUL →</button>
+  </div>
+</div>
+
+<!-- TOP 10 CHART MODAL -->
+<div id="top10-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top 10 Vândute</div>
+      <button onclick="document.getElementById('top10-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top10-chart-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER EVAL MODAL -->
+<div id="supplier-eval-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⭐ Evaluare Furnizori</div>
+      <button onclick="document.getElementById('supplier-eval-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-eval-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BOSS DASHBOARD MODAL -->
+<div id="boss-dashboard-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Dashboard Șef</div>
+      <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="boss-dashboard-content"></div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -8517,6 +9572,119 @@ function showNoMovementReport() {
       <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
     </div>
     <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- RECEPTION MODAL -->
+<div id="reception-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📥 Recepție Marfă</div>
+      <button onclick="closeReceptionModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="reception-supplier" placeholder="Furnizor (opțional)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:10px">
+        <input id="reception-name" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <input id="reception-unit" placeholder="UM" value="buc" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addReceptionItem()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="reception-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmReception()" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ CONFIRMĂ RECEPȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY CART MODAL -->
+<div id="delivery-cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🛒 Livrare Completă</div>
+      <button onclick="closeDeliveryCartModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1">
+      <input id="delivery-cart-client" placeholder="Nume client *" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-bottom:10px">
+        <select id="delivery-cart-product" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;cursor:pointer"></select>
+        <input id="delivery-cart-qty" type="number" placeholder="Cant." value="1" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+        <button onclick="addToDeliveryCart()" style="background:#a78bfa;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:16px;padding:9px 12px;cursor:pointer">+</button>
+      </div>
+      <div id="delivery-cart-list" style="min-height:60px"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmDeliveryCart()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">🚚 FINALIZEAZĂ LIVRAREA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTIAL INVENTORY MODAL -->
+<div id="partial-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🔢 Inventar Rapid</div>
+      <button onclick="document.getElementById('partial-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:10px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="openPartialInventory(null)" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:5px 10px;cursor:pointer">📦 Tot</button>
+        ${[...new Set(stock.map(p=>p.cat||'General'))].map(c=>'<button onclick="openPartialInventory(''+c+'')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:5px 10px;cursor:pointer">'+c+'</button>').join('')}
+      </div>
+    </div>
+    <div id="partial-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmPartialInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">✅ SALVEAZĂ INVENTARUL →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN TO SUPPLIER MODAL -->
+<div id="return-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">↩️ Retur Furnizor</div>
+      <button onclick="closeReturnToSupplierModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <select id="return-supplier-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;cursor:pointer;margin-bottom:10px"></select>
+    <input id="return-supplier-qty" type="number" placeholder="Cantitate de returnat" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:10px">
+    <input id="return-supplier-reason" placeholder="Motiv retur (defect, surplus...)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none;margin-bottom:16px">
+    <button onclick="confirmReturnToSupplier()" style="width:100%;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">CONFIRMĂ RETURUL →</button>
+  </div>
+</div>
+
+<!-- TOP 10 CHART MODAL -->
+<div id="top10-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top 10 Vândute</div>
+      <button onclick="document.getElementById('top10-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top10-chart-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SUPPLIER EVAL MODAL -->
+<div id="supplier-eval-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⭐ Evaluare Furnizori</div>
+      <button onclick="document.getElementById('supplier-eval-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-eval-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BOSS DASHBOARD MODAL -->
+<div id="boss-dashboard-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Dashboard Șef</div>
+      <button onclick="document.getElementById('boss-dashboard-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="boss-dashboard-content"></div>
   </div>
 </div>
 
