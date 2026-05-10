@@ -2382,22 +2382,8 @@ function handleCommand(transcript){
     }
   }, 4000);
   
-  // Queue commands if rapid fire
-  if(window._cmdTimeout) clearTimeout(window._cmdTimeout);
-  window._pendingCmds = window._pendingCmds || [];
-  window._pendingCmds.push(transcript.trim());
-  window._cmdTimeout = setTimeout(() => {
-    const cmds = window._pendingCmds || [];
-    window._pendingCmds = [];
-    if(cmds.length === 1) {
-      processCommand(cmds[0]);
-    } else if(cmds.length > 1) {
-      // Multiple commands - process each one
-      cmds.forEach((cmd, i) => {
-        setTimeout(() => processCommand(cmd), i * 300);
-      });
-    }
-  }, 600); // Wait 600ms for more commands before processing
+  // Process command immediately
+  processCommand(transcript.trim());
   // Mic restarts automatically after speak() finishes via utt.onend
 }
 function setMicState(state){
@@ -2418,16 +2404,7 @@ function processManual(){
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   document.getElementById('transcript-display').textContent=val;
   document.getElementById('manual-input').value='';
-  window._pendingCmds = window._pendingCmds || [];
-  window._pendingCmds.push(val);
-  if(window._cmdTimeout) clearTimeout(window._cmdTimeout);
-  window._cmdTimeout = setTimeout(() => {
-    const cmds = window._pendingCmds || [];
-    window._pendingCmds = [];
-    cmds.forEach((cmd, i) => {
-      setTimeout(() => processCommand(cmd), i * 200);
-    });
-  }, 100);
+  processCommand(val);
 }
 function normalizeText(text){
   return text.replace(/[șş]/g,'s').replace(/[țţ]/g,'t').replace(/[ăâ]/g,'a').replace(/î/g,'i')
@@ -2445,7 +2422,7 @@ function findProduct(words, clientName){
   // Remove common words that are not product names
   const removeWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos',
     'luat','ridicat','preluat','scoate','scot','adauga','adaugă','pune','bag',
-    'stoc','stock','de','un','o','bucati','bucăți','paleți','cutii','litri',
+    'stoc','stock','bucati','bucăți','cutii','litri',
     'intrare','iesire','ieșire','plus','minus','consum'];
   removeWords.forEach(w => {
     searchText = searchText.replace(new RegExp('\\b' + normalizeText(w) + '\\b', 'gi'), ' ');
@@ -2610,7 +2587,7 @@ function processCommand(text){
   if(!opType){setFeedback('⚠️ Nerecunoscut. Ex: Adaugă 10 șuruburi M6','warn');speak('Comandă nerecunoscută.');addLog(text,'Nerecunoscut','err');return;}
   const qty=parseQuantity(text);
   const product=findProduct(text.split(/\s+/), clientName);
-  if(!product){setFeedback('⚠️ Produs negăsit.','warn');speak('Produsul nu a fost găsit.');addLog(text,'Produs negăsit','err');return;}
+  if(!product){const dbg='⚠️ Produs negăsit: "'+text+'"';setFeedback(dbg,'warn');speak('Produsul nu a fost gasit in stoc.');addLog(text,'Produs negasit','err');console.warn('findProduct failed for:',text,'stock names:',stock.map(p=>p.name));return;}
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
   if(opType==='out'){
     if(product.qty<qty){const msg=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}.`;setFeedback(`❌ ${msg}`,'err');speak(msg);addLog(text,msg,'err');const c=document.getElementById(`card-${product.id}`);if(c){c.classList.add('flash-out');setTimeout(()=>c.classList.remove('flash-out'),600);}return;}
