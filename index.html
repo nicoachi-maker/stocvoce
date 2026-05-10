@@ -165,7 +165,24 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+// ── ADJUST INVENTAR ──
+function openAdjustModal(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  document.getElementById('adjust-product-name').textContent = p.name;
+  document.getElementById('adjust-current-qty').textContent = p.qty + ' ' + p.unit;
+  document.getElementById('adjust-product-id').value = productId;
+  document.getElementById('adjust-new-qty').value = p.qty;
+  const r = document.getElementById('adjust-reason');
+  if (r) r.value = '';
+  document.getElementById('adjust-modal').style.display = 'flex';
+}
+function closeAdjustModal() {
+  document.getElementById('adjust-modal').style.display = 'none';
+}
+
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -643,6 +660,18 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
       <button onclick="document.getElementById('restore-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="restore-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
@@ -8033,6 +8062,18 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -8331,6 +8372,18 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -8403,6 +8456,18 @@ function showNoMovementReport() {
       <button onclick="document.getElementById('restore-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
     </div>
     <div id="restore-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- CARD ZOOM MODAL -->
+<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
+      <button onclick="closeCardZoom()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">✕ ÎNCHIDE</button>
+    </div>
+    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
