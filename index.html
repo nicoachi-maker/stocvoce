@@ -1473,7 +1473,7 @@ function renderStock(){
     const isLow=p.qty<=p.min,isZero=p.qty===0;
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
     return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
-      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
+      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:1" class="card-actions" id="actions-${p.id}">
         <button onclick="openAdjustModal(${p.id})" style="background:#181d24;border:1px solid #ffa502;border-radius:5px;color:#ffa502;font-size:12px;padding:3px 7px;cursor:pointer" title="Ajustare">⚖️</button>
         <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
         <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
@@ -1494,17 +1494,7 @@ function renderStock(){
     </div>`;
   }).join('');
 
-  // Show action buttons on hover
-  document.querySelectorAll('.stock-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-      const actions = card.querySelector('.card-actions');
-      if (actions) actions.style.opacity = '1';
-    });
-    card.addEventListener('mouseleave', () => {
-      const actions = card.querySelector('.card-actions');
-      if (actions) actions.style.opacity = '0';
-    });
-  });
+  // Card actions always visible (mobile friendly)
 }
 function openAddModal(){if(!currentUser){speak('Conectați-vă mai întâi.');return;}document.getElementById('add-modal').classList.add('show');}
 function closeAddModal(){document.getElementById('add-modal').classList.remove('show');}
