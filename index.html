@@ -426,6 +426,7 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="filterFavorites()" style="border-color:#ffa502;color:#ffa502">⭐ Favorite</button>
         <button class="add-btn" onclick="sortStock('qty')" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive(90)" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
+        <button class="add-btn" onclick="openTextImportModal()" style="border-color:#00e5a0;color:#00e5a0">📋 Import Text</button>
         <button class="add-btn" onclick="document.getElementById('sort-bar').style.display=document.getElementById('sort-bar').style.display==='none'?'flex':'none'" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive()" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
         <button class="add-btn" onclick="printDashboard()" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
@@ -452,6 +453,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="calcVATReport()" style="border-color:#6b7a8d;color:#6b7a8d">🧾 TVA</button>
         <button class="add-btn" onclick="forecastBudget()" style="border-color:#a78bfa;color:#a78bfa">💸 Buget</button>
         <button class="add-btn" onclick="runFullAnalysis()" style="border-color:#00e5a0;color:#00e5a0">🔬 Analiză</button>
+        <button class="add-btn" onclick="aiSuggestOrder()" style="border-color:#a78bfa;color:#a78bfa">🤖 Comandă AI</button>
+        <button class="add-btn" onclick="exportForWhatsApp()" style="border-color:#00e5a0;color:#00e5a0">📱 WhatsApp</button>
         <button class="add-btn" onclick="showSupplierReport()" style="border-color:#ffa502;color:#ffa502">🏭 Furnizori</button>
         <button class="add-btn" onclick="showLocationReport()" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
         <button class="add-btn" onclick="showNoMovementReport()" style="border-color:#6b7a8d;color:#6b7a8d">💤 Fără mișcare</button>
@@ -1137,6 +1140,16 @@ function processCommand(text){
   if(typeof handleVoiceQuery==='function'&&handleVoiceQuery(text))return;
   // Check full status command
   if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
+  // Check category query
+  if(typeof handleCategoryQuery==='function'&&handleCategoryQuery(text))return;
+  // Check stats voice
+  if(typeof handleStatsVoiceCommand==='function'&&handleStatsVoiceCommand(text))return;
+  // Check repeated command
+  if(typeof handleRepeatedCommand==='function'&&handleRepeatedCommand(text))return;
+  // Check location command
+  if(typeof handleLocationCommand==='function'&&handleLocationCommand(text))return;
+  // Check client mixed
+  if(typeof handleClientMixedCommand==='function'&&handleClientMixedCommand(text))return;
   // Check approximate qty
   if(typeof handleApproxQty==='function'&&handleApproxQty(text))return;
   
@@ -3882,6 +3895,65 @@ function printEtichete() {
   </div>
 </div>
 
+
+<!-- TEXT IMPORT MODAL -->
+<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
+    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
+    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ORDER MODAL -->
+<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
+      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TEXT IMPORT MODAL -->
+<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
+    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
+    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ORDER MODAL -->
+<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
+      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+</body></html>';
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
+  printWindow.document.close();
+}
+
 </body></html>`);
   printWindow.document.close();
   setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
@@ -4180,46 +4252,10 @@ function initLangModal() {
 
 
 // ── ALERTE EXPIRARE ──
-function checkExpiryAlerts() {
-  try {
-  if (!userProfile) return;
-  const today = new Date();
-  const in30 = new Date(); in30.setDate(in30.getDate()+30);
-  
-  stock.forEach(p => {
-    if (!p.expiry) return;
-    const expDate = new Date(p.expiry);
-    const daysLeft = Math.ceil((expDate-today)/(1000*60*60*24));
-    
-    if (daysLeft <= 0) {
-      triggerAlert(`🔴 EXPIRAT: ${p.name} a expirat pe ${p.expiry}!`, 'zero');
-      if (userProfile.telegram_id) {
-        sendTelegramAlert(`🔴 <b>PRODUS EXPIRAT!</b>\n📦 ${p.name}\n📅 Expirat: ${p.expiry}\n🏭 ${userProfile.depot}`, userProfile.telegram_id);
-      }
-    } else if (daysLeft <= 30) {
-      triggerAlert(`⚠️ EXPIRĂ CURÂND: ${p.name} — mai sunt ${daysLeft} zile!`, 'warn');
-      if (daysLeft <= 7 && userProfile.telegram_id) {
-        sendTelegramAlert(`⚠️ <b>EXPIRĂ ÎN ${daysLeft} ZILE!</b>\n📦 ${p.name}\n📅 Expiră: ${p.expiry}\n🏭 ${userProfile.depot}`, userProfile.telegram_id);
-      }
-    }
-  });
-  } catch(e) { console.error('Expiry check error:', e); }
-}
+
 
 // ── ISTORIC PREȚURI ──
-function trackPriceHistory(product, newBuyPrice, newSellPrice) {
-  if (!product.price_history) product.price_history = [];
-  const lastEntry = product.price_history[product.price_history.length-1];
-  const priceChanged = !lastEntry || lastEntry.buy !== newBuyPrice || lastEntry.sell !== newSellPrice;
-  if (priceChanged && (newBuyPrice || newSellPrice)) {
-    product.price_history.push({
-      buy: newBuyPrice, sell: newSellPrice,
-      date: new Date().toISOString().slice(0,10),
-      user: userProfile ? userProfile.name : '—'
-    });
-    if (product.price_history.length > 50) product.price_history.shift();
-  }
-}
+
 
 // ── LOTURI / BATCH TRACKING ──
 let batches = JSON.parse(localStorage.getItem('sv_batches') || '{}');
@@ -8074,6 +8110,17 @@ function setupAutocomplete() {
   document.addEventListener('click', e => {
     if (!input.contains(e.target)) hideAutocomplete();
   });
+  
+  // Auto-classify on blur
+  input.addEventListener('blur', async function() {
+    if (this.value.length > 3) {
+      const catInput = document.getElementById('new-cat');
+      if (catInput && !catInput.value) {
+        const suggested = await aiClassifyProduct(this.value);
+        if (suggested) { catInput.value = suggested; }
+      }
+    }
+  });
 }
 
 function selectAutocomplete(idx) {
@@ -8198,28 +8245,22 @@ function printDashboard() {
   const depot = userProfile ? userProfile.depot : 'Depozit';
   const now = new Date().toLocaleDateString('ro-RO');
   const printWindow = window.open('', '_blank');
+  if (!printWindow) { setFeedback('Permite popup-urile pentru print!', 'warn'); return; }
   
-  const stockHTML = stock.map(p => {
-    const status = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
-    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td><b>' + p.qty + '</b></td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + status + '</td></tr>';
+  const rows = stock.map(p => {
+    const s = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
+    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td>' + p.qty + '</td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + s + '</td></tr>';
   }).join('');
   
-  const html = '<!DOCTYPE html><html><head>' +
-    '<title>StocVoce ' + depot + ' ' + now + '</title>' +
-    '<style>body{font-family:Arial,sans-serif;padding:20px}' +
-    'table{width:100%;border-collapse:collapse;font-size:12px}' +
-    'th{background:#000;color:#fff;padding:6px}' +
-    'td{padding:5px;border-bottom:1px solid #ddd}' +
-    'tr:nth-child(even){background:#f5f5f5}' +
-    '@media print{button{display:none}}' +
-    '</style></head><body>' +
-    '<h1>StocVoce ' + depot + ' ' + now + '</h1>' +
+  printWindow.document.write('<!DOCTYPE html><html><head>' +
+    '<title>StocVoce ' + depot + '</title>' +
+    '<style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#000;color:#fff;padding:6px}td{padding:5px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style>' +
+    '</head><body>' +
+    '<h2>StocVoce — ' + depot + ' — ' + now + '</h2>' +
     '<p>Total: ' + stock.length + ' | Scazut: ' + stock.filter(p=>p.qty<=p.min&&p.qty>0).length + ' | Epuizat: ' + stock.filter(p=>p.qty===0).length + '</p>' +
-    '<button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;cursor:pointer">Printeaza</button>' +
-    '<table><tr><th>Produs</th><th>Categorie</th><th>Cantitate</th><th>UM</th><th>Locatie</th><th>Min.</th><th>Status</th></tr>' +
-    stockHTML + '</table></body></html>';
-  
-  printWindow.document.write(html);
+    '<button onclick="window.print()">Printeaza</button>' +
+    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Loc</th><th>Min</th><th>Status</th></tr>' +
+    rows + '</table></body></html>');
   printWindow.document.close();
 }
   printWindow.document.close();
@@ -8233,6 +8274,460 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAutoNightMode();
   }, 2000);
 });
+
+
+// ══════════════════════════════════════════
+// 20 FUNCȚII NOI
+// ══════════════════════════════════════════
+
+// 1. COMANDĂ VOCALĂ CU CLIENT + MIXT
+function handleClientMixedCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const clientName = extractClientNameML(text) || extractClientName(text, norm);
+  if (!clientName) return false;
+  
+  const connectors = ['si', 'si', 'and', 'plus'];
+  const hasConnector = connectors.some(c => norm.includes(' ' + normalizeText(c) + ' '));
+  if (!hasConnector) return false;
+  
+  const splitRegex = /\s+(?:si|și|and|plus)\s+/i;
+  const parts = text.split(splitRegex).filter(p => p.trim().length > 1);
+  if (parts.length < 2) return false;
+  
+  const inKW = ['adauga','adaugă','pune','baga','bagă','primit','adus'];
+  const outKW = ['luat','scos','ia','iau','dus','dat','vandut','vândut','cumparat'];
+  
+  let processed = 0;
+  parts.forEach(part => {
+    const pNorm = normalizeText(part.toLowerCase());
+    let op = 'out';
+    if (inKW.some(k => pNorm.includes(normalizeText(k)))) op = 'in';
+    if (outKW.some(k => pNorm.includes(normalizeText(k)))) op = 'out';
+    const qty = parseQuantity(pNorm) || 1;
+    const product = findProduct(part.split(/\s+/));
+    if (product) {
+      const old = product.qty;
+      if (op === 'in') product.qty += qty;
+      else product.qty = Math.max(0, product.qty - qty);
+      addLog(part.trim(), op.toUpperCase() + ' ' + qty + ' ' + product.unit + ' ' + old + '->' + product.qty, op, clientName);
+      processed++;
+    }
+  });
+  
+  if (processed > 0) {
+    saveStockToFirebase(); renderStock(); updateStats();
+    speak(processed + ' operatii inregistrate pentru ' + clientName + '.');
+    setFeedback('✅ ' + processed + ' operații pentru ' + clientName, 'ok');
+    return true;
+  }
+  return false;
+}
+
+// 2. COMANDĂ VOCALĂ REPETATĂ
+function handleRepeatedCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const repeatMatch = norm.match(/(\d+)\s*(?:ori|times|mal)/);
+  if (!repeatMatch) return false;
+  const times = parseInt(repeatMatch[1]);
+  if (times < 2 || times > 100) return false;
+  
+  const cleanText = text.replace(new RegExp(repeatMatch[0], 'i'), '').trim();
+  const qty = parseQuantity(normalizeText(cleanText.toLowerCase())) || 1;
+  const product = findProduct(cleanText.split(/\s+/));
+  if (!product) return false;
+  
+  const inKW = ['adauga','adaugă','pune','baga'];
+  const opType = inKW.some(k => norm.includes(normalizeText(k))) ? 'in' : 'out';
+  const totalQty = qty * times;
+  
+  const old = product.qty;
+  if (opType === 'in') product.qty += totalQty;
+  else product.qty = Math.max(0, product.qty - totalQty);
+  
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog(text, opType.toUpperCase() + ' ' + totalQty + ' (' + qty + 'x' + times + ') ' + product.unit + ' ' + old + '->' + product.qty, opType);
+  speak('OK. ' + (opType==='in'?'Adaugat':'Scos') + ' ' + totalQty + ' ' + product.unit + ' de ' + product.name + ' de ' + times + ' ori.');
+  setFeedback('✅ ' + product.name + ': ' + (opType==='in'?'+':'-') + totalQty + ' ' + product.unit + ' (' + qty + 'x' + times + ')', 'ok');
+  return true;
+}
+
+// 3. COMANDĂ VOCALĂ LOCAȚIE
+function handleLocationCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('muta') && !norm.includes('mută') && !norm.includes('schimba') && !norm.includes('schimbă')) return false;
+  
+  const fromMatch = text.match(/din\s+([A-Z][0-9A-Za-z-]+)/i);
+  const toMatch = text.match(/(?:in|în|la)\s+([A-Z][0-9A-Za-z-]+)/i);
+  
+  if (!fromMatch || !toMatch) return false;
+  
+  const fromLoc = fromMatch[1];
+  const toLoc = toMatch[1];
+  const product = findProduct(text.split(/\s+/));
+  
+  if (!product) {
+    const moved = stock.filter(p => normalizeText((p.loc||'').toLowerCase()) === normalizeText(fromLoc.toLowerCase()));
+    if (moved.length === 0) { setFeedback('❌ Niciun produs în locatia ' + fromLoc, 'err'); return true; }
+    moved.forEach(p => { p.loc = toLoc; });
+    saveStockToFirebase(); renderStock();
+    speak(moved.length + ' produse mutate din ' + fromLoc + ' in ' + toLoc + '.');
+    setFeedback('✅ ' + moved.length + ' produse mutate: ' + fromLoc + ' → ' + toLoc, 'ok');
+    return true;
+  }
+  
+  product.loc = toLoc;
+  saveStockToFirebase(); renderStock();
+  speak(product.name + ' mutat in ' + toLoc + '.');
+  setFeedback('✅ ' + product.name + ' mutat: ' + fromLoc + ' → ' + toLoc, 'ok');
+  return true;
+}
+
+// 4. COMANDĂ VOCALĂ STOC CATEGORIE
+function handleCategoryQuery(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('categori') && !norm.includes('catego')) return false;
+  if (!norm.includes('cate') && !norm.includes('câte') && !norm.includes('cat') && !norm.includes('câț')) return false;
+  
+  const cats = [...new Set(stock.map(p => p.cat || 'General'))];
+  let foundCat = null;
+  cats.forEach(cat => {
+    if (norm.includes(normalizeText(cat.toLowerCase()))) foundCat = cat;
+  });
+  
+  if (!foundCat) {
+    const catList = cats.join(', ');
+    speak('Categorii disponibile: ' + catList);
+    setFeedback('📂 Categorii: ' + catList, 'ok');
+    return true;
+  }
+  
+  const catProducts = stock.filter(p => (p.cat||'General') === foundCat);
+  const total = catProducts.length;
+  const zero = catProducts.filter(p => p.qty === 0).length;
+  speak('Categoria ' + foundCat + ' are ' + total + ' produse. ' + zero + ' epuizate.');
+  setFeedback('📂 ' + foundCat + ': ' + total + ' produse, ' + zero + ' epuizate', 'ok');
+  return true;
+}
+
+// 5. IMPORT MASIV DIN TEXT
+function openTextImportModal() {
+  document.getElementById('text-import-modal').style.display = 'flex';
+}
+function closeTextImportModal() {
+  document.getElementById('text-import-modal').style.display = 'none';
+}
+
+function importFromText() {
+  const raw = document.getElementById('text-import-input').value.trim();
+  if (!raw) return;
+  
+  const lines = raw.split('\n').filter(l => l.trim());
+  let added = 0;
+  
+  lines.forEach(line => {
+    const parts = line.trim().split(/[,;\t]+/);
+    if (parts.length < 1) return;
+    
+    const name = parts[0].trim();
+    const qty = parseInt(parts[1]) || 0;
+    const unit = parts[2] ? parts[2].trim() : 'buc';
+    const loc = parts[3] ? parts[3].trim() : '';
+    
+    if (!name || name.length < 2) return;
+    
+    const existing = stock.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(name.toLowerCase()));
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      stock.push({ id: nextId++, name, qty, unit, loc, cat: 'Import', min: 5, maxQty: qty*3||100, notes: [], note_preview: '' });
+      added++;
+    }
+  });
+  
+  saveStockToFirebase(); renderStock(); updateStats();
+  closeTextImportModal();
+  setFeedback('✅ ' + added + ' produse importate, ' + (lines.length - added) + ' actualizate!', 'ok');
+  speak(added + ' produse importate cu succes.');
+}
+
+// 6. ALERTĂ EXPIRARE AUTOMATĂ
+function checkExpiryAlerts() {
+  if (!userProfile) return;
+  const today = new Date();
+  const in30 = new Date(today.getTime() + 30*24*3600*1000);
+  
+  stock.forEach(p => {
+    if (!p.expiry) return;
+    const exp = new Date(p.expiry);
+    if (exp < today) {
+      triggerAlert('🔴 EXPIRAT: ' + p.name + ' (exp. ' + p.expiry + ')', 'zero');
+      if (userProfile.telegram_id) {
+        sendTelegramAlert('🔴 <b>PRODUS EXPIRAT!</b>\n📦 ' + p.name + '\n📅 ' + p.expiry + '\n🏭 ' + userProfile.depot, userProfile.telegram_id);
+      }
+    } else if (exp <= in30) {
+      triggerAlert('⚠️ EXPIRĂ ÎN ' + Math.ceil((exp-today)/86400000) + ' ZILE: ' + p.name, 'warn');
+    }
+  });
+}
+setInterval(checkExpiryAlerts, 3600000);
+
+// 7. ISTORIC PREȚURI
+let priceHistory = JSON.parse(localStorage.getItem('sv_price_history') || '{}');
+function trackPriceHistory(product, buyPrice, sellPrice) {
+  const key = String(product.id);
+  if (!priceHistory[key]) priceHistory[key] = [];
+  priceHistory[key].push({ date: new Date().toLocaleDateString('ro-RO'), buy: buyPrice, sell: sellPrice });
+  if (priceHistory[key].length > 50) priceHistory[key] = priceHistory[key].slice(-50);
+  localStorage.setItem('sv_price_history', JSON.stringify(priceHistory));
+}
+function getPriceHistory(productId) {
+  return priceHistory[String(productId)] || [];
+}
+
+// 8. STATISTICI VOCALE
+function handleStatsVoiceCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('operatii') && !norm.includes('operații') && !norm.includes('statistici') && !norm.includes('câte am')) return false;
+  
+  const today = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const todayOps = log.filter(e => e.time && e.time.startsWith(today));
+  const todayIn = todayOps.filter(e => e.type === 'in').length;
+  const todayOut = todayOps.filter(e => e.type === 'out').length;
+  const todayErr = todayOps.filter(e => e.type === 'err').length;
+  
+  const msg = 'Astăzi: ' + todayOps.length + ' operații totale. ' + todayIn + ' intrări, ' + todayOut + ' ieșiri' + (todayErr > 0 ? ', ' + todayErr + ' erori' : '') + '.';
+  speak(msg);
+  setFeedback('📊 ' + msg, 'ok');
+  return true;
+}
+
+// 9. BON FISCAL SIMPLU
+let bonSeriesCounter = parseInt(localStorage.getItem('sv_bon_counter') || '1');
+async function generateBonFiscal(clientName, items) {
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const bonNr = 'BON-' + String(bonSeriesCounter).padStart(6, '0');
+  bonSeriesCounter++;
+  localStorage.setItem('sv_bon_counter', String(bonSeriesCounter));
+  
+  // Header
+  doc.setFillColor(10, 12, 15);
+  doc.rect(0, 0, 210, 45, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(0, 229, 160);
+  doc.text('BON FISCAL', 14, 20);
+  doc.setFontSize(10);
+  doc.setTextColor(153, 168, 184);
+  doc.text(bonNr + '  |  ' + now.toLocaleString('ro-RO'), 14, 30);
+  doc.text(depot, 14, 38);
+  
+  doc.setFontSize(12);
+  doc.setTextColor(232, 236, 240);
+  doc.text('Client: ' + (clientName || 'Clienti diverse'), 14, 55);
+  
+  const subtotal = items.reduce((s, i) => s + (i.price||0)*i.qty, 0);
+  const tva = subtotal * 0.19;
+  const total = subtotal + tva;
+  
+  doc.autoTable({
+    startY: 65,
+    head: [['Nr.', 'Produs', 'Cant.', 'UM', 'Pret', 'Total']],
+    body: items.map((item, i) => [i+1, item.name, item.qty, item.unit||'buc', (item.price||0).toFixed(2)+' RON', ((item.price||0)*item.qty).toFixed(2)+' RON']),
+    styles: { fontSize: 9, textColor: [153,168,184], fillColor: [17,20,24] },
+    headStyles: { fillColor: [10,12,15], textColor: [0,229,160], fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [24,29,36] },
+    margin: { left: 14, right: 14 }
+  });
+  
+  const fy = doc.lastAutoTable.finalY + 8;
+  doc.setFontSize(10);
+  doc.setTextColor(153, 168, 184);
+  doc.text('Subtotal: ' + subtotal.toFixed(2) + ' RON', 130, fy);
+  doc.text('TVA 19%: ' + tva.toFixed(2) + ' RON', 130, fy+7);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(0, 229, 160);
+  doc.text('TOTAL: ' + total.toFixed(2) + ' RON', 130, fy+17);
+  
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(107, 122, 141);
+  doc.text('Multumim pentru cumparaturi!', 14, fy+30);
+  
+  doc.save(bonNr + '_' + (clientName||'client').replace(/\s+/g,'_') + '.pdf');
+  setFeedback('✅ ' + bonNr + ' generat! Total: ' + total.toFixed(2) + ' RON', 'ok');
+  speak('Bon generat. Total: ' + total.toFixed(0) + ' lei.');
+}
+
+// 10. COMANDĂ RAPIDĂ CLIENT
+let clientFavoriteProducts = JSON.parse(localStorage.getItem('sv_client_favs') || '{}');
+function setClientFavoriteProduct(clientName, productId, qty) {
+  const key = normalizeText(clientName.toLowerCase());
+  if (!clientFavoriteProducts[key]) clientFavoriteProducts[key] = [];
+  clientFavoriteProducts[key].push({ productId, qty });
+  localStorage.setItem('sv_client_favs', JSON.stringify(clientFavoriteProducts));
+  setFeedback('✅ Produs favorit salvat pentru ' + clientName, 'ok');
+}
+function quickOrderClient(clientName) {
+  const key = normalizeText(clientName.toLowerCase());
+  const favs = clientFavoriteProducts[key] || [];
+  if (!favs.length) { setFeedback('⚠️ ' + clientName + ' nu are produse favorite setate.', 'warn'); return; }
+  
+  let processed = 0;
+  favs.forEach(fav => {
+    const p = stock.find(s => s.id === fav.productId);
+    if (p && p.qty >= fav.qty) {
+      p.qty -= fav.qty;
+      addLog('Comanda rapida: ' + clientName, 'OUT ' + fav.qty + ' ' + p.unit + ' ' + p.name, 'out', clientName);
+      processed++;
+    }
+  });
+  
+  if (processed > 0) {
+    saveStockToFirebase(); renderStock(); updateStats();
+    speak('Comanda rapida pentru ' + clientName + ' procesata. ' + processed + ' produse.');
+    setFeedback('✅ Comanda rapida ' + clientName + ': ' + processed + ' produse', 'ok');
+  }
+}
+
+// 11. ALERTĂ CLIENT INACTIV
+function checkInactiveClients() {
+  const cutoff = new Date(Date.now() - 30*24*3600*1000);
+  const segs = segmentClients ? segmentClients() : [];
+  const vips = segs.filter(c => c.visits >= 10);
+  
+  vips.forEach(vip => {
+    const lastVisit = clients.filter(c => normalizeText((c.name||'').toLowerCase()) === normalizeText(vip.name.toLowerCase())).slice(-1)[0];
+    if (lastVisit && lastVisit.time) {
+      const parts = lastVisit.time.split(' ')[0].split('.');
+      if (parts.length >= 2) {
+        const lastDate = new Date(new Date().getFullYear(), parseInt(parts[1])-1, parseInt(parts[0]));
+        if (lastDate < cutoff) {
+          triggerAlert('💤 CLIENT VIP INACTIV: ' + vip.name + ' nu a cumparat in 30+ zile!', 'warn');
+        }
+      }
+    }
+  });
+}
+setInterval(checkInactiveClients, 86400000);
+
+// 12. EXPORT WHATSAPP
+function exportForWhatsApp() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  let msg = '*📦 SITUATIE STOC - ' + depot + '*\n_' + now + '_\n\n';
+  
+  const zero = stock.filter(p => p.qty === 0);
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min);
+  
+  if (zero.length > 0) {
+    msg += '*🔴 EPUIZAT (' + zero.length + '):*\n';
+    zero.forEach(p => { msg += '• ' + p.name + '\n'; });
+    msg += '\n';
+  }
+  if (low.length > 0) {
+    msg += '*⚠️ STOC SCAZUT (' + low.length + '):*\n';
+    low.forEach(p => { msg += '• ' + p.name + ': ' + p.qty + ' ' + p.unit + '\n'; });
+    msg += '\n';
+  }
+  msg += '*✅ Total produse: ' + stock.length + '*';
+  
+  navigator.clipboard.writeText(msg).then(() => {
+    setFeedback('✅ Copiat! Lipeste pe WhatsApp.', 'ok');
+    speak('Raport copiat pentru WhatsApp.');
+  });
+}
+
+// 13. RAPORT CLIENT VIP PDF
+async function generateVIPReport(clientName) {
+  await exportClientHistoryPDF(clientName);
+  setFeedback('✅ Raport VIP generat pentru ' + clientName, 'ok');
+}
+
+// 14. SUGESTIE COMANDĂ AUTOMATĂ AI
+async function aiSuggestOrder() {
+  const el = document.getElementById('ai-order-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;padding:20px">⏳ AI analizeaza consumul...</div>';
+  document.getElementById('ai-order-modal').style.display = 'flex';
+  
+  const lowStock = stock.filter(p => p.qty <= p.min * 2).map(p => ({
+    name: p.name, qty: p.qty, min: p.min, unit: p.unit,
+    supplier: p.supplier||'—', lead_time: p.lead_time||7
+  }));
+  
+  if (!lowStock.length) {
+    el.innerHTML = '<div style="color:#00e5a0;padding:20px">✅ Toate produsele au stoc suficient!</div>';
+    return;
+  }
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 500,
+        messages: [{ role: 'user', content: 'Esti expert in gestiune depozit. Analizeaza aceste produse cu stoc scazut si propune o lista de comanda cu cantitati recomandate. Raspunde in romana, concis, cu bullets.Produse: ' + JSON.stringify(lowStock) }]
+      })
+    });
+    const data = await resp.json();
+    el.innerHTML = '<div style="font-size:13px;color:#e8ecf0;line-height:1.8;white-space:pre-wrap">' + data.content[0].text + '</div>';
+  } catch(e) {
+    el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la AI.</div>';
+  }
+}
+
+// 15. CLASIFICARE AUTOMATĂ PRODUSE NOI
+async function aiClassifyProduct(productName) {
+  try {
+    const cats = [...new Set(stock.map(p => p.cat || 'General'))];
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 50,
+        messages: [{ role: 'user', content: 'Categorizeaza acest produs de depozit intr-una din categoriile existente: ' + cats.join(', ') + '. Produs: "' + productName + '". Raspunde DOAR cu numele categoriei.' }]
+      })
+    });
+    const data = await resp.json();
+    return data.content[0].text.trim();
+  } catch(e) { return 'General'; }
+}
+
+// 16. RAPORT ANOMALII ZILNIC TELEGRAM
+async function sendDailyAnomaliesTelegram() {
+  if (!userProfile || !userProfile.telegram_id) return;
+  
+  const lastSent = localStorage.getItem('sv_anomalies_sent');
+  const today = new Date().toISOString().slice(0, 10);
+  if (lastSent === today) return;
+  
+  const now = new Date();
+  if (now.getHours() !== 8) return;
+  
+  localStorage.setItem('sv_anomalies_sent', today);
+  
+  const zero = stock.filter(p => p.qty === 0).length;
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
+  const expired = stock.filter(p => p.expiry && new Date(p.expiry) < now).length;
+  
+  if (zero === 0 && low === 0 && expired === 0) return;
+  
+  const msg = '🌅 <b>RAPORT ANOMALII - ' + now.toLocaleDateString('ro-RO') + '</b>\n' +
+    '🏭 ' + userProfile.depot + '\n\n' +
+    (zero > 0 ? '🔴 Epuizate: <b>' + zero + '</b> produse\n' : '') +
+    (low > 0 ? '⚠️ Stoc scazut: <b>' + low + '</b> produse\n' : '') +
+    (expired > 0 ? '📅 Expirate: <b>' + expired + '</b> produse\n' : '') +
+    '\nVerificati aplicatia StocVoce!';
+  
+  await sendTelegramAlert(msg, userProfile.telegram_id);
+}
+setInterval(sendDailyAnomaliesTelegram, 3600000);
+
+// Voice handlers integrated into processCommand
 
 window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};</script>
 
@@ -9250,6 +9745,65 @@ function installApp() {
     <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
   </div>
 </div>
+
+
+<!-- TEXT IMPORT MODAL -->
+<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
+    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
+    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ORDER MODAL -->
+<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
+      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TEXT IMPORT MODAL -->
+<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
+    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
+    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ORDER MODAL -->
+<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
+      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+</body></html>';
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
+  printWindow.document.close();
+}
 
 </body>
 </html>
