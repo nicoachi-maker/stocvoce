@@ -284,7 +284,10 @@ function closeAdjustModal() {
 <!-- ADD MODAL -->
 <div id="add-modal">
   <div class="add-box">
-    <h3>+ Produs Nou</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="margin:0" id="add-modal-title">+ Produs Nou</h3>
+      <button onclick="closeAddModal();const t=document.getElementById('add-modal-title');if(t)t.textContent='+ Produs Nou';const b=document.querySelector('#add-modal .add-confirm');if(b){b.textContent='ADAUGĂ →';b.onclick=doAdd;}" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:18px;padding:4px 12px;cursor:pointer;line-height:1">✕</button>
+    </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Nume</label><input class="form-input" id="new-name" placeholder="ex: Șuruburi M8"></div>
       <div class="form-group"><label class="form-label">Categorie</label><input class="form-input" id="new-cat" placeholder="ex: Hardware"></div>
@@ -1827,7 +1830,7 @@ function openEditModal(productId) {
   setVal('new-moq', p.moq);
   setVal('new-weight', p.weight);
   // Change title and save button to edit mode
-  const title = document.querySelector('#add-modal h3');
+  const title = document.getElementById('add-modal-title') || document.querySelector('#add-modal h3');
   if (title) title.textContent = '✏️ Editează Produs';
   const saveBtn = document.querySelector('#add-modal .add-confirm');
   if (saveBtn) { saveBtn.textContent = 'SALVEAZĂ MODIFICĂRILE →'; saveBtn.onclick = () => saveEditProduct(productId); }
@@ -1857,7 +1860,7 @@ function saveEditProduct(productId) {
   renderStock(); updateStats();
   closeAddModal();
   // Reset title
-  const title = document.querySelector('#add-modal h3');
+  const title = document.getElementById('add-modal-title') || document.querySelector('#add-modal h3');
   if (title) title.textContent = '+ Produs Nou';
   const saveBtn = document.querySelector('#add-modal .add-confirm');
   if (saveBtn) { saveBtn.textContent = 'ADAUGĂ →'; saveBtn.onclick = doAdd; }
