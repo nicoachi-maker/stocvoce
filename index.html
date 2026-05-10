@@ -427,6 +427,13 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="sortStock('qty')" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive(90)" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
         <button class="add-btn" onclick="openTextImportModal()" style="border-color:#00e5a0;color:#00e5a0">📋 Import Text</button>
+        <button class="add-btn" onclick="updateAllSafetyStocks()" style="border-color:#ffa502;color:#ffa502">🛡️ Stoc Sigur</button>
+        <button class="add-btn" onclick="sortByExpiry()" style="border-color:#ffa502;color:#ffa502">📅 FEFO</button>
+        <button class="add-btn" onclick="document.getElementById('transit-modal').style.display='flex';renderTransitStock()" style="border-color:#ffa502;color:#ffa502">🚛 Tranzit</button>
+        <button class="add-btn" onclick="sortByExpiry()" style="border-color:#ffa502;color:#ffa502">📅 FEFO</button>
+        <button class="add-btn" onclick="showTransitModal()" style="border-color:#ffa502;color:#ffa502">🚛 Tranzit</button>
+        <button class="add-btn" onclick="openInventarAdjust()" style="border-color:#a78bfa;color:#a78bfa">⚖️ Ajustare</button>
+        <button class="add-btn" onclick="updateAllSafetyStocks()" style="border-color:#00e5a0;color:#00e5a0">🛡️ Stoc Sig.</button>
         <button class="add-btn" onclick="document.getElementById('sort-bar').style.display=document.getElementById('sort-bar').style.display==='none'?'flex':'none'" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
         <button class="add-btn" onclick="autoArchiveInactive()" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
         <button class="add-btn" onclick="printDashboard()" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
@@ -455,6 +462,19 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="runFullAnalysis()" style="border-color:#00e5a0;color:#00e5a0">🔬 Analiză</button>
         <button class="add-btn" onclick="aiSuggestOrder()" style="border-color:#a78bfa;color:#a78bfa">🤖 Comandă AI</button>
         <button class="add-btn" onclick="exportForWhatsApp()" style="border-color:#00e5a0;color:#00e5a0">📱 WhatsApp</button>
+        <button class="add-btn" onclick="exportAuditPDF()" style="border-color:#6b7a8d;color:#6b7a8d">📋 Audit PDF</button>
+        <button class="add-btn" onclick="showTopClientsMonth()" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
+        <button class="add-btn" onclick="show3MonthsChart()" style="border-color:#a78bfa;color:#a78bfa">📊 3 Luni</button>
+        <button class="add-btn" onclick="showLocationMovements()" style="border-color:#6b7a8d;color:#6b7a8d">📍 Loc. Mișcări</button>
+        <button class="add-btn" onclick="aiPredictStockBreak()" style="border-color:#ff4757;color:#ff4757">🔮 Predicție AI</button>
+        <button class="add-btn" onclick="aiOptimizeLocations()" style="border-color:#a78bfa;color:#a78bfa">🗺️ Optimizare AI</button>
+        <button class="add-btn" onclick="showTopClientsThisMonth()" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
+        <button class="add-btn" onclick="showLocationMovements()" style="border-color:#00e5a0;color:#00e5a0">📍 Locații</button>
+        <button class="add-btn" onclick="show3MonthChart()" style="border-color:#a78bfa;color:#a78bfa">📊 3 Luni</button>
+        <button class="add-btn" onclick="calcMonthlyMargin()" style="border-color:#00e5a0;color:#00e5a0">💰 Marjă</button>
+        <button class="add-btn" onclick="exportAuditPDF()" style="border-color:#6b7a8d;color:#6b7a8d">📋 Audit PDF</button>
+        <button class="add-btn" onclick="aiPredictStockout()" style="border-color:#ff4757;color:#ff4757">🤖 Predicție</button>
+        <button class="add-btn" onclick="aiOptimizeLocations()" style="border-color:#a78bfa;color:#a78bfa">🤖 Optimizare</button>
         <button class="add-btn" onclick="showSupplierReport()" style="border-color:#ffa502;color:#ffa502">🏭 Furnizori</button>
         <button class="add-btn" onclick="showLocationReport()" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
         <button class="add-btn" onclick="showNoMovementReport()" style="border-color:#6b7a8d;color:#6b7a8d">💤 Fără mișcare</button>
@@ -485,6 +505,8 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
         <button class="add-btn" onclick="doAutoBackup()" style="border-color:#6b7a8d;color:#6b7a8d">💾 Backup</button>
         <button class="add-btn" onclick="toggleKioskMode()" style="border-color:#00e5a0;color:#00e5a0">📺 Kiosk</button>
         <button class="add-btn" onclick="showHealthMeter()" style="border-color:#00e5a0;color:#00e5a0">💚 Sănătate</button>
+        <button class="add-btn" onclick="checkReplenishPoints()" style="border-color:#ffa502;color:#ffa502">🔔 Reaproviz.</button>
+        <button class="add-btn" onclick="toggleDailyReport()" style="border-color:#6b7a8d;color:#6b7a8d">📄 Raport Auto</button>
         <button class="add-btn" onclick="generatePackingList(stock.slice(0,5),'—')" style="border-color:#ffa502;color:#ffa502">📋 Packing</button>
       </div>
       
@@ -524,7 +546,25 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">function printDashboard() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  const pw = window.open('', '_blank');
+  if (!pw) { setFeedback('Permite popup-urile!', 'warn'); return; }
+  const rows = stock.map(p => {
+    const s = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
+    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td>' + p.qty + '</td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + s + '</td></tr>';
+  }).join('');
+  pw.document.write('<!DOCTYPE html><html><head><title>StocVoce ' + depot + '</title>' +
+    '<style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#000;color:#fff;padding:6px}td{padding:5px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style></head><body>' +
+    '<h2>StocVoce - ' + depot + ' - ' + now + '</h2>' +
+    '<p>Total: ' + stock.length + ' produse</p>' +
+    '<button onclick="window.print()">Print</button>' +
+    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Loc</th><th>Min</th><th>Status</th></tr>' +
+    rows + '</table></body></html>');
+  pw.document.close();
+}
+</script>
 
 <script>
 // ── FIREBASE INIT ──
@@ -705,6 +745,7 @@ auth.onAuthStateChanged(async (user) => {
     loadStockFromFirebase();
     logLoginDevice();
     resetLoginAttempts();
+    setTimeout(initStockValueLive, 2000);
     loadLogFromFirebase();
 
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
@@ -1334,6 +1375,7 @@ function renderStock(){
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
     return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
       <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
+        <button onclick="openAdjustModal(${p.id})" style="background:#181d24;border:1px solid #ffa502;border-radius:5px;color:#ffa502;font-size:12px;padding:3px 7px;cursor:pointer" title="Ajustare">⚖️</button>
         <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
         <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
         <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
@@ -3533,434 +3575,27 @@ function printEtichete() {
     </div>`;
   }).join('');
 
-  printWindow.document.write(`
-    <!DOCTYPE html><html><head>
-    <title>Etichete QR - ${depot}</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-    <style>
-      body{margin:0;padding:10px;font-family:Arial,sans-serif;background:#fff}
-      .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-      .eticheta{border:2px solid #000;border-radius:6px;padding:10px;text-align:center;break-inside:avoid}
-      .eticheta-name{font-weight:900;font-size:14px;margin-bottom:3px}
-      .eticheta-info{font-size:10px;color:#666;margin-bottom:2px}
-      .eticheta-depot{font-size:10px;color:#666;margin-bottom:6px}
-      .qr-container{display:flex;justify-content:center;margin:6px 0}
-      .qr-container img,.qr-container canvas{width:80px!important;height:80px!important}
-      .eticheta-min{font-size:10px;color:#666;margin-top:3px}
-      @media print{body{margin:0}button{display:none}}
-    </style>
-    </head><body>
-    <button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;background:#000;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px">🖨️ Printează</button>
-    <div class="grid">${eticheteHTML}</div>
-    <script>
-      const products = ${JSON.stringify(selected)};
-      const depot = "${depot}";
-      products.forEach(p => {
-        const el = document.getElementById('qr-'+p.id);
-        if(el) new QRCode(el, {text: JSON.stringify({id:p.id,name:p.name,depot,sku:p.sku||''}), width:80, height:80});
-      });
-    <\/script>
-    
-<!-- LANGUAGE MODAL -->
-<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🌍 Limbă / Language</div>
-      <button onclick="closeLangModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="lang-grid"></div>
-  </div>
-</div>
-
-
-<!-- CALENDAR MODAL -->
-<div id="calendar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <button onclick="renderCalendar(calMonth===0?calYear-1:calYear,calMonth===0?11:calMonth-1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">‹</button>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;color:#ffa502;text-transform:uppercase" id="calendar-header">Calendar</div>
-        <button onclick="renderCalendar(calMonth===11?calYear+1:calYear,calMonth===11?0:calMonth+1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">›</button>
-      </div>
-      <button onclick="closeCalendarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="calendar-grid"></div>
-    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#6b7a8d">
-      <span>🟢 Recepționat</span><span>🟡 Așteptat</span><span style="border:1px solid #00e5a0;border-radius:4px;padding:1px 6px;color:#00e5a0">Azi</span>
-    </div>
-  </div>
-</div>
-
-
-<!-- CATEGORII MODAL -->
-<div id="categories-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:440px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Categorii</div>
-      <button onclick="closeCategoriesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="cat-list" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- RAPORT LUNAR MODAL -->
-<div id="raport-lunar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📊 Raport Lunar</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="exportFullExcel()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer">📊 EXCEL</button>
-        <button onclick="closeRaportLunarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button onclick="showTop10()" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🏆 TOP 10</button>
-      <button onclick="showStagnant(30)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 30 ZILE</button>
-      <button onclick="showStagnant(60)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 60 ZILE</button>
-      <button onclick="showOperatorReport()" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">👤 OPERATORI</button>
-      <button onclick="calcAutoMinStock()" style="background:#181d24;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🤖 AUTO MIN</button>
-    </div>
-    <div id="raport-lunar-content"></div>
-  </div>
-</div>
-
-<!-- STAGNANT MODAL -->
-<div id="stagnant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
-      <button onclick="document.getElementById('stagnant-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="stagnant-list" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- OPERATOR REPORT MODAL -->
-<div id="operator-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#a78bfa;text-transform:uppercase">👤 Raport Operatori</div>
-      <button onclick="document.getElementById('operator-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="operator-report-content"></div>
-  </div>
-</div>
-
-<!-- CLIENT PROFILE MODAL -->
-<div id="client-profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 Profil Client</div>
-        <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px" id="client-profile-name">—</div>
-      </div>
-      <button onclick="closeClientProfileModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="client-profile-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- BON RETUR MODAL -->
-<div id="bon-retur-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase;margin-bottom:20px">🔄 Bon de Retur</div>
-    <input id="retur-client" placeholder="Nume client" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
-    <select id="retur-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:10px"></select>
-    <input id="retur-qty" type="number" placeholder="Cantitate returnată" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
-    <input id="retur-reason" placeholder="Motiv retur" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:16px">
-    <div style="display:flex;gap:10px">
-      <button onclick="closeBonReturModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="doRetur()" style="flex:2;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">GENEREAZĂ BON →</button>
-    </div>
-  </div>
-</div>
-
-<!-- GLOBAL STOCK MODAL -->
-<div id="global-stock-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:900px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Global — Toate Depozitele</div>
-      <button onclick="closeGlobalStockModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="global-stock-content"></div>
-  </div>
-</div>
-
-<!-- COMPARAȚIE DEPOZITE MODAL -->
-<div id="comparatie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Comparație Depozite</div>
-      <button onclick="closeComparatieDep()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="comparatie-content"></div>
-  </div>
-</div>
-
-<!-- CONSOLIDAT MODAL -->
-<div id="consolidat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔢 Stoc Consolidat Global</div>
-      <button onclick="closeConsolidatModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="consolidat-content" style="max-height:500px;overflow-y:auto"></div>
-  </div>
-</div>
-
-
-<!-- PREDICTIONS MODAL -->
-<div id="predictions-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Predicție Epuizare</div>
-      <button onclick="document.getElementById('predictions-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="predictions-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- HEATMAP MODAL -->
-<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
-      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="heatmap-content"></div>
-  </div>
-</div>
-
-<!-- ANOMALIES MODAL -->
-<div id="anomalies-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🤖 Anomalii AI</div>
-      <button onclick="document.getElementById('anomalies-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="anomalies-content"></div>
-  </div>
-</div>
-
-<!-- CHATBOT MODAL -->
-<div id="chatbot-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🤖 StocVoce AI</div>
-      <button onclick="document.getElementById('chatbot-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="chat-response" style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:14px;min-height:100px;flex:1;overflow-y:auto;font-size:13px;color:#6b7a8d">Întreabă-mă orice despre stocul tău...</div>
-    <div style="display:flex;gap:8px;flex-shrink:0">
-      <input id="chat-input" placeholder="ex: Câte șuruburi avem? Ce produse expiră?" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px 12px;outline:none" onkeydown="if(event.key==='Enter'){askStocVoceBot(this.value);this.value=''}">
-      <button onclick="askStocVoceBot(document.getElementById('chat-input').value);document.getElementById('chat-input').value=''" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">ASK</button>
-    </div>
-  </div>
-</div>
-
-<!-- WAREHOUSE MAP MODAL -->
-<div id="warehouse-map-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🗺️ Hartă Depozit</div>
-      <button onclick="closeWarehouseMap()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="warehouse-map-content"></div>
-  </div>
-</div>
-
-<!-- INVOICE IMPORT MODAL -->
-<div id="invoice-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:420px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase;margin-bottom:20px">📄 Import Factură PDF</div>
-    <div onclick="document.getElementById('invoice-file').click()" style="border:2px dashed #1e2530;border-radius:12px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='#1e2530'">
-      <div style="font-size:36px;margin-bottom:10px">📄</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#99a8b8;font-weight:700">Selectează factura PDF</div>
-      <div style="font-size:12px;color:#6b7a8d;margin-top:6px">AI extrage automat produsele</div>
-      <input type="file" id="invoice-file" accept=".pdf" style="display:none" onchange="importFromInvoicePDF(this.files[0]);document.getElementById('invoice-modal').style.display='none'">
-    </div>
-    <button onclick="document.getElementById('invoice-modal').style.display='none'" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-  </div>
-</div>
-
-<!-- CLIENT SEGMENTS MODAL -->
-<div id="segments-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👥 Segmente Clienți</div>
-      <button onclick="document.getElementById('segments-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="segments-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- CATEGORY PIE MODAL -->
-<div id="category-pie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
-      <button onclick="document.getElementById('category-pie-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="category-pie-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- PROFIT MODAL -->
-<div id="profit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💰 Raport Profit</div>
-      <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="profit-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- PRODUCT ZOOM MODAL -->
-<div id="product-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 16px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="zoom-title">Produs</div>
-      <button onclick="closeZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:14px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="zoom-content" style="overflow-y:auto;padding:20px;flex:1"></div>
-  </div>
-</div>
-
-<!-- SUPPLIER REPORT MODAL -->
-<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🏭 Raport Furnizori</div>
-      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- STAGNANT FULL MODAL -->
-<div id="stagnant-full-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:540px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
-      <button onclick="document.getElementById('stagnant-full-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="stagnant-full-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- SORT TOOLBAR -->
-<div id="sort-bar" style="display:none;gap:4px;flex-wrap:wrap;padding:6px 0">
-  <span style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;padding:4px">↕️ SORTARE:</span>
-  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Nume</button>
-  <button onclick="sortStock('qty')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Cantitate</button>
-  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Categorie</button>
-  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Locație</button>
-  <button onclick="sortStock('price_buy')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Preț</button>
-  <button onclick="sortField=null;renderStock()" style="background:#181d24;border:1px solid #ff4757;border-radius:5px;color:#ff4757;font-size:11px;padding:4px 8px;cursor:pointer">✕ Reset</button>
-</div>
-
-
-<!-- CARD ZOOM MODAL -->
-<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
-      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- SUPPLIER REPORT MODAL -->
-<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
-      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- NO MOVEMENT MODAL -->
-<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
-      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- TEXT IMPORT MODAL -->
-<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
-    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
-    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
-    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI ORDER MODAL -->
-<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
-      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- TEXT IMPORT MODAL -->
-<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
-    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
-    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
-    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI ORDER MODAL -->
-<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
-      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-</body></html>';
-  
+  const html = '<!DOCTYPE html><html><head>' +
+    '<title>Etichete QR - ' + depot + '</title>' +
+    '<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>' +
+    '<style>body{margin:0;padding:10px;font-family:Arial,sans-serif;background:#fff}' +
+    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}' +
+    '.eticheta{border:2px solid #000;border-radius:6px;padding:10px;text-align:center;break-inside:avoid}' +
+    '.eticheta-name{font-weight:900;font-size:14px;margin-bottom:3px}' +
+    '.eticheta-info{font-size:10px;color:#666;margin-bottom:2px}' +
+    '@media print{body{margin:0}button{display:none}}' +
+    '</style></head><body>' +
+    '<button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;background:#000;color:#fff;border:none;cursor:pointer">Printeaza</button>' +
+    '<div class="grid">' + eticheteHTML + '</div>' +
+    '<scr' + 'ipt>' +
+    'const products=' + JSON.stringify(selected) + ';' +
+    'const depot="' + depot + '";' +
+    'products.forEach(p=>{const el=document.getElementById("qr-"+p.id);' +
+    'if(el)new QRCode(el,{text:JSON.stringify({id:p.id,name:p.name,depot,sku:p.sku||""}),width:80,height:80});});' +
+    '<\/scr' + 'ipt>';
   printWindow.document.write(html);
   printWindow.document.close();
 }
-  printWindow.document.close();
-}
-
-</body></html>`);
-  printWindow.document.close();
-  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
-}
-
-
-// ── MULTI-LANGUAGE (toate limbile UE) ──
 const LANGUAGES = {
   ro: { name:'Română', flag:'🇷🇴', translations: {
     add_product:'+ Produs', excel:'📊 Excel', transfer:'🔄 Transfer', scan:'📷 Scan',
@@ -4368,15 +4003,7 @@ function calculateStockValue() {
 }
 
 // Show stock value in footer
-function updateStockValueDisplay() {
-  const val = calculateStockValue();
-  const el = document.getElementById('stock-value-display');
-  if (el && val.productsWithPrice > 0) {
-    el.textContent = `💰 ${val.totalBuy} RON`;
-    el.title = `Valoare achiziție: ${val.totalBuy} RON · Valoare vânzare: ${val.totalSell} RON · Profit estimat: ${val.profit} RON`;
-    el.style.display = 'flex';
-  }
-}
+
 
 // ── AUDIT TRAIL ──
 let auditLog = [];
@@ -7264,6 +6891,7 @@ function showPLReport() {
     `Marjă: ${revenue > 0 ? (profit/revenue*100).toFixed(1) : 0}%`);
 
 // 46. OBIECTIVE STOC
+}
 let stockGoals = JSON.parse(localStorage.getItem('sv_goals') || '[]');
 
 function setStockGoal(type, target, deadline) {
@@ -8240,1562 +7868,10 @@ function showNoMovementReport() {
   document.getElementById('no-movement-modal').style.display = 'flex';
 }
 
-// 26. DASHBOARD PRINT-FRIENDLY
-function printDashboard() {
-  const depot = userProfile ? userProfile.depot : 'Depozit';
-  const now = new Date().toLocaleDateString('ro-RO');
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) { setFeedback('Permite popup-urile pentru print!', 'warn'); return; }
-  
-  const rows = stock.map(p => {
-    const s = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
-    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td>' + p.qty + '</td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + s + '</td></tr>';
-  }).join('');
-  
-  printWindow.document.write('<!DOCTYPE html><html><head>' +
-    '<title>StocVoce ' + depot + '</title>' +
-    '<style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#000;color:#fff;padding:6px}td{padding:5px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style>' +
-    '</head><body>' +
-    '<h2>StocVoce — ' + depot + ' — ' + now + '</h2>' +
-    '<p>Total: ' + stock.length + ' | Scazut: ' + stock.filter(p=>p.qty<=p.min&&p.qty>0).length + ' | Epuizat: ' + stock.filter(p=>p.qty===0).length + '</p>' +
-    '<button onclick="window.print()">Printeaza</button>' +
-    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Loc</th><th>Min</th><th>Status</th></tr>' +
-    rows + '</table></body></html>');
-  printWindow.document.close();
-}
-  printWindow.document.close();
-}
-
-// Initialize on app load
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    initTouchGestures();
-    setupAutocomplete();
-    checkAutoNightMode();
-  }, 2000);
-});
-
-
-// ══════════════════════════════════════════
-// 20 FUNCȚII NOI
-// ══════════════════════════════════════════
-
-// 1. COMANDĂ VOCALĂ CU CLIENT + MIXT
-function handleClientMixedCommand(text) {
-  const norm = normalizeText(text.toLowerCase());
-  const clientName = extractClientNameML(text) || extractClientName(text, norm);
-  if (!clientName) return false;
-  
-  const connectors = ['si', 'si', 'and', 'plus'];
-  const hasConnector = connectors.some(c => norm.includes(' ' + normalizeText(c) + ' '));
-  if (!hasConnector) return false;
-  
-  const splitRegex = /\s+(?:si|și|and|plus)\s+/i;
-  const parts = text.split(splitRegex).filter(p => p.trim().length > 1);
-  if (parts.length < 2) return false;
-  
-  const inKW = ['adauga','adaugă','pune','baga','bagă','primit','adus'];
-  const outKW = ['luat','scos','ia','iau','dus','dat','vandut','vândut','cumparat'];
-  
-  let processed = 0;
-  parts.forEach(part => {
-    const pNorm = normalizeText(part.toLowerCase());
-    let op = 'out';
-    if (inKW.some(k => pNorm.includes(normalizeText(k)))) op = 'in';
-    if (outKW.some(k => pNorm.includes(normalizeText(k)))) op = 'out';
-    const qty = parseQuantity(pNorm) || 1;
-    const product = findProduct(part.split(/\s+/));
-    if (product) {
-      const old = product.qty;
-      if (op === 'in') product.qty += qty;
-      else product.qty = Math.max(0, product.qty - qty);
-      addLog(part.trim(), op.toUpperCase() + ' ' + qty + ' ' + product.unit + ' ' + old + '->' + product.qty, op, clientName);
-      processed++;
-    }
-  });
-  
-  if (processed > 0) {
-    saveStockToFirebase(); renderStock(); updateStats();
-    speak(processed + ' operatii inregistrate pentru ' + clientName + '.');
-    setFeedback('✅ ' + processed + ' operații pentru ' + clientName, 'ok');
-    return true;
-  }
-  return false;
-}
-
-// 2. COMANDĂ VOCALĂ REPETATĂ
-function handleRepeatedCommand(text) {
-  const norm = normalizeText(text.toLowerCase());
-  const repeatMatch = norm.match(/(\d+)\s*(?:ori|times|mal)/);
-  if (!repeatMatch) return false;
-  const times = parseInt(repeatMatch[1]);
-  if (times < 2 || times > 100) return false;
-  
-  const cleanText = text.replace(new RegExp(repeatMatch[0], 'i'), '').trim();
-  const qty = parseQuantity(normalizeText(cleanText.toLowerCase())) || 1;
-  const product = findProduct(cleanText.split(/\s+/));
-  if (!product) return false;
-  
-  const inKW = ['adauga','adaugă','pune','baga'];
-  const opType = inKW.some(k => norm.includes(normalizeText(k))) ? 'in' : 'out';
-  const totalQty = qty * times;
-  
-  const old = product.qty;
-  if (opType === 'in') product.qty += totalQty;
-  else product.qty = Math.max(0, product.qty - totalQty);
-  
-  saveStockToFirebase(); renderStock(); updateStats();
-  addLog(text, opType.toUpperCase() + ' ' + totalQty + ' (' + qty + 'x' + times + ') ' + product.unit + ' ' + old + '->' + product.qty, opType);
-  speak('OK. ' + (opType==='in'?'Adaugat':'Scos') + ' ' + totalQty + ' ' + product.unit + ' de ' + product.name + ' de ' + times + ' ori.');
-  setFeedback('✅ ' + product.name + ': ' + (opType==='in'?'+':'-') + totalQty + ' ' + product.unit + ' (' + qty + 'x' + times + ')', 'ok');
-  return true;
-}
-
-// 3. COMANDĂ VOCALĂ LOCAȚIE
-function handleLocationCommand(text) {
-  const norm = normalizeText(text.toLowerCase());
-  if (!norm.includes('muta') && !norm.includes('mută') && !norm.includes('schimba') && !norm.includes('schimbă')) return false;
-  
-  const fromMatch = text.match(/din\s+([A-Z][0-9A-Za-z-]+)/i);
-  const toMatch = text.match(/(?:in|în|la)\s+([A-Z][0-9A-Za-z-]+)/i);
-  
-  if (!fromMatch || !toMatch) return false;
-  
-  const fromLoc = fromMatch[1];
-  const toLoc = toMatch[1];
-  const product = findProduct(text.split(/\s+/));
-  
-  if (!product) {
-    const moved = stock.filter(p => normalizeText((p.loc||'').toLowerCase()) === normalizeText(fromLoc.toLowerCase()));
-    if (moved.length === 0) { setFeedback('❌ Niciun produs în locatia ' + fromLoc, 'err'); return true; }
-    moved.forEach(p => { p.loc = toLoc; });
-    saveStockToFirebase(); renderStock();
-    speak(moved.length + ' produse mutate din ' + fromLoc + ' in ' + toLoc + '.');
-    setFeedback('✅ ' + moved.length + ' produse mutate: ' + fromLoc + ' → ' + toLoc, 'ok');
-    return true;
-  }
-  
-  product.loc = toLoc;
-  saveStockToFirebase(); renderStock();
-  speak(product.name + ' mutat in ' + toLoc + '.');
-  setFeedback('✅ ' + product.name + ' mutat: ' + fromLoc + ' → ' + toLoc, 'ok');
-  return true;
-}
-
-// 4. COMANDĂ VOCALĂ STOC CATEGORIE
-function handleCategoryQuery(text) {
-  const norm = normalizeText(text.toLowerCase());
-  if (!norm.includes('categori') && !norm.includes('catego')) return false;
-  if (!norm.includes('cate') && !norm.includes('câte') && !norm.includes('cat') && !norm.includes('câț')) return false;
-  
-  const cats = [...new Set(stock.map(p => p.cat || 'General'))];
-  let foundCat = null;
-  cats.forEach(cat => {
-    if (norm.includes(normalizeText(cat.toLowerCase()))) foundCat = cat;
-  });
-  
-  if (!foundCat) {
-    const catList = cats.join(', ');
-    speak('Categorii disponibile: ' + catList);
-    setFeedback('📂 Categorii: ' + catList, 'ok');
-    return true;
-  }
-  
-  const catProducts = stock.filter(p => (p.cat||'General') === foundCat);
-  const total = catProducts.length;
-  const zero = catProducts.filter(p => p.qty === 0).length;
-  speak('Categoria ' + foundCat + ' are ' + total + ' produse. ' + zero + ' epuizate.');
-  setFeedback('📂 ' + foundCat + ': ' + total + ' produse, ' + zero + ' epuizate', 'ok');
-  return true;
-}
-
-// 5. IMPORT MASIV DIN TEXT
-function openTextImportModal() {
-  document.getElementById('text-import-modal').style.display = 'flex';
-}
-function closeTextImportModal() {
-  document.getElementById('text-import-modal').style.display = 'none';
-}
-
-function importFromText() {
-  const raw = document.getElementById('text-import-input').value.trim();
-  if (!raw) return;
-  
-  const lines = raw.split('\n').filter(l => l.trim());
-  let added = 0;
-  
-  lines.forEach(line => {
-    const parts = line.trim().split(/[,;\t]+/);
-    if (parts.length < 1) return;
-    
-    const name = parts[0].trim();
-    const qty = parseInt(parts[1]) || 0;
-    const unit = parts[2] ? parts[2].trim() : 'buc';
-    const loc = parts[3] ? parts[3].trim() : '';
-    
-    if (!name || name.length < 2) return;
-    
-    const existing = stock.find(p => normalizeText(p.name.toLowerCase()) === normalizeText(name.toLowerCase()));
-    if (existing) {
-      existing.qty += qty;
-    } else {
-      stock.push({ id: nextId++, name, qty, unit, loc, cat: 'Import', min: 5, maxQty: qty*3||100, notes: [], note_preview: '' });
-      added++;
-    }
-  });
-  
-  saveStockToFirebase(); renderStock(); updateStats();
-  closeTextImportModal();
-  setFeedback('✅ ' + added + ' produse importate, ' + (lines.length - added) + ' actualizate!', 'ok');
-  speak(added + ' produse importate cu succes.');
-}
-
-// 6. ALERTĂ EXPIRARE AUTOMATĂ
-function checkExpiryAlerts() {
-  if (!userProfile) return;
-  const today = new Date();
-  const in30 = new Date(today.getTime() + 30*24*3600*1000);
-  
-  stock.forEach(p => {
-    if (!p.expiry) return;
-    const exp = new Date(p.expiry);
-    if (exp < today) {
-      triggerAlert('🔴 EXPIRAT: ' + p.name + ' (exp. ' + p.expiry + ')', 'zero');
-      if (userProfile.telegram_id) {
-        sendTelegramAlert('🔴 <b>PRODUS EXPIRAT!</b>\n📦 ' + p.name + '\n📅 ' + p.expiry + '\n🏭 ' + userProfile.depot, userProfile.telegram_id);
-      }
-    } else if (exp <= in30) {
-      triggerAlert('⚠️ EXPIRĂ ÎN ' + Math.ceil((exp-today)/86400000) + ' ZILE: ' + p.name, 'warn');
-    }
-  });
-}
-setInterval(checkExpiryAlerts, 3600000);
-
-// 7. ISTORIC PREȚURI
-let priceHistory = JSON.parse(localStorage.getItem('sv_price_history') || '{}');
-function trackPriceHistory(product, buyPrice, sellPrice) {
-  const key = String(product.id);
-  if (!priceHistory[key]) priceHistory[key] = [];
-  priceHistory[key].push({ date: new Date().toLocaleDateString('ro-RO'), buy: buyPrice, sell: sellPrice });
-  if (priceHistory[key].length > 50) priceHistory[key] = priceHistory[key].slice(-50);
-  localStorage.setItem('sv_price_history', JSON.stringify(priceHistory));
-}
-function getPriceHistory(productId) {
-  return priceHistory[String(productId)] || [];
-}
-
-// 8. STATISTICI VOCALE
-function handleStatsVoiceCommand(text) {
-  const norm = normalizeText(text.toLowerCase());
-  if (!norm.includes('operatii') && !norm.includes('operații') && !norm.includes('statistici') && !norm.includes('câte am')) return false;
-  
-  const today = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
-  const todayOps = log.filter(e => e.time && e.time.startsWith(today));
-  const todayIn = todayOps.filter(e => e.type === 'in').length;
-  const todayOut = todayOps.filter(e => e.type === 'out').length;
-  const todayErr = todayOps.filter(e => e.type === 'err').length;
-  
-  const msg = 'Astăzi: ' + todayOps.length + ' operații totale. ' + todayIn + ' intrări, ' + todayOut + ' ieșiri' + (todayErr > 0 ? ', ' + todayErr + ' erori' : '') + '.';
-  speak(msg);
-  setFeedback('📊 ' + msg, 'ok');
-  return true;
-}
-
-// 9. BON FISCAL SIMPLU
-let bonSeriesCounter = parseInt(localStorage.getItem('sv_bon_counter') || '1');
-async function generateBonFiscal(clientName, items) {
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF();
-  const depot = userProfile ? userProfile.depot : 'Depozit';
-  const now = new Date();
-  const bonNr = 'BON-' + String(bonSeriesCounter).padStart(6, '0');
-  bonSeriesCounter++;
-  localStorage.setItem('sv_bon_counter', String(bonSeriesCounter));
-  
-  // Header
-  doc.setFillColor(10, 12, 15);
-  doc.rect(0, 0, 210, 45, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(22);
-  doc.setTextColor(0, 229, 160);
-  doc.text('BON FISCAL', 14, 20);
-  doc.setFontSize(10);
-  doc.setTextColor(153, 168, 184);
-  doc.text(bonNr + '  |  ' + now.toLocaleString('ro-RO'), 14, 30);
-  doc.text(depot, 14, 38);
-  
-  doc.setFontSize(12);
-  doc.setTextColor(232, 236, 240);
-  doc.text('Client: ' + (clientName || 'Clienti diverse'), 14, 55);
-  
-  const subtotal = items.reduce((s, i) => s + (i.price||0)*i.qty, 0);
-  const tva = subtotal * 0.19;
-  const total = subtotal + tva;
-  
-  doc.autoTable({
-    startY: 65,
-    head: [['Nr.', 'Produs', 'Cant.', 'UM', 'Pret', 'Total']],
-    body: items.map((item, i) => [i+1, item.name, item.qty, item.unit||'buc', (item.price||0).toFixed(2)+' RON', ((item.price||0)*item.qty).toFixed(2)+' RON']),
-    styles: { fontSize: 9, textColor: [153,168,184], fillColor: [17,20,24] },
-    headStyles: { fillColor: [10,12,15], textColor: [0,229,160], fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [24,29,36] },
-    margin: { left: 14, right: 14 }
-  });
-  
-  const fy = doc.lastAutoTable.finalY + 8;
-  doc.setFontSize(10);
-  doc.setTextColor(153, 168, 184);
-  doc.text('Subtotal: ' + subtotal.toFixed(2) + ' RON', 130, fy);
-  doc.text('TVA 19%: ' + tva.toFixed(2) + ' RON', 130, fy+7);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(0, 229, 160);
-  doc.text('TOTAL: ' + total.toFixed(2) + ' RON', 130, fy+17);
-  
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(107, 122, 141);
-  doc.text('Multumim pentru cumparaturi!', 14, fy+30);
-  
-  doc.save(bonNr + '_' + (clientName||'client').replace(/\s+/g,'_') + '.pdf');
-  setFeedback('✅ ' + bonNr + ' generat! Total: ' + total.toFixed(2) + ' RON', 'ok');
-  speak('Bon generat. Total: ' + total.toFixed(0) + ' lei.');
-}
-
-// 10. COMANDĂ RAPIDĂ CLIENT
-let clientFavoriteProducts = JSON.parse(localStorage.getItem('sv_client_favs') || '{}');
-function setClientFavoriteProduct(clientName, productId, qty) {
-  const key = normalizeText(clientName.toLowerCase());
-  if (!clientFavoriteProducts[key]) clientFavoriteProducts[key] = [];
-  clientFavoriteProducts[key].push({ productId, qty });
-  localStorage.setItem('sv_client_favs', JSON.stringify(clientFavoriteProducts));
-  setFeedback('✅ Produs favorit salvat pentru ' + clientName, 'ok');
-}
-function quickOrderClient(clientName) {
-  const key = normalizeText(clientName.toLowerCase());
-  const favs = clientFavoriteProducts[key] || [];
-  if (!favs.length) { setFeedback('⚠️ ' + clientName + ' nu are produse favorite setate.', 'warn'); return; }
-  
-  let processed = 0;
-  favs.forEach(fav => {
-    const p = stock.find(s => s.id === fav.productId);
-    if (p && p.qty >= fav.qty) {
-      p.qty -= fav.qty;
-      addLog('Comanda rapida: ' + clientName, 'OUT ' + fav.qty + ' ' + p.unit + ' ' + p.name, 'out', clientName);
-      processed++;
-    }
-  });
-  
-  if (processed > 0) {
-    saveStockToFirebase(); renderStock(); updateStats();
-    speak('Comanda rapida pentru ' + clientName + ' procesata. ' + processed + ' produse.');
-    setFeedback('✅ Comanda rapida ' + clientName + ': ' + processed + ' produse', 'ok');
-  }
-}
-
-// 11. ALERTĂ CLIENT INACTIV
-function checkInactiveClients() {
-  const cutoff = new Date(Date.now() - 30*24*3600*1000);
-  const segs = segmentClients ? segmentClients() : [];
-  const vips = segs.filter(c => c.visits >= 10);
-  
-  vips.forEach(vip => {
-    const lastVisit = clients.filter(c => normalizeText((c.name||'').toLowerCase()) === normalizeText(vip.name.toLowerCase())).slice(-1)[0];
-    if (lastVisit && lastVisit.time) {
-      const parts = lastVisit.time.split(' ')[0].split('.');
-      if (parts.length >= 2) {
-        const lastDate = new Date(new Date().getFullYear(), parseInt(parts[1])-1, parseInt(parts[0]));
-        if (lastDate < cutoff) {
-          triggerAlert('💤 CLIENT VIP INACTIV: ' + vip.name + ' nu a cumparat in 30+ zile!', 'warn');
-        }
-      }
-    }
-  });
-}
-setInterval(checkInactiveClients, 86400000);
-
-// 12. EXPORT WHATSAPP
-function exportForWhatsApp() {
-  const depot = userProfile ? userProfile.depot : 'Depozit';
-  const now = new Date().toLocaleDateString('ro-RO');
-  let msg = '*📦 SITUATIE STOC - ' + depot + '*\n_' + now + '_\n\n';
-  
-  const zero = stock.filter(p => p.qty === 0);
-  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min);
-  
-  if (zero.length > 0) {
-    msg += '*🔴 EPUIZAT (' + zero.length + '):*\n';
-    zero.forEach(p => { msg += '• ' + p.name + '\n'; });
-    msg += '\n';
-  }
-  if (low.length > 0) {
-    msg += '*⚠️ STOC SCAZUT (' + low.length + '):*\n';
-    low.forEach(p => { msg += '• ' + p.name + ': ' + p.qty + ' ' + p.unit + '\n'; });
-    msg += '\n';
-  }
-  msg += '*✅ Total produse: ' + stock.length + '*';
-  
-  navigator.clipboard.writeText(msg).then(() => {
-    setFeedback('✅ Copiat! Lipeste pe WhatsApp.', 'ok');
-    speak('Raport copiat pentru WhatsApp.');
-  });
-}
-
-// 13. RAPORT CLIENT VIP PDF
-async function generateVIPReport(clientName) {
-  await exportClientHistoryPDF(clientName);
-  setFeedback('✅ Raport VIP generat pentru ' + clientName, 'ok');
-}
-
-// 14. SUGESTIE COMANDĂ AUTOMATĂ AI
-async function aiSuggestOrder() {
-  const el = document.getElementById('ai-order-content');
-  if (!el) return;
-  el.innerHTML = '<div style="color:#6b7a8d;padding:20px">⏳ AI analizeaza consumul...</div>';
-  document.getElementById('ai-order-modal').style.display = 'flex';
-  
-  const lowStock = stock.filter(p => p.qty <= p.min * 2).map(p => ({
-    name: p.name, qty: p.qty, min: p.min, unit: p.unit,
-    supplier: p.supplier||'—', lead_time: p.lead_time||7
-  }));
-  
-  if (!lowStock.length) {
-    el.innerHTML = '<div style="color:#00e5a0;padding:20px">✅ Toate produsele au stoc suficient!</div>';
-    return;
-  }
-  
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        messages: [{ role: 'user', content: 'Esti expert in gestiune depozit. Analizeaza aceste produse cu stoc scazut si propune o lista de comanda cu cantitati recomandate. Raspunde in romana, concis, cu bullets.Produse: ' + JSON.stringify(lowStock) }]
-      })
-    });
-    const data = await resp.json();
-    el.innerHTML = '<div style="font-size:13px;color:#e8ecf0;line-height:1.8;white-space:pre-wrap">' + data.content[0].text + '</div>';
-  } catch(e) {
-    el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la AI.</div>';
-  }
-}
-
-// 15. CLASIFICARE AUTOMATĂ PRODUSE NOI
-async function aiClassifyProduct(productName) {
-  try {
-    const cats = [...new Set(stock.map(p => p.cat || 'General'))];
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 50,
-        messages: [{ role: 'user', content: 'Categorizeaza acest produs de depozit intr-una din categoriile existente: ' + cats.join(', ') + '. Produs: "' + productName + '". Raspunde DOAR cu numele categoriei.' }]
-      })
-    });
-    const data = await resp.json();
-    return data.content[0].text.trim();
-  } catch(e) { return 'General'; }
-}
-
-// 16. RAPORT ANOMALII ZILNIC TELEGRAM
-async function sendDailyAnomaliesTelegram() {
-  if (!userProfile || !userProfile.telegram_id) return;
-  
-  const lastSent = localStorage.getItem('sv_anomalies_sent');
-  const today = new Date().toISOString().slice(0, 10);
-  if (lastSent === today) return;
-  
-  const now = new Date();
-  if (now.getHours() !== 8) return;
-  
-  localStorage.setItem('sv_anomalies_sent', today);
-  
-  const zero = stock.filter(p => p.qty === 0).length;
-  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
-  const expired = stock.filter(p => p.expiry && new Date(p.expiry) < now).length;
-  
-  if (zero === 0 && low === 0 && expired === 0) return;
-  
-  const msg = '🌅 <b>RAPORT ANOMALII - ' + now.toLocaleDateString('ro-RO') + '</b>\n' +
-    '🏭 ' + userProfile.depot + '\n\n' +
-    (zero > 0 ? '🔴 Epuizate: <b>' + zero + '</b> produse\n' : '') +
-    (low > 0 ? '⚠️ Stoc scazut: <b>' + low + '</b> produse\n' : '') +
-    (expired > 0 ? '📅 Expirate: <b>' + expired + '</b> produse\n' : '') +
-    '\nVerificati aplicatia StocVoce!';
-  
-  await sendTelegramAlert(msg, userProfile.telegram_id);
-}
-setInterval(sendDailyAnomaliesTelegram, 3600000);
-
-// Voice handlers integrated into processCommand
-
-window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};</script>
-
-<!-- ADMIN PANEL -->
-<div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2500;overflow-y:auto;padding:24px">
-  <div style="max-width:800px;margin:0 auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;letter-spacing:2px;color:#e8ecf0">
-        Stoc<span style="color:#00e5a0">Voce</span> <span style="font-size:14px;color:#6b7a8d;font-weight:400">APROBARE UTILIZATORI</span>
-      </div>
-      <button onclick="closeAdminPanel()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 14px;cursor:pointer">✕ ÎNCHIDE</button>
-    </div>
-
-    <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">⏳ CERERI ÎN AȘTEPTARE</div>
-      <div id="pending-users">
-        <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
-      </div>
-    </div>
-
-    <div style="background:#111418;border:1px solid #1e2530;border-radius:16px;padding:24px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">✅ UTILIZATORI APROBAȚI</div>
-      <div id="approved-users">
-        <div style="color:#6b7a8d;font-size:13px">Se încarcă...</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- IMPORT EXCEL MODAL -->
-<div id="import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:36px;max-width:520px;width:90%">
-    <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📊 Import Excel</h3>
-    <p style="font-size:13px;color:#6b7a8d;margin-bottom:24px">Încarcă un fișier Excel (.xlsx) cu produsele tale. Coloanele trebuie să fie: <strong style="color:#99a8b8">Nume, Categorie, Cantitate, Unitate, Locatie, Stoc_Minim</strong></p>
-    
-    <!-- Template download -->
-    <button onclick="downloadTemplate()" style="background:var(--surface2);border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:9px 16px;cursor:pointer;text-transform:uppercase;margin-bottom:16px;width:100%">⬇️ DESCARCĂ TEMPLATE EXCEL</button>
-
-    <!-- File upload -->
-    <div id="drop-zone" onclick="document.getElementById('excel-file').click()" style="border:2px dashed #1e2530;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='#1e2530'">
-      <div style="font-size:36px;margin-bottom:10px">📁</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#99a8b8;font-weight:700">Trage fișierul Excel aici</div>
-      <div style="font-size:12px;color:#6b7a8d;margin-top:6px">sau click pentru a selecta</div>
-      <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelFile(this)">
-    </div>
-
-    <!-- Preview -->
-    <div id="import-preview" style="display:none;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:10px">PREVIZUALIZARE</div>
-      <div id="preview-table" style="background:#181d24;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-size:12px;font-family:'JetBrains Mono',monospace;color:#99a8b8"></div>
-      <div id="import-count" style="font-size:13px;color:#00e5a0;margin-top:10px;font-weight:600"></div>
-    </div>
-
-    <div id="import-error" style="background:rgba(255,71,87,0.1);border:1px solid #ff4757;border-radius:8px;padding:10px;font-size:13px;color:#ff4757;display:none;margin-bottom:12px"></div>
-
-    <div style="display:flex;gap:10px">
-      <button onclick="closeImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="doImport()" id="import-btn" disabled style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase;opacity:0.5">IMPORTĂ PRODUSELE →</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- EDIT PRODUCT MODAL -->
-<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:32px;max-width:400px;width:90%">
-    <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase;margin-bottom:20px">✏️ Editează Produs</h3>
-    <input type="hidden" id="edit-id">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Nume</div>
-        <input class="form-input" id="edit-name" placeholder="Nume produs">
-      </div>
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Categorie</div>
-        <input class="form-input" id="edit-cat" placeholder="Categorie">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Cantitate</div>
-        <input class="form-input" id="edit-qty" type="number" placeholder="0">
-      </div>
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Unitate</div>
-        <input class="form-input" id="edit-unit" placeholder="buc/kg/palet">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Locație</div>
-        <input class="form-input" id="edit-loc" placeholder="Raft A-3">
-      </div>
-      <div>
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:5px;font-family:'JetBrains Mono',monospace">Stoc Minim</div>
-        <input class="form-input" id="edit-min" type="number" placeholder="10">
-      </div>
-    </div>
-    <div style="margin-bottom:18px">
-      <label style="font-size:12px;color:#6b7a8d;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="edit-sensitive"> Produs sensibil 🔒
-      </label>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeEditModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="saveEdit()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- SECRET ADMIN DASHBOARD -->
-<div id="secret-dashboard" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:3000;overflow-y:auto">
-  <div style="max-width:1100px;margin:0 auto;padding:28px 20px">
-    
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;border-bottom:1px solid #1e2530;padding-bottom:20px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;letter-spacing:3px;color:#e8ecf0">
-          Stoc<span style="color:#00e5a0">Voce</span> 
-          <span style="font-size:14px;color:#6b7a8d;font-weight:400;letter-spacing:1px">DASHBOARD GLOBAL</span>
-        </div>
-        <div style="font-size:12px;color:#6b7a8d;margin-top:4px;font-family:'JetBrains Mono',monospace" id="dash-updated">—</div>
-      </div>
-      <div style="display:flex;gap:10px">
-        <button onclick="showAdminPanel()" style="background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer">👥 APROBĂRI</button>
-        <button onclick="closeDashboard()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 16px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">✕ ÎNCHIDE</button>
-      </div>
-    </div>
-
-    <!-- Global Stats -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px" id="global-stats">
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #00e5a0">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#00e5a0" id="gs-depots">—</div>
-        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Depozite Active</div>
-      </div>
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #a78bfa">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#a78bfa" id="gs-users">—</div>
-        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Utilizatori Activi</div>
-      </div>
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #ffa502">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#ffa502" id="gs-low">—</div>
-        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Stocuri Critice</div>
-      </div>
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px;text-align:center;border-top:2px solid #ff4757">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:900;color:#ff4757" id="gs-zero">—</div>
-        <div style="font-size:11px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-top:4px">Stocuri Epuizate</div>
-      </div>
-    </div>
-
-    <!-- Charts row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px">
-      <!-- Bar chart per depot -->
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:18px">📊 PRODUSE PE DEPOZIT</div>
-        <div id="chart-depots" style="display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 8px"></div>
-        <div id="chart-labels" style="display:flex;gap:8px;margin-top:8px;padding:0 8px"></div>
-      </div>
-      
-      <!-- Status pie/donut -->
-      <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:20px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:18px">🔴 STATUS STOC GLOBAL</div>
-        <div id="status-chart" style="display:flex;flex-direction:column;gap:10px"></div>
-      </div>
-    </div>
-
-    <!-- Depots grid -->
-    <div style="margin-bottom:28px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:16px">🏭 TOATE DEPOZITELE</div>
-      <div id="all-depots" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>
-    </div>
-
-    <!-- Clients section -->
-    <div style="margin-bottom:28px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase">👥 IEȘIRI CLIENȚI — TOATE DEPOZITELE</div>
-        <input id="dash-client-search" oninput="filterDashClients()" placeholder="Caută client..." style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:12px;padding:6px 12px;outline:none;width:200px" onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
-      </div>
-      <div id="dash-clients-list" style="background:#111418;border:1px solid #1e2530;border-radius:14px;overflow:hidden;max-height:320px;overflow-y:auto">
-        <div style="padding:20px;color:#6b7a8d;font-size:13px;text-align:center">Se încarcă...</div>
-      </div>
-    </div>
-
-    <!-- Users list with approve/reject -->
-    <div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:14px">👥 UTILIZATORI & APROBARE</div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <!-- Search -->
-        <div style="flex:1;min-width:200px;position:relative">
-          <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#6b7a8d;font-size:14px">🔍</span>
-          <input id="user-search" oninput="searchUsers()" placeholder="Caută după nume, email sau depozit..." 
-            style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:13px;padding:9px 12px 9px 34px;outline:none;transition:border-color .2s"
-            onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
-        </div>
-        <!-- Filter buttons -->
-        <div style="display:flex;gap:6px;flex-shrink:0">
-          <button onclick="filterUsers('all')" id="filter-all" style="background:rgba(0,229,160,0.15);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">TOȚI <span id="count-all"></span></button>
-          <button onclick="filterUsers('pending')" id="filter-pending" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">AȘTEPTARE <span id="count-pending" style="color:#ffa502"></span></button>
-          <button onclick="filterUsers('approved')" id="filter-approved" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">APROBAȚI <span id="count-approved" style="color:#00e5a0"></span></button>
-          <button onclick="filterUsers('rejected')" id="filter-rejected" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px">REFUZAȚI <span id="count-rejected" style="color:#ff4757"></span></button>
-        </div>
-      </div>
-      <div id="all-users" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px"></div>
-    </div>
-
-  </div>
-</div>
-
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('SW registered:', reg.scope))
-      .catch(err => console.log('SW error:', err));
-  });
-}
-
-// PWA Install prompt
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // Show install button
-  const installBtn = document.getElementById('install-btn');
-  if (installBtn) installBtn.style.display = 'flex';
-});
-
-window.addEventListener('appinstalled', () => {
-  const installBtn = document.getElementById('install-btn');
-  if (installBtn) installBtn.style.display = 'none';
-  deferredPrompt = null;
-});
-
-function installApp() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(choice => {
-    if (choice.outcome === 'accepted') {
-      console.log('PWA installed');
-    }
-    deferredPrompt = null;
-  });
-}
 </script>
 
+// 26. DASHBOARD PRINT-FRIENDLY
 
-<!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:4000;padding:12px 20px;background:linear-gradient(90deg,#ff4757,#ff6b7a);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:1px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(255,71,87,0.5);animation:slideDown .3s ease">
-  <div style="display:flex;align-items:center;gap:12px">
-    <span style="font-size:22px">🚨</span>
-    <span id="alert-text">ALERTĂ STOC!</span>
-  </div>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:5px 12px;cursor:pointer">✕</button>
-</div>
-@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
-
-<!-- PRODUCT HISTORY MODAL -->
-<div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">📋 Istoric Produs</div>
-        <div style="font-size:13px;color:#6b7a8d;margin-top:2px" id="history-product-name">—</div>
-      </div>
-      <button onclick="closeHistoryModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="history-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"></div>
-    <div id="history-list" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- TRANSFER MODAL -->
-<div id="transfer-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:420px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;margin-bottom:6px">🔄 Transfer Stoc</div>
-    <div style="font-size:13px;color:#6b7a8d;margin-bottom:20px">Trimite cantitate către alt depozit</div>
-    
-    <div style="margin-bottom:14px">
-      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Produs</div>
-      <select id="transfer-product" class="form-input" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;padding:10px 12px;outline:none;font-size:14px"></select>
-    </div>
-    <div style="margin-bottom:14px">
-      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Cantitate</div>
-      <input id="transfer-qty" type="number" min="1" placeholder="ex: 50" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none">
-    </div>
-    <div style="margin-bottom:20px">
-      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Depozit Destinație</div>
-      <input id="transfer-dest" placeholder="ex: Depozit București" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#1e2530'">
-      <div style="font-size:11px;color:#6b7a8d;margin-top:5px">⚠️ Depozitul destinație trebuie să existe și operatorul lui va vedea produsul adăugat</div>
-    </div>
-    <div id="transfer-error" style="background:rgba(255,71,87,0.1);border:1px solid #ff4757;border-radius:8px;padding:10px;font-size:13px;color:#ff4757;display:none;margin-bottom:12px"></div>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTransferModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="doTransfer()" style="flex:2;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">TRIMITE →</button>
-    </div>
-  </div>
-</div>
-
-<!-- QR SCANNER MODAL -->
-<div id="qr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:16px">
-  <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0">📷 SCANEAZĂ COD</div>
-  <div style="position:relative;width:280px;height:280px;border:3px solid #00e5a0;border-radius:16px;overflow:hidden;background:#000">
-    <video id="qr-video" style="width:100%;height:100%;object-fit:cover" playsinline autoplay></video>
-    <!-- Scanner frame -->
-    <div style="position:absolute;inset:0;border:2px solid rgba(0,229,160,0.3);border-radius:14px;pointer-events:none"></div>
-    <div style="position:absolute;top:20px;left:20px;width:30px;height:30px;border-top:3px solid #00e5a0;border-left:3px solid #00e5a0;border-radius:3px 0 0 0"></div>
-    <div style="position:absolute;top:20px;right:20px;width:30px;height:30px;border-top:3px solid #00e5a0;border-right:3px solid #00e5a0;border-radius:0 3px 0 0"></div>
-    <div style="position:absolute;bottom:20px;left:20px;width:30px;height:30px;border-bottom:3px solid #00e5a0;border-left:3px solid #00e5a0;border-radius:0 0 0 3px"></div>
-    <div style="position:absolute;bottom:20px;right:20px;width:30px;height:30px;border-bottom:3px solid #00e5a0;border-right:3px solid #00e5a0;border-radius:0 0 3px 0"></div>
-  </div>
-  <div id="qr-result" style="font-size:13px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;text-align:center;max-width:280px">Îndreaptă camera spre codul de bare sau QR</div>
-  <div style="display:flex;gap:10px">
-    <button onclick="closeQRModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">ANULEAZĂ</button>
-    <button onclick="manualBarcode()" style="background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;cursor:pointer">✏️ MANUAL</button>
-  </div>
-</div>
-
-
-<!-- SETTINGS MODAL -->
-<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:460px;width:100%;max-height:90vh;display:flex;flex-direction:column">
-    <!-- Sticky header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">⚙️ Setări Cont</div>
-        <div style="font-size:12px;color:#6b7a8d;margin-top:2px">Personalizează aplicația</div>
-      </div>
-      <button onclick="closeSettingsModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:14px;padding:6px 12px;cursor:pointer;flex-shrink:0">✕</button>
-    </div>
-    <!-- Scrollable content -->
-    <div style="overflow-y:auto;padding:20px 24px;flex:1">
-
-    <!-- Language selector -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">🌍 Limba aplicației și comenzi vocale</div>
-      <select id="settings-language" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer"></select>
-      <div style="font-size:11px;color:#6b7a8d;margin-top:4px">Microfonul va asculta în limba selectată</div>
-    </div>
-
-    <!-- Telegram ID -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Telegram Chat ID</div>
-      <input id="settings-telegram" placeholder="ex: 123456789" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='#00e5a0'" onblur="this.style.borderColor='#1e2530'">
-      <div style="font-size:11px;color:#6b7a8d;margin-top:4px">Caută <strong style="color:#a78bfa">@userinfobot</strong> pe Telegram → Start → copiază ID-ul</div>
-    </div>
-
-    <!-- Daily report toggle -->
-    <div style="margin-bottom:18px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div>
-          <div style="font-size:14px;color:#e8ecf0;font-weight:600">📅 Raport zilnic</div>
-          <div style="font-size:11px;color:#6b7a8d;margin-top:2px">Situația stocului pe Telegram</div>
-        </div>
-        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
-          <input type="checkbox" id="settings-report-enabled" style="opacity:0;width:0;height:0" onchange="toggleReportTime()">
-          <span id="toggle-span" style="position:absolute;inset:0;background:#1e2530;border-radius:24px;transition:.3s;cursor:pointer"></span>
-          <span id="toggle-dot" style="position:absolute;left:3px;top:3px;width:18px;height:18px;background:#6b7a8d;border-radius:50%;transition:.3s"></span>
-        </label>
-      </div>
-      <div id="report-time-section" style="display:none">
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#6b7a8d;margin-bottom:6px;font-family:'JetBrains Mono',monospace">Ora raportului</div>
-        <select id="settings-report-hour" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer">
-          <option value="6">06:00</option>
-          <option value="7">07:00</option>
-          <option value="8" selected>08:00</option>
-          <option value="9">09:00</option>
-          <option value="10">10:00</option>
-          <option value="12">12:00</option>
-          <option value="14">14:00</option>
-          <option value="16">16:00</option>
-          <option value="17">17:00</option>
-          <option value="18">18:00</option>
-          <option value="20">20:00</option>
-          <option value="22">22:00</option>
-        </select>
-        <div style="font-size:11px;color:#6b7a8d;margin-top:6px">⚠️ Aplicația trebuie să fie deschisă la ora raportului</div>
-      </div>
-    </div>
-
-    <!-- Alert settings -->
-    <div style="margin-bottom:20px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:8px">🔔 Alerte automate</div>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px">
-        <input type="checkbox" id="settings-alert-low" checked style="width:16px;height:16px;cursor:pointer">
-        <span style="font-size:13px;color:#99a8b8">⚠️ Alertă stoc scăzut</span>
-      </label>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-        <input type="checkbox" id="settings-alert-zero" checked style="width:16px;height:16px;cursor:pointer">
-        <span style="font-size:13px;color:#99a8b8">🔴 Alertă stoc epuizat</span>
-      </label>
-    </div>
-
-
-    <!-- TEMA -->
-    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">🎨 Temă aplicație</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <button onclick="setTheme('dark')" id="theme-dark" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
-        <button onclick="setTheme('light')" id="theme-light" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
-        <button onclick="setTheme('blue')" id="theme-blue" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
-      </div>
-    </div>
-
-    <!-- FONT SIZE -->
-    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">🔤 Dimensiune font</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <button onclick="setFontSize('small')" id="font-small" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px">A MIC</button>
-        <button onclick="setFontSize('normal')" id="font-normal" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">A NORMAL</button>
-        <button onclick="setFontSize('large')" id="font-large" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px">A MARE</button>
-      </div>
-    </div>
-
-    <!-- GRID SIZE -->
-    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:10px">📱 Afișare produse</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-        <button onclick="setGridSize('small')" id="grid-small" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px">▦ MIC</button>
-        <button onclick="setGridSize('normal')" id="grid-normal" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:10px;cursor:pointer;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">▤ NORMAL</button>
-        <button onclick="setGridSize('large')" id="grid-large" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:10px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">▣ MARE</button>
-      </div>
-    </div>
-
-    <!-- TOGGLE SETTINGS -->
-    <div style="margin-bottom:16px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:12px">🔧 Opțiuni avansate</div>
-      
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">🔊 Sunet la comenzi vocale</div>
-          <div style="font-size:11px;color:#6b7a8d">Bip de confirmare după fiecare comandă</div>
-        </div>
-        <input type="checkbox" id="settings-sound" style="width:18px;height:18px;cursor:pointer">
-      </label>
-      
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">🎙️ Confirmare vocală după comandă</div>
-          <div style="font-size:11px;color:#6b7a8d">Aplicația citește rezultatul cu voce</div>
-        </div>
-        <input type="checkbox" id="settings-voice-confirm" style="width:18px;height:18px;cursor:pointer">
-      </label>
-      
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">🌅 Rezumat vocal zilnic la ora 8</div>
-          <div style="font-size:11px;color:#6b7a8d">Îți citește situația stocului dimineața</div>
-        </div>
-        <input type="checkbox" id="settings-daily-summary" style="width:18px;height:18px;cursor:pointer">
-      </label>
-      
-      <div style="margin-top:8px">
-        <div style="font-size:12px;color:#6b7a8d;margin-bottom:8px">🎤 Voce sintetizată</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-          <button onclick="setVoicePreference('female')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">👩 Femeie</button>
-          <button onclick="setVoicePreference('male')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">👨 Bărbat</button>
-          <button onclick="setVoicePreference('robot')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;padding:7px;cursor:pointer;color:#99a8b8;font-size:12px">🤖 Robot</button>
-        </div>
-      </div>
-      
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">🔔 Notificări browser</div>
-          <div style="font-size:11px;color:#6b7a8d">Popup în browser la alertele de stoc</div>
-        </div>
-        <input type="checkbox" id="settings-browser-notif" style="width:18px;height:18px;cursor:pointer">
-      </label>
-
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:12px">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">📊 Export CSV automat zilnic</div>
-          <div style="font-size:11px;color:#6b7a8d">Descarcă automat CSV la miezul nopții</div>
-        </div>
-        <input type="checkbox" id="settings-auto-csv" style="width:18px;height:18px;cursor:pointer">
-      </label>
-
-      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
-        <div>
-          <div style="font-size:13px;color:#99a8b8">🧪 Mod demonstrativ</div>
-          <div style="font-size:11px;color:#6b7a8d">Fără salvare în Firebase (test local)</div>
-        </div>
-        <input type="checkbox" id="settings-demo-mode" style="width:18px;height:18px;cursor:pointer">
-      </label>
-    </div>
-
-    <!-- APPROVAL THRESHOLD -->
-    <div style="margin-bottom:20px;background:#181d24;border-radius:10px;padding:14px">
-      <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:8px">🤝 Prag aprobare ieșiri</div>
-      <div style="font-size:11px;color:#6b7a8d;margin-bottom:10px">Cantități mai mari necesită aprobare supervisor</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
-        <button onclick="setApprovalThreshold(20)" id="thresh-20" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">20</button>
-        <button onclick="setApprovalThreshold(50)" id="thresh-50" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:8px;padding:8px;cursor:pointer;color:#00e5a0;font-family:'JetBrains Mono',monospace;font-size:12px">50</button>
-        <button onclick="setApprovalThreshold(100)" id="thresh-100" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">100</button>
-        <button onclick="setApprovalThreshold(999)" id="thresh-999" style="background:#111418;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px">OFF</button>
-      </div>
-    </div>
-
-    </div><!-- end scrollable -->
-    <!-- Sticky footer -->
-    <div style="display:flex;gap:10px;padding:16px 24px;border-top:1px solid #1e2530;flex-shrink:0">
-      <button onclick="closeSettingsModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="saveSettings()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- NOTES MODAL -->
-<div id="notes-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">💬 Note Produs</div>
-        <div style="font-size:13px;color:#6b7a8d;margin-top:2px" id="notes-product-name">—</div>
-      </div>
-      <button onclick="closeNotesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    
-    <!-- Notes list -->
-    <div id="notes-list" style="flex:1;overflow-y:auto;margin-bottom:16px;min-height:100px"></div>
-    
-    <!-- Add note -->
-    <div style="border-top:1px solid #1e2530;padding-top:14px">
-      <textarea id="new-note-text" placeholder="Scrie o notă... (ex: Livrare așteptată, lot defect, rezervat pentru client X)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:13px;padding:10px 12px;outline:none;resize:none;height:70px;transition:border-color .2s;margin-bottom:10px" onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#1e2530'"></textarea>
-      <button onclick="addNote()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:1px;padding:11px;cursor:pointer;text-transform:uppercase">+ ADAUGĂ NOTĂ</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- CHARTS MODAL -->
-<div id="charts-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">📊 Grafice Evoluție Stoc</div>
-      <button onclick="closeChartsModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div style="margin-bottom:16px">
-      <select id="chart-product-select" onchange="updateChart()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:12px"></select>
-    </div>
-    <div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:16px">
-      <canvas id="stock-chart" height="200"></canvas>
-    </div>
-    <div id="chart-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
-    
-    <!-- AI Prediction -->
-    <div style="margin-top:16px;background:#181d24;border-radius:12px;padding:16px;border:1px solid rgba(167,139,250,0.3)">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase;margin-bottom:12px">🤖 Predicție AI Reaprovizionare</div>
-      <div id="ai-prediction" style="font-size:13px;color:#99a8b8;line-height:1.6">Click pe un produs pentru a vedea predicția AI...</div>
-      <button onclick="getAIPrediction()" id="ai-btn" style="display:none;margin-top:12px;width:100%;background:rgba(167,139,250,0.15);border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">🤖 GENEREAZĂ PREDICȚIE AI</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- DELIVERY TRACKING MODAL -->
-<div id="delivery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">🚚 Livrări Așteptate</div>
-      <button onclick="closeDeliveryModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="delivery-list" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
-    <div style="border-top:1px solid #1e2530;padding-top:14px">
-      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Adaugă Livrare Așteptată</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <input id="del-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <input id="del-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <input id="del-supplier" placeholder="Furnizor" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <input id="del-date" type="date" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-      </div>
-      <button onclick="addDelivery()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ ADAUGĂ LIVRARE</button>
-    </div>
-  </div>
-</div>
-
-<!-- CLIENTS MODAL -->
-<div id="clients-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">👥 Clienți</div>
-      <button onclick="closeClientsModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="clients-list" style="flex:1;overflow-y:auto;margin-bottom:16px"></div>
-    <div style="border-top:1px solid #1e2530;padding-top:14px">
-      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Înregistrează Ieșire Client</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <input id="cli-name" placeholder="Nume client" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <input id="cli-contact" placeholder="Telefon / Email" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <input id="cli-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <input id="cli-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-      </div>
-      <button onclick="addClient()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ ÎNREGISTREAZĂ</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- 1. INVENTAR PERIODIC MODAL -->
-<div id="inventar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:680px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🔁 Inventar Periodic</div>
-        <div style="font-size:12px;color:#6b7a8d;margin-top:2px">Verifică și actualizează stocul fizic</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button onclick="finishInventar()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer;letter-spacing:1px">✅ FINALIZEAZĂ</button>
-        <button onclick="closeInventarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer">✕</button>
-      </div>
-    </div>
-    <div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:14px;font-size:12px;color:#ffa502">
-      ⚠️ Introduceți cantitatea FIZICĂ reală pentru fiecare produs. Diferențele vor fi marcate.
-    </div>
-    <div id="inventar-list"></div>
-  </div>
-</div>
-
-<!-- 2. COMANDĂ FURNIZOR MODAL -->
-<div id="comanda-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📋 Comandă Furnizor</div>
-      <button onclick="closeComandaModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:16px">
-      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">Produse sub stoc minim</div>
-      <div id="comanda-list"></div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="exportComandaPDF()" style="flex:1;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📄 EXPORT PDF</button>
-      <button onclick="exportComandaTelegram()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase">📱 TRIMITE TELEGRAM</button>
-    </div>
-  </div>
-</div>
-
-<!-- 3. REZERVĂRI MODAL -->
-<div id="rezervari-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#a78bfa;text-transform:uppercase">⏰ Rezervări</div>
-      <button onclick="closeRezervariModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="rezervari-list" style="flex:1;overflow-y:auto;margin-bottom:14px"></div>
-    <div style="border-top:1px solid #1e2530;padding-top:14px">
-      <div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">+ Rezervare Nouă</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <input id="rez-client" placeholder="Nume client" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <select id="rez-product" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none;cursor:pointer"></select>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <input id="rez-qty" type="number" placeholder="Cantitate" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-        <input id="rez-date" type="date" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:13px;padding:8px 10px;outline:none">
-      </div>
-      <button onclick="addRezervare()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px;cursor:pointer;text-transform:uppercase">+ REZERVĂ</button>
-    </div>
-  </div>
-</div>
-
-<!-- 4. ETICHETE QR MODAL -->
-<div id="etichete-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Etichete QR</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="printEtichete()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer">🖨️ PRINTEAZĂ</button>
-        <button onclick="closeEticheteModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;cursor:pointer">✕</button>
-      </div>
-    </div>
-    <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
-      <input id="etichete-search" placeholder="Filtrează produse..." oninput="filterEtichete()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px 12px;outline:none">
-      <button onclick="selectAllEtichete()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#99a8b8;font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 12px;cursor:pointer">SELECT ALL</button>
-    </div>
-    <div id="etichete-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;max-height:400px;overflow-y:auto"></div>
-  </div>
-</div>
-
-
-<!-- LANGUAGE MODAL -->
-<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🌍 Limbă / Language</div>
-      <button onclick="closeLangModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px" id="lang-grid"></div>
-  </div>
-</div>
-
-
-<!-- CALENDAR MODAL -->
-<div id="calendar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <button onclick="renderCalendar(calMonth===0?calYear-1:calYear,calMonth===0?11:calMonth-1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">‹</button>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:2px;color:#ffa502;text-transform:uppercase" id="calendar-header">Calendar</div>
-        <button onclick="renderCalendar(calMonth===11?calYear+1:calYear,calMonth===11?0:calMonth+1)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;padding:6px 10px;cursor:pointer;font-size:16px">›</button>
-      </div>
-      <button onclick="closeCalendarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="calendar-grid"></div>
-    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#6b7a8d">
-      <span>🟢 Recepționat</span><span>🟡 Așteptat</span><span style="border:1px solid #00e5a0;border-radius:4px;padding:1px 6px;color:#00e5a0">Azi</span>
-    </div>
-  </div>
-</div>
-
-
-<!-- CATEGORII MODAL -->
-<div id="categories-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:440px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#00e5a0;text-transform:uppercase">🏷️ Categorii</div>
-      <button onclick="closeCategoriesModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="cat-list" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- RAPORT LUNAR MODAL -->
-<div id="raport-lunar-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:2px;color:#ffa502;text-transform:uppercase">📊 Raport Lunar</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="exportFullExcel()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer">📊 EXCEL</button>
-        <button onclick="closeRaportLunarModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button onclick="showTop10()" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🏆 TOP 10</button>
-      <button onclick="showStagnant(30)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 30 ZILE</button>
-      <button onclick="showStagnant(60)" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">💤 60 ZILE</button>
-      <button onclick="showOperatorReport()" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">👤 OPERATORI</button>
-      <button onclick="calcAutoMinStock()" style="background:#181d24;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 14px;cursor:pointer">🤖 AUTO MIN</button>
-    </div>
-    <div id="raport-lunar-content"></div>
-  </div>
-</div>
-
-<!-- STAGNANT MODAL -->
-<div id="stagnant-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:90%;max-height:80vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
-      <button onclick="document.getElementById('stagnant-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="stagnant-list" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- OPERATOR REPORT MODAL -->
-<div id="operator-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#a78bfa;text-transform:uppercase">👤 Raport Operatori</div>
-      <button onclick="document.getElementById('operator-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="operator-report-content"></div>
-  </div>
-</div>
-
-<!-- CLIENT PROFILE MODAL -->
-<div id="client-profile-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:520px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 Profil Client</div>
-        <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px" id="client-profile-name">—</div>
-      </div>
-      <button onclick="closeClientProfileModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="client-profile-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- BON RETUR MODAL -->
-<div id="bon-retur-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:400px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase;margin-bottom:20px">🔄 Bon de Retur</div>
-    <input id="retur-client" placeholder="Nume client" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
-    <select id="retur-product" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;cursor:pointer;margin-bottom:10px"></select>
-    <input id="retur-qty" type="number" placeholder="Cantitate returnată" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:10px">
-    <input id="retur-reason" placeholder="Motiv retur" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 12px;outline:none;margin-bottom:16px">
-    <div style="display:flex;gap:10px">
-      <button onclick="closeBonReturModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="doRetur()" style="flex:2;background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">GENEREAZĂ BON →</button>
-    </div>
-  </div>
-</div>
-
-<!-- GLOBAL STOCK MODAL -->
-<div id="global-stock-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:900px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Global — Toate Depozitele</div>
-      <button onclick="closeGlobalStockModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="global-stock-content"></div>
-  </div>
-</div>
-
-<!-- COMPARAȚIE DEPOZITE MODAL -->
-<div id="comparatie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Comparație Depozite</div>
-      <button onclick="closeComparatieDep()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="comparatie-content"></div>
-  </div>
-</div>
-
-<!-- CONSOLIDAT MODAL -->
-<div id="consolidat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔢 Stoc Consolidat Global</div>
-      <button onclick="closeConsolidatModal()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="consolidat-content" style="max-height:500px;overflow-y:auto"></div>
-  </div>
-</div>
-
-
-<!-- PREDICTIONS MODAL -->
-<div id="predictions-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Predicție Epuizare</div>
-      <button onclick="document.getElementById('predictions-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="predictions-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- HEATMAP MODAL -->
-<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
-      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="heatmap-content"></div>
-  </div>
-</div>
-
-<!-- ANOMALIES MODAL -->
-<div id="anomalies-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🤖 Anomalii AI</div>
-      <button onclick="document.getElementById('anomalies-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="anomalies-content"></div>
-  </div>
-</div>
-
-<!-- CHATBOT MODAL -->
-<div id="chatbot-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🤖 StocVoce AI</div>
-      <button onclick="document.getElementById('chatbot-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="chat-response" style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:14px;min-height:100px;flex:1;overflow-y:auto;font-size:13px;color:#6b7a8d">Întreabă-mă orice despre stocul tău...</div>
-    <div style="display:flex;gap:8px;flex-shrink:0">
-      <input id="chat-input" placeholder="ex: Câte șuruburi avem? Ce produse expiră?" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px 12px;outline:none" onkeydown="if(event.key==='Enter'){askStocVoceBot(this.value);this.value=''}">
-      <button onclick="askStocVoceBot(document.getElementById('chat-input').value);document.getElementById('chat-input').value=''" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">ASK</button>
-    </div>
-  </div>
-</div>
-
-<!-- WAREHOUSE MAP MODAL -->
-<div id="warehouse-map-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px;overflow-y:auto">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:700px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🗺️ Hartă Depozit</div>
-      <button onclick="closeWarehouseMap()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="warehouse-map-content"></div>
-  </div>
-</div>
-
-<!-- INVOICE IMPORT MODAL -->
-<div id="invoice-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:420px;width:90%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase;margin-bottom:20px">📄 Import Factură PDF</div>
-    <div onclick="document.getElementById('invoice-file').click()" style="border:2px dashed #1e2530;border-radius:12px;padding:32px;text-align:center;cursor:pointer;margin-bottom:16px" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='#1e2530'">
-      <div style="font-size:36px;margin-bottom:10px">📄</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:#99a8b8;font-weight:700">Selectează factura PDF</div>
-      <div style="font-size:12px;color:#6b7a8d;margin-top:6px">AI extrage automat produsele</div>
-      <input type="file" id="invoice-file" accept=".pdf" style="display:none" onchange="importFromInvoicePDF(this.files[0]);document.getElementById('invoice-modal').style.display='none'">
-    </div>
-    <button onclick="document.getElementById('invoice-modal').style.display='none'" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-  </div>
-</div>
-
-<!-- CLIENT SEGMENTS MODAL -->
-<div id="segments-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👥 Segmente Clienți</div>
-      <button onclick="document.getElementById('segments-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="segments-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- CATEGORY PIE MODAL -->
-<div id="category-pie-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
-      <button onclick="document.getElementById('category-pie-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="category-pie-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- PROFIT MODAL -->
-<div id="profit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:580px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💰 Raport Profit</div>
-      <button onclick="document.getElementById('profit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="profit-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- PRODUCT ZOOM MODAL -->
-<div id="product-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 16px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="zoom-title">Produs</div>
-      <button onclick="closeZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:14px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="zoom-content" style="overflow-y:auto;padding:20px;flex:1"></div>
-  </div>
-</div>
-
-<!-- SUPPLIER REPORT MODAL -->
-<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🏭 Raport Furnizori</div>
-      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- STAGNANT FULL MODAL -->
-<div id="stagnant-full-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:540px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Produse Stagnante</div>
-      <button onclick="document.getElementById('stagnant-full-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="stagnant-full-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- SORT TOOLBAR -->
-<div id="sort-bar" style="display:none;gap:4px;flex-wrap:wrap;padding:6px 0">
-  <span style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;padding:4px">↕️ SORTARE:</span>
-  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Nume</button>
-  <button onclick="sortStock('qty')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Cantitate</button>
-  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Categorie</button>
-  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Locație</button>
-  <button onclick="sortStock('price_buy')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:11px;padding:4px 8px;cursor:pointer">Preț</button>
-  <button onclick="sortField=null;renderStock()" style="background:#181d24;border:1px solid #ff4757;border-radius:5px;color:#ff4757;font-size:11px;padding:4px 8px;cursor:pointer">✕ Reset</button>
-</div>
-
-
-<!-- CARD ZOOM MODAL -->
-<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
-      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- SUPPLIER REPORT MODAL -->
-<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
-      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- NO MOVEMENT MODAL -->
-<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
-      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-
-<!-- TEXT IMPORT MODAL -->
-<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
-    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
-    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
-    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI ORDER MODAL -->
-<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
-      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- TEXT IMPORT MODAL -->
-<div id="text-import-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase;margin-bottom:8px">📋 Import din Text</div>
-    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px">Format: Nume, Cantitate, UM, Locatie (un produs per linie)</div>
-    <div style="font-size:11px;color:#6b7a8d;margin-bottom:12px;background:#181d24;border-radius:6px;padding:8px;font-family:'JetBrains Mono',monospace">Exemplu:<br>Suruburi M6, 100, buc, A1<br>Ciment, 50, saci, B2<br>Paleți, 20, buc</div>
-    <textarea id="text-import-input" placeholder="Lipeste lista de produse aici..." style="width:100%;height:150px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-family:'JetBrains Mono',monospace;font-size:12px;padding:10px;outline:none;resize:vertical;margin-bottom:12px"></textarea>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
-      <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">📥 IMPORTĂ →</button>
-    </div>
-  </div>
-</div>
-
-<!-- AI ORDER MODAL -->
-<div id="ai-order-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Sugestie Comandă AI</div>
-      <button onclick="document.getElementById('ai-order-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="ai-order-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
 
 </body></html>';
   
@@ -9803,6 +7879,229 @@ function installApp() {
   printWindow.document.close();
 }
   printWindow.document.close();
+}
+
+
+<!-- TRANSIT MODAL -->
+<div id="transit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🚛 Stoc în Tranzit</div>
+      <button onclick="document.getElementById('transit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="transit-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- INVENTAR ADJUST MODAL -->
+<div id="inventar-adjust-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚖️ Ajustare Inventar</div>
+      <button onclick="document.getElementById('inventar-adjust-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:12px;flex-shrink:0">Introdu cantitatea fizică. Diferența se va aplica automat.</div>
+    <div id="inventar-adjust-content" style="overflow-y:auto;flex:1"></div>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-shrink:0">
+      <button onclick="document.getElementById('inventar-adjust-modal').style.display='none'" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="applyInventarAdjust()" style="flex:2;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">✅ APLICĂ AJUSTĂRILE</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS MODAL -->
+<div id="top-clients-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Clienți Luna Asta</div>
+      <button onclick="document.getElementById('top-clients-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- LOCATION MOVEMENTS MODAL -->
+<div id="location-movements-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Mișcări per Locație</div>
+      <button onclick="document.getElementById('location-movements-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="location-movements-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CHART 3 MONTHS MODAL -->
+<div id="chart-3months-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:600px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Evoluție 3 Luni</div>
+      <button onclick="document.getElementById('chart-3months-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <canvas id="chart-3months" height="250"></canvas>
+  </div>
+</div>
+
+<!-- AI STOCKOUT MODAL -->
+<div id="ai-stockout-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🤖 Predicție Ruptură Stoc</div>
+      <button onclick="document.getElementById('ai-stockout-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-stockout-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- ADJUST INVENTAR MODAL -->
+<div id="adjust-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase;margin-bottom:4px">⚖️ Ajustare Inventar</div>
+    <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:4px" id="adjust-product-name">—</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:16px">Stoc actual: <span id="adjust-current-qty" style="color:#00e5a0;font-weight:700">—</span></div>
+    <input type="hidden" id="adjust-product-id">
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#6b7a8d;display:block;margin-bottom:4px">Cantitate reală (după numărătoare)</label>
+      <input id="adjust-new-qty" type="number" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:16px;padding:10px;outline:none">
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:#6b7a8d;display:block;margin-bottom:4px">Motiv ajustare</label>
+      <input id="adjust-reason" placeholder="ex: Inventar fizic, Pierdere, Deteriorare..." style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeAdjustModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doAdjustInventar()" style="flex:2;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSIT STOCK MODAL -->
+<div id="transit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🚛 Stoc în Tranzit</div>
+      <button onclick="document.getElementById('transit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px;flex-shrink:0">
+      <input id="transit-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-supplier" placeholder="Furnizor" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-eta" placeholder="ETA (zile)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+    </div>
+    <button onclick="addTransitStock(document.getElementById('transit-product').value,parseInt(document.getElementById('transit-qty').value)||0,'buc',document.getElementById('transit-supplier').value,document.getElementById('transit-eta').value)" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer;margin-bottom:12px;flex-shrink:0">+ ADAUGĂ TRANZIT</button>
+    <div id="transit-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS MODAL -->
+<div id="top-clients-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Clienți Luna Aceasta</div>
+      <button onclick="document.getElementById('top-clients-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI PREDICT MODAL -->
+<div id="ai-predict-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Predicție Ruptură Stoc AI</div>
+      <button onclick="document.getElementById('ai-predict-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-predict-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CHART 3 MONTHS MODAL -->
+<div id="chart3m-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Grafic 3 Luni</div>
+      <button onclick="document.getElementById('chart3m-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="chart3m-content"></div>
+  </div>
+</div>
+
+<!-- ADJUST INVENTAR MODAL -->
+<div id="adjust-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:400px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase;margin-bottom:4px">⚖️ Ajustare Inventar</div>
+    <div style="font-size:14px;color:#e8ecf0;font-weight:600;margin-bottom:4px" id="adjust-product-name">—</div>
+    <div style="font-size:12px;color:#6b7a8d;margin-bottom:16px">Stoc actual: <span id="adjust-current-qty" style="color:#00e5a0;font-weight:700">—</span></div>
+    <input type="hidden" id="adjust-product-id">
+    <div style="margin-bottom:10px">
+      <label style="font-size:12px;color:#6b7a8d;display:block;margin-bottom:4px">Cantitate reală (după numărătoare)</label>
+      <input id="adjust-new-qty" type="number" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:16px;padding:10px;outline:none">
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:#6b7a8d;display:block;margin-bottom:4px">Motiv ajustare</label>
+      <input id="adjust-reason" placeholder="ex: Inventar fizic, Pierdere, Deteriorare..." style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeAdjustModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
+      <button onclick="doAdjustInventar()" style="flex:2;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSIT STOCK MODAL -->
+<div id="transit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🚛 Stoc în Tranzit</div>
+      <button onclick="document.getElementById('transit-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px;flex-shrink:0">
+      <input id="transit-product" placeholder="Produs" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-qty" type="number" placeholder="Cant." style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-supplier" placeholder="Furnizor" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+      <input id="transit-eta" placeholder="ETA (zile)" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:7px;outline:none">
+    </div>
+    <button onclick="addTransitStock(document.getElementById('transit-product').value,parseInt(document.getElementById('transit-qty').value)||0,'buc',document.getElementById('transit-supplier').value,document.getElementById('transit-eta').value)" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer;margin-bottom:12px;flex-shrink:0">+ ADAUGĂ TRANZIT</button>
+    <div id="transit-list" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS MODAL -->
+<div id="top-clients-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Clienți Luna Aceasta</div>
+      <button onclick="document.getElementById('top-clients-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI PREDICT MODAL -->
+<div id="ai-predict-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%;max-height:85vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🔮 Predicție Ruptură Stoc AI</div>
+      <button onclick="document.getElementById('ai-predict-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-predict-content" style="overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CHART 3 MONTHS MODAL -->
+<div id="chart3m-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📊 Grafic 3 Luni</div>
+      <button onclick="document.getElementById('chart3m-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
+    </div>
+    <div id="chart3m-content"></div>
+  </div>
+</div>
+
+</body></html>';
+  printWindow.document.write(html);
 }
 
 </body>
