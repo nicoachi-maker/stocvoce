@@ -5600,50 +5600,57 @@ function handleVoiceQuery(text) {
 function handleMultiProductCommand(text, opType) {
   const norm = normalizeText(text.toLowerCase());
   
-  // Check connector words (si/și/and/plus/cu)
+  // Check connector words
   const connectors = ['si', 'si', 'and', 'plus', 'cu', 'et', 'und'];
-  const hasConnector = connectors.some(c => {
-    const nc = normalizeText(c);
-    return norm.includes(' ' + nc + ' ');
-  });
+  const hasConnector = connectors.some(c => norm.includes(' ' + normalizeText(c) + ' '));
   if (!hasConnector) return false;
   
-  // Split by connector words - use normalized text for splitting
+  // Split by connector words
   const splitRegex = /\s+(?:si|și|and|plus|cu|et|und)\s+/i;
   const parts = text.split(splitRegex).filter(p => p.trim().length > 1);
   if (parts.length < 2) return false;
   
-  // For each part, find quantity and product
-  // The first part might have the action verb - that's OK, parseQuantity and findProduct handle it
+  // IN keywords
+  const inKW = ['adauga','adaugă','pune','baga','bagă','add','intrare','in','plus',
+                 'receptie','recepție','stoc','primit','sosit'];
+  // OUT keywords  
+  const outKW = ['scoate','scade','scot','ia','iau','minus','out','ieșire','iesire',
+                 'livrat','consumat','dat','vandut','vândut','folosit','retras'];
+  
   const validParts = [];
-  parts.forEach((part, idx) => {
-    const partWords = part.trim().split(/\s+/);
-    const qty = parseQuantity(normalizeText(part.toLowerCase()));
-    const product = findProduct(partWords);
+  
+  parts.forEach(part => {
+    const partNorm = normalizeText(part.toLowerCase());
+    
+    // Detect op type for THIS part
+    let partOp = opType; // default to overall opType
+    if (inKW.some(k => partNorm.includes(normalizeText(k)))) partOp = 'in';
+    if (outKW.some(k => partNorm.includes(normalizeText(k)))) partOp = 'out';
+    
+    const qty = parseQuantity(partNorm);
+    const product = findProduct(part.trim().split(/\s+/));
     
     if (product) {
-      // If no qty found, default to 1
       const finalQty = qty && qty > 0 ? qty : 1;
-      validParts.push({ part: part.trim(), qty: finalQty, product });
+      validParts.push({ part: part.trim(), qty: finalQty, product, op: partOp });
     }
   });
   
-  // Need at least 2 products found
   if (validParts.length < 2) return false;
   
   let processed = 0;
-  const names = [];
+  const results = [];
   
-  validParts.forEach(({ part, qty, product }) => {
+  validParts.forEach(({ part, qty, product, op }) => {
     const oldQty = product.qty;
-    if (opType === 'in') product.qty += qty;
+    if (op === 'in') product.qty += qty;
     else product.qty = Math.max(0, product.qty - qty);
     
-    addLog(part, `${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, opType);
-    names.push(`${product.name} (${qty} ${product.unit})`);
+    const opLabel = op === 'in' ? 'IN' : 'OUT';
+    addLog(part, `${opLabel} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, op);
+    results.push(`${op==='in'?'➕':'➖'} ${product.name}: ${qty} ${product.unit}`);
     processed++;
     
-    // Alerts
     if (product.qty === 0) {
       setTimeout(() => triggerAlert(`🔴 EPUIZAT: ${product.name}`, 'zero'), 300 * processed);
     } else if (product.qty <= product.min) {
@@ -5655,9 +5662,10 @@ function handleMultiProductCommand(text, opType) {
     saveStockToFirebase();
     renderStock();
     updateStats();
-    const summary = names.join(', ');
-    speak(`${processed} produse actualizate: ${names.map(n=>n.split('(')[0].trim()).join(', ')}.`);
-    setFeedback(`✅ ${processed} produse: ${summary}`, 'ok');
+    const summary = results.join(', ');
+    const names = validParts.map(v => (v.op==='in'?'adăugat':'scos') + ' ' + v.qty + ' ' + v.product.unit + ' de ' + v.product.name);
+    speak(names.join(' și ') + '.');
+    setFeedback('✅ ' + processed + ' produse: ' + summary, 'ok');
     return true;
   }
   return false;
