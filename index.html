@@ -1312,7 +1312,11 @@ function renderStock(){
     const pct=Math.min(100,Math.round((p.qty/(p.maxQty||Math.max(p.qty*2,100)))*100));
     const isLow=p.qty<=p.min,isZero=p.qty===0;
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
-    return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">\n      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">\n        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>\n        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>\n        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
+    return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
+      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
+        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
+        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
+        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
       </div>
       <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
       ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px">` : ''}
@@ -1326,7 +1330,11 @@ function renderStock(){
         <button onclick="openNotesModal(${p.id})" style="flex:1;background:none;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.background='rgba(167,139,250,0.1)'" onmouseout="this.style.background='none'">💬 NOTE</button>
         <button onclick="openHistoryModal(${p.id})" style="flex:1;background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">📋 ISTORIC</button>
       </div>
-    </div>`;\n  }).join('');\n\n  // Show action buttons on hover\n  document.querySelectorAll('.stock-card').forEach(card => {
+    </div>`;
+  }).join('');
+
+  // Show action buttons on hover
+  document.querySelectorAll('.stock-card').forEach(card => {
     card.addEventListener('mouseenter', () => {
       const actions = card.querySelector('.card-actions');
       if (actions) actions.style.opacity = '1';
@@ -1393,14 +1401,22 @@ function loadAllUsers() {
             <button onclick="rejectUser('${u.uid}', '${u.name}')" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 18px;cursor:pointer">❌ REFUZĂ</button>
           </div>
         </div>
-      `).join('');\n    }\n\n    // Approved\n    if (approved.length === 0) {
+      `).join('');
+    }
+
+    // Approved
+    if (approved.length === 0) {
       document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator aprobat.</div>';
     } else {
       document.getElementById('approved-users').innerHTML = approved.map(u => `\n        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#181d24;border-radius:10px;margin-bottom:8px;border:1px solid #1e2530">\n          <div>\n            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name}</div>\n            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email} · 🏭 ${u.depot}</div>
           </div>
           <button onclick="revokeUser('${u.uid}', '${u.name}')" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 12px;cursor:pointer">REVOCĂ</button>
         </div>
-      `).join('');\n    }\n  });\n}\n
+      `).join('');
+    }
+  });
+}
+
 async function approveUser(uid, name) {
   await db.ref('users/' + uid + '/status').set('approved');
   console.log('Approved:', name);
@@ -2071,7 +2087,11 @@ async function loadDashboardData() {
           <div style="height:100%;width:${s.pct}%;background:${s.color};border-radius:4px;transition:width .6s ease"></div>
         </div>
       </div>
-    `).join('');\n\n    // All depots cards\n    document.getElementById('all-depots').innerHTML = depotStats.length === 0 \n      ? '<div style="color:#6b7a8d;font-size:13px">Niciun depozit înregistrat.</div>'
+    `).join('');
+
+    // All depots cards
+    document.getElementById('all-depots').innerHTML = depotStats.length === 0 
+      ? '<div style="color:#6b7a8d;font-size:13px">Niciun depozit înregistrat.</div>'
       : depotStats.map(d => `\n        <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:18px;border-left:3px solid ${d.zero>0?'#ff4757':d.low>0?'#ffa502':'#00e5a0'}">\n          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:12px">${d.name}</div>\n          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">\n            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
               <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${d.total}</div>
               <div style="font-size:10px;color:#6b7a8d">PRODUSE</div>
@@ -2094,7 +2114,11 @@ async function loadDashboardData() {
             ${d.stock.length > 8 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px 0">... și încă ${d.stock.length-8} produse</div>` : ''}
           </div>
         </div>
-      `).join('');\n\n    // Load all clients from all depots\n    const allClientsEl = document.getElementById('dash-clients-list');\n    let allDashClients = [];
+      `).join('');
+
+    // Load all clients from all depots
+    const allClientsEl = document.getElementById('dash-clients-list');
+    let allDashClients = [];
     for (const key of depotKeys) {
       const depotSnap = await db.ref('depozite/' + key + '/clients').once('value');
       const depotClients = depotSnap.val();
@@ -2224,7 +2248,17 @@ function renderDashUsers(filter) {
     if (u.status === 'pending') {
       actionBtns = `\n        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:#00e5a0;border:none;border-radius:6px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">\n          ✅ APROBĂ\n        </button>\n        <button onclick="dashReject('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:#ff4757;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">\n          ❌ REFUZĂ\n        </button>`;
     } else if (u.status === 'approved') {
-      actionBtns = `\n        <button onclick="dashRevoke('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:none;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">\n          REVOCĂ\n        </button>`;\n    } else {\n      actionBtns = `\n        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:none;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">\n          REACTIVEAZĂ\n        </button>`;
+      actionBtns = `
+        <button onclick="dashRevoke('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:none;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">
+          REVOCĂ
+        </button>`;
+    } else {
+      actionBtns = `
+        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
+          style="background:none;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">
+          REACTIVEAZĂ
+        </button>`;
     }
 
     return `\n      <div style="background:#111418;border:1px solid ${statusColor}33;border-radius:12px;padding:16px;border-left:3px solid ${statusColor}">\n        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">\n          <div style="width:42px;height:42px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>\n          <div style="flex:1;min-width:0">
@@ -2237,7 +2271,11 @@ function renderDashUsers(filter) {
         <div style="display:flex;gap:8px;justify-content:flex-end">
           ${actionBtns}
         </div>
-      </div>`;\n  }).join('');\n}\n\nasync function dashApprove(uid, name) {
+      </div>`;
+  }).join('');
+}
+
+async function dashApprove(uid, name) {
   await db.ref('users/' + uid + '/status').set('approved');
   // Update local data
   const u = (window.dashUsers||[]).find(u => u.uid === uid);
@@ -2322,11 +2360,19 @@ function openHistoryModal(productId) {
     <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#a78bfa">${productLog.length}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">TOTAL OPS</div>
-    </div>`;\n\n  // List\n  if (productLog.length === 0) {\n    document.getElementById('history-list').innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:20px;text-align:center">Nicio operație înregistrată pentru acest produs.</div>';
+    </div>`;
+
+  // List
+  if (productLog.length === 0) {
+    document.getElementById('history-list').innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:20px;text-align:center">Nicio operație înregistrată pentru acest produs.</div>';
   } else {
     document.getElementById('history-list').innerHTML = productLog.map(e => `\n      <div style="padding:10px;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:10px">\n        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b7a8d;flex-shrink:0">${e.time||'—'}</span>\n        <span class="log-badge ${e.type}" style="flex-shrink:0">${e.type==='in'?'IN':'OUT'}</span>\n        <span style="font-size:12px;color:#99a8b8;flex:1">${e.result||e.cmd||'—'}</span>
         <span style="font-size:11px;color:#6b7a8d;flex-shrink:0">${e.user||'—'}</span>
-      </div>`).join('');\n  }\n\n  document.getElementById('history-modal').style.display = 'flex';\n}
+      </div>`).join('');
+  }
+
+  document.getElementById('history-modal').style.display = 'flex';
+}
 
 function closeHistoryModal() {
   document.getElementById('history-modal').style.display = 'none';
@@ -2693,25 +2739,25 @@ async function sendDailyReport() {
   const zeroItems = stock.filter(p => p.qty === 0);
   const okItems = total - lowItems.length - zeroItems.length;
 
-  let msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n;
-  msg += `🏭 <b>${depot}</b>\n\n;
-  msg += `✅ Stoc OK: <b>${okItems}</b> produse\n;
-  msg += `⚠️ Stoc scăzut: <b>${lowItems.length}</b> produse\n;
-  msg += `🔴 Epuizat: <b>${zeroItems.length}</b> produse\n;
-  msg += `📦 Total: <b>${total}</b> produse\n;
+  let msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n`;
+  msg += `🏭 <b>${depot}</b>`;
+  msg += `✅ Stoc OK: <b>${okItems}</b> produse\n`;
+  msg += `⚠️ Stoc scăzut: <b>${lowItems.length}</b> produse\n`;
+  msg += `🔴 Epuizat: <b>${zeroItems.length}</b> produse\n`;
+  msg += `📦 Total: <b>${total}</b> produse\n`;
 
   if (lowItems.length > 0) {
-    msg += `\n⚠️ <b>STOCURI SCĂZUTE:</b>\n;
+    msg += `\n⚠️ <b>STOCURI SCĂZUTE:</b>\n`;
     lowItems.slice(0,5).forEach(p => {
-      msg += `• ${p.name}: ${p.qty} ${p.unit} (min: ${p.min})\n;
+      msg += `• ${p.name}: ${p.qty} ${p.unit} (min: ${p.min})\n`;
     });
-    if (lowItems.length > 5) msg += `... și încă ${lowItems.length-5} produse\n;
+    if (lowItems.length > 5) msg += `... și încă ${lowItems.length-5} produse\n`;
   }
 
   if (zeroItems.length > 0) {
-    msg += `\n🔴 <b>EPUIZATE:</b>\n;
+    msg += `\n🔴 <b>EPUIZATE:</b>\n`;
     zeroItems.slice(0,5).forEach(p => {
-      msg += `• ${p.name}\n;
+      msg += `• ${p.name}\n`;
     });
   }
 
@@ -2770,7 +2816,11 @@ function renderNotes(product) {
   el.innerHTML = [...notes].reverse().map((n, i) => `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid #a78bfa;position:relative">\n      <div style="font-size:13px;color:#e8ecf0;margin-bottom:8px;line-height:1.5">${n.text}</div>\n      <div style="display:flex;justify-content:space-between;align-items:center">\n        <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">👤 ${n.user} · ${n.time}</div>
         ${n.user === (userProfile?userProfile.name:'') ? `<button onclick="deleteNote(${notes.length-1-i})" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:14px;padding:0 4px" title="Șterge">🗑️</button>` : ''}
       </div>
-    </div>`).join('');\n}\n\nfunction addNote() {\n  const text = document.getElementById('new-note-text').value.trim();
+    </div>`).join('');
+}
+
+function addNote() {
+  const text = document.getElementById('new-note-text').value.trim();
   if (!text) return;
   
   const p = stock.find(s => s.id === currentNotesProductId);
@@ -2960,7 +3010,11 @@ function updateChart() {
     <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#a78bfa">${maxQty}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MAXIM</div>
-    </div>`;\n\n  // Draw chart\n  const ctx = document.getElementById('stock-chart').getContext('2d');\n  if (stockChart) stockChart.destroy();
+    </div>`;
+
+  // Draw chart
+  const ctx = document.getElementById('stock-chart').getContext('2d');
+  if (stockChart) stockChart.destroy();
   
   const isLow = p.qty <= p.min;
   const color = p.qty === 0 ? '#ff4757' : isLow ? '#ffa502' : '#00e5a0';
@@ -3047,7 +3101,11 @@ Răspunde în maxim 3 propoziții cu:
 2. Cantitatea recomandată pentru reaprovizionare
 3. Frecvența recomandată de comandă
 
-Fii concis și specific.`\n        }]\n      })\n    });\n
+Fii concis și specific.`
+        }]
+      })
+    });
+
     const data = await response.json();
     const prediction = data.content[0].text;
     predEl.innerHTML = `<strong style="color:#a78bfa">🤖 Predicție AI:</strong><br><br>${prediction}`;
@@ -3091,7 +3149,11 @@ function renderDeliveries() {
         <span style="background:rgba(0,0,0,0.3);border:1px solid ${statusColor};border-radius:6px;padding:2px 8px;font-size:10px;color:${statusColor};font-family:'JetBrains Mono',monospace;flex-shrink:0">${statusText}</span>
       </div>
       ${d.status!=='received'?`<button onclick="markDeliveryReceived(${i})" style="width:100%;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',monospace;font-size:12px;padding:5px;cursor:pointer;letter-spacing:1px">✅ MARCHEAZĂ RECEPȚIONAT</button>`:''}
-    </div>`;\n  }).join('');\n}\n\nfunction addDelivery() {
+    </div>`;
+  }).join('');
+}
+
+function addDelivery() {
   const product = document.getElementById('del-product').value.trim();
   const qty = document.getElementById('del-qty').value;
   const supplier = document.getElementById('del-supplier').value.trim();
@@ -3150,7 +3212,11 @@ function renderClients() {
     return;
   }
   el.innerHTML = [...clients].reverse().map(c => `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #a78bfa">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${c.name}</div>\n      <div style="font-size:12px;color:#6b7a8d;margin-top:2px">📞 ${c.contact||'—'} · 📦 ${c.product}: ${c.qty} unități</div>\n      <div style="font-size:11px;color:#6b7a8d;margin-top:2px">🕐 ${c.time} · 👤 ${c.user||'—'}</div>
-    </div>`).join('');\n}\n\nfunction addClient() {\n  const name = document.getElementById('cli-name').value.trim();
+    </div>`).join('');
+}
+
+function addClient() {
+  const name = document.getElementById('cli-name').value.trim();
   const contact = document.getElementById('cli-contact').value.trim();
   const product = document.getElementById('cli-product').value.trim();
   const qty = document.getElementById('cli-qty').value;
@@ -3196,7 +3262,11 @@ function openInventarModal() {
         style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:7px;outline:none;text-align:center">
       <div id="inv-diff-${p.id}" style="font-size:12px;width:60px;text-align:right">—</div>
     </div>
-  `).join('');\n  document.getElementById('inventar-modal').style.display = 'flex';\n}\n\nfunction checkInventarDiff(id, systemQty) {
+  `).join('');
+  document.getElementById('inventar-modal').style.display = 'flex';
+}
+
+function checkInventarDiff(id, systemQty) {
   const input = document.getElementById('inv-'+id);
   const diffEl = document.getElementById('inv-diff-'+id);
   const row = document.getElementById('inv-row-'+id);
@@ -3254,7 +3324,11 @@ function openComandaModal() {
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#00e5a0">${needed}</div>
           <div style="font-size:10px;color:#6b7a8d">${p.unit} de comandat</div>
         </div>
-      </div>`;\n    }).join('');\n  }\n  document.getElementById('comanda-modal').style.display = 'flex';\n}
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('comanda-modal').style.display = 'flex';
+}
 
 function closeComandaModal() { document.getElementById('comanda-modal').style.display='none'; }
 
@@ -3344,7 +3418,11 @@ function renderRezervari() {
         </div>
         <button onclick="completeRezervare(${i})" style="background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px 10px;cursor:pointer;flex-shrink:0">✅ RIDICĂ</button>
       </div>
-    </div>`;\n  }).join('');\n}\n\nfunction addRezervare() {
+    </div>`;
+  }).join('');
+}
+
+function addRezervare() {
   const client = document.getElementById('rez-client').value.trim();
   const productId = parseInt(document.getElementById('rez-product').value);
   const qty = parseInt(document.getElementById('rez-qty').value);
@@ -3411,7 +3489,11 @@ function renderEticheteGrid(products) {
   const grid = document.getElementById('etichete-grid');
   grid.innerHTML = products.map(p => `\n    <div onclick="toggleEticheta(${p.id})" id="eticheta-card-${p.id}" \n      style="background:#181d24;border:2px solid ${selectedEtichete.has(p.id)?'#00e5a0':'#1e2530'};border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;text-align:center">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;margin-bottom:4px;line-height:1.2">${p.name}</div>\n      <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px">📍 ${p.loc||'—'}</div>
       ${selectedEtichete.has(p.id)?'<div style="color:#00e5a0;font-size:18px">✅</div>':'<div style="color:#1e2530;font-size:18px">○</div>'}
-    </div>`).join('');\n}\n\nfunction toggleEticheta(id) {\n  if (selectedEtichete.has(id)) selectedEtichete.delete(id);
+    </div>`).join('');
+}
+
+function toggleEticheta(id) {
+  if (selectedEtichete.has(id)) selectedEtichete.delete(id);
   else selectedEtichete.add(id);
   filterEtichete();
 }
@@ -3428,7 +3510,10 @@ function printEtichete() {
     return `\n    <div class="eticheta">\n      <div class="eticheta-name">${p.name}</div>\n      <div class="eticheta-info">${p.sku ? p.sku + ' · ' : ''}📍 ${p.loc||'—'}</div>\n      <div class="eticheta-depot">${depot}</div>
       <div id="qr-${p.id}" class="qr-container"></div>
       <div class="eticheta-min">Min: ${p.min} ${p.unit}</div>
-    </div>`;\n  }).join('');\n\n  printWindow.document.write(`
+    </div>`;
+  }).join('');
+
+  printWindow.document.write(`
     <!DOCTYPE html><html><head>
     <title>Etichete QR - ${depot}</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -3790,7 +3875,11 @@ function printEtichete() {
   </div>
 </div>
 
-</body></html>`);\n  printWindow.document.close();\n  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');\n}\n
+</body></html>`);
+  printWindow.document.close();
+  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
+}
+
 
 // ── MULTI-LANGUAGE (toate limbile UE) ──
 const LANGUAGES = {
@@ -4320,7 +4409,11 @@ function renderCalendar(year, month) {
       title="${dayDeliveries.length?dayDeliveries.map(d=>d.product).join(', '):''}">
       <div style="font-size:12px;font-weight:600;color:${isToday?'#00e5a0':'#e8ecf0'};margin-bottom:2px">${day}</div>
       ${dayDeliveries.map(d=>`<div style="font-size:9px;background:${d.status==='received'?'rgba(0,229,160,0.2)':'rgba(255,165,2,0.2)'};border-radius:3px;padding:1px 3px;margin-bottom:1px;color:${d.status==='received'?'#00e5a0':'#ffa502'};overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${d.product}</div>`).join('')}
-    </div>`;\n  }\n  html += '</div>';\n  if (el) el.innerHTML = html;\n}
+    </div>`;
+  }
+  html += '</div>';
+  if (el) el.innerHTML = html;
+}
 
 function showDayDeliveries(dateStr) {
   const dayDels = deliveries.filter(d => d.date === dateStr);
@@ -4617,7 +4710,11 @@ function renderCategoriesModal() {
   el.innerHTML = allCats.map(cat => `\n    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px">\n      <input type="color" value="${savedColors[cat]||'#00e5a0'}" \n        onchange="setCatColor('${cat}', this.value)"\n        style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;background:none">
       <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${cat}</span>
       <span style="font-size:12px;color:#6b7a8d">${stock.filter(p=>p.cat===cat).length} produse</span>
-    </div>`).join('');\n}\n\nfunction setCatColor(cat, color) {\n  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
+    </div>`).join('');
+}
+
+function setCatColor(cat, color) {
+  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
   colors[cat] = color;
   localStorage.setItem('sv_cat_colors', JSON.stringify(colors));
   renderStock();
@@ -4708,7 +4805,11 @@ function showStagnant(days) {
     el.innerHTML = stagnant.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:12px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
         </div>
         <div style="font-size:12px;color:#ffa502">+${days} zile fără mișcare</div>
-      </div>`).join('');\n    document.getElementById('stagnant-modal').style.display = 'flex';\n  }\n}\n
+      </div>`).join('');
+    document.getElementById('stagnant-modal').style.display = 'flex';
+  }
+}
+
 // 9. RAPORT PER OPERATOR
 function showOperatorReport() {
   const operators = {};
@@ -4739,7 +4840,11 @@ function showOperatorReport() {
           <div style="font-size:10px;color:#6b7a8d">TOTAL</div>
         </div>
       </div>
-    </div>`).join('');\n\n  document.getElementById('operator-report-modal').style.display = 'flex';\n}\n
+    </div>`).join('');
+
+  document.getElementById('operator-report-modal').style.display = 'flex';
+}
+
 // 10. EXPORT EXCEL COMPLET
 function exportFullExcel() {
   try {
@@ -5239,7 +5344,11 @@ async function showConsolidatedStock() {
     el.innerHTML = sorted.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1e2530" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">\n        <div style="color:#e8ecf0;font-weight:600">${p.name}</div>\n        <div style="display:flex;align-items:center;gap:14px">\n          <div style="font-size:11px;color:#6b7a8d">${p.depots.length} depozite</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;color:#00e5a0">${p.total} <span style="font-size:11px">${p.unit}</span></div>
         </div>
-      </div>`).join('');\n\n    document.getElementById('consolidat-modal').style.display = 'flex';\n  } catch(e) {\n    console.error('Consolidare error:', e);
+      </div>`).join('');
+
+    document.getElementById('consolidat-modal').style.display = 'flex';
+  } catch(e) {
+    console.error('Consolidare error:', e);
   }
 }
 function closeConsolidatModal() { document.getElementById('consolidat-modal').style.display='none'; }
@@ -5624,7 +5733,11 @@ function showPredictions() {
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${p.pred.urgency==='critical'?'#ff4757':p.pred.urgency==='warn'?'#ffa502':'#00e5a0'}">${p.pred.days}z</div>
           <div style="font-size:10px;color:#6b7a8d">${p.pred.message}</div>
         </div>
-      </div>`).join('');\n\n  document.getElementById('predictions-modal').style.display = 'flex';\n}\n
+      </div>`).join('');
+
+  document.getElementById('predictions-modal').style.display = 'flex';
+}
+
 // 8. HEATMAP ACTIVITATE
 function generateHeatmap() {
   const hours = Array(24).fill(0);
@@ -5652,7 +5765,11 @@ function generateHeatmap() {
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
         ${dayNames.map((d, i) => `\n          <div style="text-align:center">\n            <div style="height:50px;background:rgba(0,229,160,${(days[i]/maxD).toFixed(2)});border-radius:6px;margin-bottom:4px" title="${days[i]} operații"></div>\n            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${d}</div>\n          </div>`).join('')}
       </div>
-    </div>`;\n\n  document.getElementById('heatmap-modal').style.display = 'flex';\n}\n
+    </div>`;
+
+  document.getElementById('heatmap-modal').style.display = 'flex';
+}
+
 // 9. EFICIENȚĂ OPERATOR
 function calcOperatorEfficiency() {
   const ops = {};
@@ -5743,11 +5860,17 @@ function renderWarehouseMap() {
   
   const sortedLocs = Object.entries(locations).sort(([a],[b]) => a.localeCompare(b));
   
-  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">\n      ${sortedLocs.map(([loc, products]) => {\n        const hasZero = products.some(p => p.qty === 0);\n        const hasLow = products.some(p => p.qty <= p.min && p.qty > 0);
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+      ${sortedLocs.map(([loc, products]) => {
+        const hasZero = products.some(p => p.qty === 0);
+        const hasLow = products.some(p => p.qty <= p.min && p.qty > 0);
         const color = hasZero ? '#ff4757' : hasLow ? '#ffa502' : '#00e5a0';
         return `\n          <div style="background:#181d24;border:2px solid ${color};border-radius:10px;padding:12px;cursor:pointer" onclick="filterByLocation('${loc}')" title="Click pentru filtrare">\n            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:${color};margin-bottom:6px">📍 ${loc}</div>\n            <div style="font-size:12px;color:#99a8b8">${products.length} produse</div>\n            ${products.slice(0,3).map(p => `<div style="font-size:10px;color:#6b7a8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>`).join('')}
             ${products.length > 3 ? `<div style="font-size:10px;color:#6b7a8d">+${products.length-3} mai multe</div>` : ''}
-          </div>`;\n      }).join('')}\n    </div>`;
+          </div>`;
+      }).join('')}
+    </div>`;
 }
 
 function filterByLocation(loc) {
@@ -6407,7 +6530,11 @@ function showClientSegments() {
           <div style="color:${c.color};font-weight:700;font-size:13px">${c.segment}</div>
           <button onclick="toggleFavoriteClient('${c.name.replace(/'/g,"&#39;")}')" style="margin-top:4px;background:none;border:1px solid #1e2530;border-radius:4px;color:#6b7a8d;font-size:11px;padding:2px 8px;cursor:pointer">⭐ FAV</button>\n          <button onclick="exportClientHistoryPDF('${c.name.replace(/'/g,"&#39;")}')" style="margin-top:4px;margin-left:4px;background:none;border:1px solid #1e2530;border-radius:4px;color:#6b7a8d;font-size:11px;padding:2px 8px;cursor:pointer">📄 PDF</button>
         </div>
-      </div>`).join('');\n  document.getElementById('segments-modal').style.display = 'flex';\n}\n\n
+      </div>`).join('');
+  document.getElementById('segments-modal').style.display = 'flex';
+}
+
+
 // ══════════════════════════════════════════
 // RUNDA 1: VOCE & AI (1-10)
 // ══════════════════════════════════════════
@@ -6678,12 +6805,12 @@ async function screenshotDashboard() {
   const val = calculateStockValue();
   const now = new Date().toLocaleString('ro-RO');
   
-  const msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n🏭 <b>${depot}</b>\n\n +
-    `💚 Sănătate: <b>${health}%</b>\n +
-    `📦 Total produse: <b>${stock.length}</b>\n +
-    `⚠️ Stoc scăzut: <b>${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}</b>\n +
-    `🔴 Epuizat: <b>${stock.filter(p=>p.qty===0).length}</b>\n +
-    `💰 Valoare stoc: <b>${val.totalBuy} RON</b>\n +
+  const msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n🏭 <b>${depot}</b>\n\n` +
+    `💚 Sănătate: <b>${health}%</b>\n` +
+    `📦 Total produse: <b>${stock.length}</b>\n` +
+    `⚠️ Stoc scăzut: <b>${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}</b>\n` +
+    `🔴 Epuizat: <b>${stock.filter(p=>p.qty===0).length}</b>\n` +
+    `💰 Valoare stoc: <b>${val.totalBuy} RON</b>\n` +
     `📈 Operații azi: <b>${log.filter(e=>e.time&&e.time.startsWith(new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}))).length}</b>`;
   
   if (userProfile && userProfile.telegram_id) {
@@ -6717,11 +6844,10 @@ function showMonthComparison() {
   
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  const msg = `📊 COMPARAȚIE LUNI\n\n +
-    `${months[thisMonth]} (curent): ${thisMonthLog.length} operații (IN:${thisIn}, OUT:${thisOut})\n +
-    `${months[lastMonth]} (precedent): ${lastMonthLog.length} operații (IN:${lastIn}, OUT:${lastOut})\n\n +
+  const msg = '📊 COMPARAȚIE LUNI\n\n' +
+    `${months[thisMonth]} (curent): ${thisMonthLog.length} operații (IN:${thisIn}, OUT:${thisOut})\n` +
+    `${months[lastMonth]} (precedent): ${lastMonthLog.length} operații (IN:${lastIn}, OUT:${lastOut})\n\n` +
     `Diferență: ${thisMonthLog.length > lastMonthLog.length ? '+' : ''}${thisMonthLog.length - lastMonthLog.length} operații`;
-  
   alert(msg);
 }
 
@@ -7064,12 +7190,11 @@ function showPLReport() {
   const profit = revenue - costs;
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  alert(`📊 P&L — ${months[now.getMonth()]} ${now.getFullYear()}\n\n +
-    `💰 Venituri: ${revenue.toFixed(2)} RON\n +
-    `📦 Costuri: ${costs.toFixed(2)} RON\n +
-    `${profit >= 0 ? '✅' : '❌'} Profit net: ${profit.toFixed(2)} RON\n\n +
+  alert(`📊 P&L — ${months[now.getMonth()]} ${now.getFullYear()}\n\n` +
+    `💰 Venituri: ${revenue.toFixed(2)} RON\n` +
+    `📦 Costuri: ${costs.toFixed(2)} RON\n` +
+    `${profit >= 0 ? '✅' : '❌'} Profit net: ${profit.toFixed(2)} RON\n\n` +
     `Marjă: ${revenue > 0 ? (profit/revenue*100).toFixed(1) : 0}%`);
-}
 
 // 46. OBIECTIVE STOC
 let stockGoals = JSON.parse(localStorage.getItem('sv_goals') || '[]');
@@ -7134,10 +7259,10 @@ function calcVATReport() {
   const now = new Date();
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  alert(`📋 RAPORT TVA — ${months[now.getMonth()]} ${now.getFullYear()}\n\n +
-    `TVA pe intrări (deductibil): ${vatIn.toFixed(2)} RON\n +
-    `TVA pe ieșiri (colectat): ${vatOut.toFixed(2)} RON\n +
-    `TVA de plată: ${Math.max(0, vatOut-vatIn).toFixed(2)} RON\n +
+  alert(`📋 RAPORT TVA — ${months[now.getMonth()]} ${now.getFullYear()}\n\n` +
+    `TVA pe intrări (deductibil): ${vatIn.toFixed(2)} RON\n` +
+    `TVA pe ieșiri (colectat): ${vatOut.toFixed(2)} RON\n` +
+    `TVA de plată: ${Math.max(0, vatOut-vatIn).toFixed(2)} RON\n` +
     `TVA de rambursat: ${Math.max(0, vatIn-vatOut).toFixed(2)} RON`);
 }
 
@@ -7187,25 +7312,38 @@ function openProductZoom(productId) {
   const pred = typeof predictStockDepletion === 'function' ? predictStockDepletion(p) : null;
   const el = document.getElementById('zoom-content');
   if (!el) return;
-  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">\n      ${[\n        ['Cantitate', `${p.qty} ${p.unit}`, '#00e5a0'],\n        ['Stoc Minim', `${p.min} ${p.unit}`, '#ffa502'],
-        ['Categorie', p.cat||'—', '#a78bfa'],
-        ['Locație', p.loc||'—', '#6b7a8d'],
-        ['SKU', p.sku||'—', '#6b7a8d'],
-        ['Furnizor', p.supplier||'—', '#6b7a8d'],
-        ['Preț Achiz.', p.price_buy ? p.price_buy+' RON' : '—', '#ffa502'],
-        ['Preț Vânz.', p.price_sell ? p.price_sell+' RON' : '—', '#00e5a0'],
-        ['Marjă', margin ? margin+'%' : '—', '#00e5a0'],
-        ['Epuizare', pred ? pred.message : '—', '#ff4757'],
-        ['Garanție', p.warranty ? p.warranty+' zile' : '—', '#6b7a8d'],
-        ['Expiră', p.expiry||'—', '#6b7a8d'],
-      ].map(([k,v,c]) => `\n        <div style="background:#181d24;border-radius:8px;padding:10px">\n          <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${k}</div>\n          <div style="font-size:14px;font-weight:700;color:${c}">${v}</div>\n        </div>`).join('')}
-    </div>
-    ${p.note_preview ? `<div style="background:#181d24;border-radius:8px;padding:12px;border-left:3px solid #a78bfa;font-size:13px;color:#99a8b8;margin-bottom:10px">💬 ${p.note_preview}</div>` : ''}
-    <div style="display:flex;gap:8px">
-      <button onclick="openEditModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
-      <button onclick="openNotesModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
-      <button onclick="openHistoryModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #6b7a8d;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">📋 ISTORIC</button>
-    </div>`;\n  document.getElementById('product-zoom-modal').style.display = 'flex';\n  document.getElementById('zoom-title').textContent = p.name;\n}\nfunction closeZoom() { document.getElementById('product-zoom-modal').style.display = 'none'; }
+
+  const rows = [
+    ['Cantitate', p.qty + ' ' + p.unit, '#00e5a0'],
+    ['Stoc Minim', p.min + ' ' + p.unit, '#ffa502'],
+    ['Categorie', p.cat || '—', '#a78bfa'],
+    ['Locație', p.loc || '—', '#6b7a8d'],
+    ['SKU', p.sku || '—', '#6b7a8d'],
+    ['Furnizor', p.supplier || '—', '#6b7a8d'],
+    ['Preț Achiz.', p.price_buy ? p.price_buy + ' RON' : '—', '#ffa502'],
+    ['Preț Vânz.', p.price_sell ? p.price_sell + ' RON' : '—', '#00e5a0'],
+    ['Marjă', margin ? margin + '%' : '—', '#00e5a0'],
+    ['Epuizare', pred ? pred.message : '—', '#ff4757'],
+    ['Garanție', p.warranty ? p.warranty + ' zile' : '—', '#6b7a8d'],
+    ['Expiră', p.expiry || '—', '#6b7a8d'],
+  ];
+
+  const rowsHTML = rows.map(([k,v,c]) => '<div style="background:#181d24;border-radius:8px;padding:10px">' +
+    '<div style="font-size:10px;color:#6b7a8d;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">' + k + '</div>' +
+    '<div style="font-size:14px;font-weight:700;color:' + c + '">' + v + '</div>' +
+    '</div>').join('');
+
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' + rowsHTML + '</div>' +
+    (p.note_preview ? '<div style="background:#181d24;border-radius:8px;padding:12px;border-left:3px solid #a78bfa;font-size:12px;color:#99a8b8;margin-bottom:12px">💬 ' + p.note_preview + '</div>' : '') +
+    '<div style="display:flex;gap:8px">' +
+    '<button onclick="openEditModal(' + p.id + ');closeZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>' +
+    '<button onclick="openNotesModal(' + p.id + ');closeZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>' +
+    '</div>';
+
+  document.getElementById('product-zoom-modal').style.display = 'flex';
+  document.getElementById('zoom-title').textContent = p.name;
+}
+function closeZoom() { document.getElementById('product-zoom-modal').style.display='none'; }
 
 // 4. FAVORIT PRODUSE
 let favProducts = JSON.parse(localStorage.getItem('sv_fav_products') || '[]');
@@ -7382,7 +7520,11 @@ function showStagnantReport() {
   el.innerHTML = result.map(r => `\n    <div style="margin-bottom:16px">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">\n        💤 ${r.days} ZILE FĂRĂ MIȘCARE (${r.count} produse)\n      </div>
       ${r.products.slice(0,5).map(p => `\n        <div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">\n          <span style="color:#99a8b8">${p.name}</span>\n          <span style="color:#6b7a8d;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>\n        </div>`).join('')}
       ${r.products.length > 5 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px">... și încă ${r.products.length-5}</div>` : ''}
-    </div>`).join('');\n\n  document.getElementById('stagnant-full-modal').style.display = 'flex';\n}\n
+    </div>`).join('');
+
+  document.getElementById('stagnant-full-modal').style.display = 'flex';
+}
+
 // 23. DASHBOARD PRINT FRIENDLY
 
 
@@ -7626,7 +7768,11 @@ function openCardZoom(productId) {
     <div style="display:flex;gap:8px">
       <button onclick="openEditModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
       <button onclick="openNotesModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
-    </div>`;\n\n  document.getElementById('card-zoom-name').textContent = p.name;\n  document.getElementById('card-zoom-modal').style.display = 'flex';\n}
+    </div>`;
+
+  document.getElementById('card-zoom-name').textContent = p.name;
+  document.getElementById('card-zoom-modal').style.display = 'flex';
+}
 function closeCardZoom() { document.getElementById('card-zoom-modal').style.display='none'; }
 
 // 5. FAVORITE PRODUSE
@@ -7710,11 +7856,11 @@ function sendWeeklyDigest() {
     return (today - d) <= 7 * 24 * 3600000;
   });
   
-  const msg = `📊 <b>DIGEST SĂPTĂMÂNAL</b>\n🏭 ${depot}\n\n +
-    `📦 Produse totale: ${stock.length}\n +
-    `📈 Operații săptămâna: ${weekLog.length}\n +
-    `⚠️ Stoc scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}\n +
-    `🔴 Epuizat: ${stock.filter(p=>p.qty===0).length}\n +
+  const msg = `📊 <b>DIGEST SĂPTĂMÂNAL</b>\n🏭 ${depot}\n\n` +
+    `📦 Produse totale: ${stock.length}\n` +
+    `📈 Operații săptămâna: ${weekLog.length}\n` +
+    `⚠️ Stoc scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}\n` +
+    `🔴 Epuizat: ${stock.filter(p=>p.qty===0).length}\n` +
     `💰 Valoare stoc: ${calculateStockValue().totalBuy} RON`;
   
   if (userProfile && userProfile.telegram_id) {
@@ -7819,7 +7965,11 @@ function showSupplierReport() {
         </div>
       </div>
       <div style="font-size:12px;color:#6b7a8d">${data.items.slice(0,3).join(', ')}${data.items.length>3?'...':''}</div>
-    </div>`).join('');\n\n  document.getElementById('supplier-report-modal').style.display = 'flex';\n}\n
+    </div>`).join('');
+
+  document.getElementById('supplier-report-modal').style.display = 'flex';
+}
+
 // 18. RAPORT LOCAȚII
 function showLocationReport() {
   const locs = {};
@@ -7835,7 +7985,7 @@ function showLocationReport() {
   
   let msg = '📍 RAPORT LOCAȚII\n\n';
   sorted.forEach(([loc, data]) => {
-    msg += `${loc}: ${data.products} produse, ${data.low} critice\n;
+    msg += `${loc}: ${data.products} produse, ${data.low} critice\n`;
   });
   alert(msg);
 }
@@ -7885,7 +8035,11 @@ function setupAutocomplete() {
     }
     
     ac.innerHTML = matches.map((p,idx) => `\n      <div onclick="selectAutocomplete(${idx})" \n        style="padding:10px 14px;cursor:pointer;font-size:13px;color:#e8ecf0;border-bottom:1px solid #1e2530"\n        onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='transparent'">\n        ${p.name} <span style="color:#6b7a8d;font-size:11px">(${p.qty} ${p.unit})</span>
-      </div>`).join('');\n    window._autocompleteMatches = matches;\n    ac.style.display = 'block';\n  });\n
+      </div>`).join('');
+    window._autocompleteMatches = matches;
+    ac.style.display = 'block';
+  });
+
   document.addEventListener('click', e => {
     if (!input.contains(e.target)) hideAutocomplete();
   });
@@ -8003,73 +8157,44 @@ function showNoMovementReport() {
           <div style="color:#6b7a8d;font-size:12px">💤 ${p.daysSince}+ zile</div>
           <button onclick="toggleArchive(${p.id})" style="background:none;border:1px solid #6b7a8d;border-radius:4px;color:#6b7a8d;font-size:10px;padding:2px 6px;cursor:pointer;margin-top:2px">📦 ARHIVEAZĂ</button>
         </div>
-      </div>`).join('');\n\n  document.getElementById('no-movement-modal').style.display = 'flex';\n}\n
+      </div>`).join('');
+
+  document.getElementById('no-movement-modal').style.display = 'flex';
+}
+
 // 26. DASHBOARD PRINT-FRIENDLY
 function printDashboard() {
   const depot = userProfile ? userProfile.depot : 'Depozit';
   const now = new Date().toLocaleDateString('ro-RO');
-  
   const printWindow = window.open('', '_blank');
-  const stockHTML = stock.map(p => `\n    <tr>\n      <td>${p.name}</td>\n      <td>${p.cat||'—'}</td>\n      <td><b>${p.qty}</b></td>
-      <td>${p.unit}</td>
-      <td>${p.loc||'—'}</td>
-      <td>${p.min}</td>
-      <td>${p.qty===0?'EPUIZAT':p.qty<=p.min?'SCĂZUT':'OK'}</td>
-    </tr>`).join('');\n\n  printWindow.document.write(`
-    <!DOCTYPE html><html><head>
-    <title>StocVoce — ${depot} — ${now}</title>
-    <style>
-      body{font-family:Arial,sans-serif;padding:20px;color:#000}
-      h1{font-size:20px;border-bottom:2px solid #000;padding-bottom:8px}
-      table{width:100%;border-collapse:collapse;font-size:12px}
-      th{background:#000;color:#fff;padding:6px;text-align:left}
-      td{padding:5px;border-bottom:1px solid #ddd}
-      tr:nth-child(even){background:#f5f5f5}
-      .ok{color:green}.low{color:orange}.zero{color:red;font-weight:bold}
-      @media print{button{display:none}}
-    </style></head><body>
-    <h1>StocVoce — ${depot} — ${now}</h1>
-    <p>Total: ${stock.length} produse | Scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length} | Epuizat: ${stock.filter(p=>p.qty===0).length}</p>
-    <button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;cursor:pointer">🖨️ Printează</button>
-    <table>
-      <tr><th>Produs</th><th>Categorie</th><th>Cantitate</th><th>UM</th><th>Locație</th><th>Min.</th><th>Status</th></tr>
-      ${stockHTML}
-    </table>
-    
-<!-- CARD ZOOM MODAL -->
-<div id="card-zoom-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:480px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase" id="card-zoom-name">Produs</div>
-      <button onclick="closeCardZoom()" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="card-zoom-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+  
+  const stockHTML = stock.map(p => {
+    const status = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
+    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td><b>' + p.qty + '</b></td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + status + '</td></tr>';
+  }).join('');
+  
+  const html = '<!DOCTYPE html><html><head>' +
+    '<title>StocVoce ' + depot + ' ' + now + '</title>' +
+    '<style>body{font-family:Arial,sans-serif;padding:20px}' +
+    'table{width:100%;border-collapse:collapse;font-size:12px}' +
+    'th{background:#000;color:#fff;padding:6px}' +
+    'td{padding:5px;border-bottom:1px solid #ddd}' +
+    'tr:nth-child(even){background:#f5f5f5}' +
+    '@media print{button{display:none}}' +
+    '</style></head><body>' +
+    '<h1>StocVoce ' + depot + ' ' + now + '</h1>' +
+    '<p>Total: ' + stock.length + ' | Scazut: ' + stock.filter(p=>p.qty<=p.min&&p.qty>0).length + ' | Epuizat: ' + stock.filter(p=>p.qty===0).length + '</p>' +
+    '<button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;cursor:pointer">Printeaza</button>' +
+    '<table><tr><th>Produs</th><th>Categorie</th><th>Cantitate</th><th>UM</th><th>Locatie</th><th>Min.</th><th>Status</th></tr>' +
+    stockHTML + '</table></body></html>';
+  
+  printWindow.document.write(html);
+  printWindow.document.close();
+}
+  printWindow.document.close();
+}
 
-<!-- SUPPLIER REPORT MODAL -->
-<div id="supplier-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏭 Raport Furnizori</div>
-      <button onclick="document.getElementById('supplier-report-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="supplier-report-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-<!-- NO MOVEMENT MODAL -->
-<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;padding:28px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">💤 Fără Mișcare</div>
-      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:none;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:12px;padding:6px 12px;cursor:pointer">✕</button>
-    </div>
-    <div id="no-movement-content" style="overflow-y:auto;flex:1"></div>
-  </div>
-</div>
-
-</body></html>`);\n  printWindow.document.close();\n}\n\n// Initialize on app load
+// Initialize on app load
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     initTouchGestures();
@@ -8078,8 +8203,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 2000);
 });
 
-window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};
-</script>
+window.speechSynthesis.onvoiceschanged=()=>{synth.getVoices();};</script>
 
 <!-- ADMIN PANEL -->
 <div id="admin-panel" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:2500;overflow-y:auto;padding:24px">
