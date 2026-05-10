@@ -2374,7 +2374,30 @@ function handleCommand(transcript){
     }
   }, 3000);
   
-  processCommand(transcript.trim().toLowerCase());
+  // Clear "Procesez comanda" after 4s if nothing else set feedback
+  setTimeout(()=>{
+    const fb = document.getElementById('feedback-msg');
+    if(fb && fb.textContent.includes('Procesez')) {
+      setFeedback('', '');
+    }
+  }, 4000);
+  
+  // Queue commands if rapid fire
+  if(window._cmdTimeout) clearTimeout(window._cmdTimeout);
+  window._pendingCmds = window._pendingCmds || [];
+  window._pendingCmds.push(transcript.trim());
+  window._cmdTimeout = setTimeout(() => {
+    const cmds = window._pendingCmds || [];
+    window._pendingCmds = [];
+    if(cmds.length === 1) {
+      processCommand(cmds[0]);
+    } else if(cmds.length > 1) {
+      // Multiple commands - process each one
+      cmds.forEach((cmd, i) => {
+        setTimeout(() => processCommand(cmd), i * 300);
+      });
+    }
+  }, 600); // Wait 600ms for more commands before processing
   // Mic restarts automatically after speak() finishes via utt.onend
 }
 function setMicState(state){
@@ -2395,7 +2418,16 @@ function processManual(){
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   document.getElementById('transcript-display').textContent=val;
   document.getElementById('manual-input').value='';
-  processCommand(val.toLowerCase());
+  window._pendingCmds = window._pendingCmds || [];
+  window._pendingCmds.push(val);
+  if(window._cmdTimeout) clearTimeout(window._cmdTimeout);
+  window._cmdTimeout = setTimeout(() => {
+    const cmds = window._pendingCmds || [];
+    window._pendingCmds = [];
+    cmds.forEach((cmd, i) => {
+      setTimeout(() => processCommand(cmd), i * 200);
+    });
+  }, 100);
 }
 function normalizeText(text){
   return text.replace(/[șş]/g,'s').replace(/[țţ]/g,'t').replace(/[ăâ]/g,'a').replace(/î/g,'i')
