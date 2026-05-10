@@ -1473,11 +1473,11 @@ function renderStock(){
     const isLow=p.qty<=p.min,isZero=p.qty===0;
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
     return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
-      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:1" class="card-actions" id="actions-${p.id}">
-        <button onclick="openAdjustModal(${p.id})" style="background:#181d24;border:1px solid #ffa502;border-radius:5px;color:#ffa502;font-size:12px;padding:3px 7px;cursor:pointer" title="Ajustare">⚖️</button>
-        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
-        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
-        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
+      <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap" class="card-actions" id="actions-${p.id}">
+        <button onclick="openAdjustModal(${p.id})" style="flex:1;background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:13px;padding:7px 4px;cursor:pointer;min-height:34px;text-align:center" title="Ajustare inventar">⚖️</button>
+        <button onclick="openCardZoom(${p.id})" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:13px;padding:7px 4px;cursor:pointer;min-height:34px;text-align:center" title="Detalii produs">🔍</button>
+        <button onclick="openEditModal(${p.id})" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:13px;padding:7px 4px;cursor:pointer;min-height:34px;text-align:center" title="Editează">✏️</button>
+        <button onclick="deleteProduct(${p.id},this.dataset.name)" data-name="${p.name.replace(/'/g,'&#39;')}" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:13px;padding:7px 4px;cursor:pointer;min-height:34px;text-align:center" title="Șterge">🗑️</button>
       </div>
       <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
       ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px">` : ''}
