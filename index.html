@@ -1160,6 +1160,13 @@ function processCommand(text){
   } else if(listKW.some(k=>norm.includes(normalizeText(k)))) {
     opType='list';
   }
+  // ── MULTI-PRODUCT CHECK (si/și/and/plus) ──
+  if (opType && typeof handleMultiProductCommand === 'function') {
+    const connectors = [' si ', ' si ', ' and ', ' plus ', ' cu ', ' et '];
+    const hasConn = connectors.some(c => normalizeText(text.toLowerCase()).includes(normalizeText(c)));
+    if (hasConn && handleMultiProductCommand(text, opType)) return;
+  }
+  
   if(opType==='list'){
     const p=findProduct(text.split(/\s+/));
     if(p){const msg=`${p.name}: ${p.qty} ${p.unit}.`;setFeedback(`ℹ️ ${msg}`,'ok');speak(msg);addLog(text,msg,'ok');}
@@ -5593,48 +5600,64 @@ function handleVoiceQuery(text) {
 function handleMultiProductCommand(text, opType) {
   const norm = normalizeText(text.toLowerCase());
   
-  // Check if contains connector words
-  const hasConnector = [' si ',' și ',' and ',' und ',' et ',' plus ',' cu '].some(c => 
-    norm.includes(normalizeText(c))
-  );
+  // Check connector words (si/și/and/plus/cu)
+  const connectors = ['si', 'si', 'and', 'plus', 'cu', 'et', 'und'];
+  const hasConnector = connectors.some(c => {
+    const nc = normalizeText(c);
+    return norm.includes(' ' + nc + ' ');
+  });
   if (!hasConnector) return false;
   
-  // Split by connector words
-  const parts = text.split(/\s+(?:si|și|and|und|et|plus|cu)\s+/i).filter(p => p.trim().length > 2);
+  // Split by connector words - use normalized text for splitting
+  const splitRegex = /\s+(?:si|și|and|plus|cu|et|und)\s+/i;
+  const parts = text.split(splitRegex).filter(p => p.trim().length > 1);
   if (parts.length < 2) return false;
   
-  // Verify each part has a quantity AND a known product
+  // For each part, find quantity and product
+  // The first part might have the action verb - that's OK, parseQuantity and findProduct handle it
   const validParts = [];
-  parts.forEach(part => {
-    const partNorm = normalizeText(part.toLowerCase());
-    const qty = parseQuantity(partNorm);
-    const product = findProduct(part.split(' '));
-    if (qty && qty > 0 && product) {
-      validParts.push({ part, qty, product });
+  parts.forEach((part, idx) => {
+    const partWords = part.trim().split(/\s+/);
+    const qty = parseQuantity(normalizeText(part.toLowerCase()));
+    const product = findProduct(partWords);
+    
+    if (product) {
+      // If no qty found, default to 1
+      const finalQty = qty && qty > 0 ? qty : 1;
+      validParts.push({ part: part.trim(), qty: finalQty, product });
     }
   });
   
-  if (validParts.length < 2) return false; // Need at least 2 valid parts
+  // Need at least 2 products found
+  if (validParts.length < 2) return false;
   
   let processed = 0;
+  const names = [];
+  
   validParts.forEach(({ part, qty, product }) => {
     const oldQty = product.qty;
     if (opType === 'in') product.qty += qty;
     else product.qty = Math.max(0, product.qty - qty);
-    addLog(part.trim(), `${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, opType);
+    
+    addLog(part, `${opType==='in'?'IN':'OUT'} ${qty} ${product.unit} · ${oldQty}→${product.qty}`, opType);
+    names.push(`${product.name} (${qty} ${product.unit})`);
     processed++;
     
-    // Check alerts
-    if (product.qty === 0) setTimeout(() => triggerAlert(`🔴 EPUIZAT: ${product.name}`, 'zero'), 300);
-    else if (product.qty <= product.min) setTimeout(() => triggerAlert(`⚠️ SCĂZUT: ${product.name} — ${product.qty} ${product.unit}`, 'warn'), 300);
+    // Alerts
+    if (product.qty === 0) {
+      setTimeout(() => triggerAlert(`🔴 EPUIZAT: ${product.name}`, 'zero'), 300 * processed);
+    } else if (product.qty <= product.min) {
+      setTimeout(() => triggerAlert(`⚠️ SCĂZUT: ${product.name} — ${product.qty} ${product.unit}`, 'warn'), 300 * processed);
+    }
   });
   
   if (processed > 0) {
     saveStockToFirebase();
-    renderStock(); updateStats();
-    const names = validParts.map(p => p.product.name).join(', ');
-    speak(`${processed} produse actualizate: ${names}.`);
-    setFeedback(`✅ ${processed} produse actualizate: ${names}`, 'ok');
+    renderStock();
+    updateStats();
+    const summary = names.join(', ');
+    speak(`${processed} produse actualizate: ${names.map(n=>n.split('(')[0].trim()).join(', ')}.`);
+    setFeedback(`✅ ${processed} produse: ${summary}`, 'ok');
     return true;
   }
   return false;
