@@ -1808,15 +1808,61 @@ document.addEventListener('DOMContentLoaded', () => {
 function openEditModal(productId) {
   const p = stock.find(s => s.id === productId);
   if (!p) return;
-  document.getElementById('edit-id').value = productId;
-  document.getElementById('edit-name').value = p.name;
-  document.getElementById('edit-cat').value = p.cat || '';
-  document.getElementById('edit-qty').value = p.qty;
-  document.getElementById('edit-unit').value = p.unit;
-  document.getElementById('edit-loc').value = p.loc || '';
-  document.getElementById('edit-min').value = p.min;
-  document.getElementById('edit-sensitive').checked = p.sensitive || false;
-  document.getElementById('edit-modal').style.display = 'flex';
+  // Pre-fill add-modal with existing product data
+  const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val||''; };
+  const setChk = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
+  setVal('new-name', p.name);
+  setVal('new-cat', p.cat);
+  setVal('new-qty', p.qty);
+  setVal('new-unit', p.unit);
+  setVal('new-loc', p.loc);
+  setVal('new-min', p.min);
+  setVal('new-maxqty', p.maxQty);
+  setVal('new-supplier', p.supplier);
+  setVal('new-price-buy', p.price_buy);
+  setVal('new-price-sell', p.price_sell);
+  setVal('new-sku', p.sku);
+  setVal('new-expiry', p.expiry);
+  setVal('new-lead-time', p.lead_time);
+  setVal('new-moq', p.moq);
+  setVal('new-weight', p.weight);
+  // Change title and save button to edit mode
+  const title = document.querySelector('#add-modal h3');
+  if (title) title.textContent = '✏️ Editează Produs';
+  const saveBtn = document.querySelector('#add-modal .add-confirm');
+  if (saveBtn) { saveBtn.textContent = 'SALVEAZĂ MODIFICĂRILE →'; saveBtn.onclick = () => saveEditProduct(productId); }
+  document.getElementById('add-modal').style.display = 'flex';
+}
+
+function saveEditProduct(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const getVal = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  p.name = getVal('new-name') || p.name;
+  p.cat = getVal('new-cat') || p.cat;
+  p.qty = parseInt(getVal('new-qty')) || p.qty;
+  p.unit = getVal('new-unit') || p.unit;
+  p.loc = getVal('new-loc') || p.loc;
+  p.min = parseInt(getVal('new-min')) || p.min;
+  p.maxQty = parseInt(getVal('new-maxqty')) || p.maxQty;
+  p.supplier = getVal('new-supplier');
+  p.price_buy = parseFloat(getVal('new-price-buy')) || null;
+  p.price_sell = parseFloat(getVal('new-price-sell')) || null;
+  p.sku = getVal('new-sku');
+  p.expiry = getVal('new-expiry');
+  p.lead_time = getVal('new-lead-time');
+  p.moq = parseInt(getVal('new-moq')) || null;
+  p.weight = parseFloat(getVal('new-weight')) || null;
+  saveStockToFirebase();
+  renderStock(); updateStats();
+  closeAddModal();
+  // Reset title
+  const title = document.querySelector('#add-modal h3');
+  if (title) title.textContent = '+ Produs Nou';
+  const saveBtn = document.querySelector('#add-modal .add-confirm');
+  if (saveBtn) { saveBtn.textContent = 'ADAUGĂ →'; saveBtn.onclick = doAdd; }
+  setFeedback('✅ Produs actualizat: ' + p.name, 'ok');
+  speak('Produs actualizat.');
 }
 
 function closeEditModal() {
