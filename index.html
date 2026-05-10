@@ -2522,11 +2522,7 @@ function processCommand(text){
   // Check full status command
   if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
   if(typeof handleFullAIStatus==='function'&&handleFullAIStatus(text))return;
-  // Try AI voice processing if enabled
-  if(typeof processCommandWithAI==='function'&&aiVoiceEnabled){
-    processCommandWithAI(text).then(handled => { if(!handled) {} });
-    return; // AI handles it
-  }
+  // AI voice is a fallback only - normal processing runs first
   // Check category query
   if(typeof handleCategoryQuery==='function'&&handleCategoryQuery(text))return;
   // Check stats voice
@@ -6613,7 +6609,7 @@ function undoLastOperation() {
 
 // 2. DICTARE NOTĂ VOCALĂ
 function handleVoiceNote(text) {
-  const noteKeywords = ['noteaza','notează','nota','scrie','memoreaza','memorează'];
+  const noteKeywords = ['noteaza','notează','memoreaza','memorează','adauga nota','adaugă notă'];
   const norm = normalizeText(text.toLowerCase());
   if (!noteKeywords.some(k => norm.includes(k))) return false;
   
@@ -6634,7 +6630,7 @@ function handleVoiceNote(text) {
 
 // 3. INTEROGARE VOCALĂ STOC
 function handleVoiceQuery(text) {
-  const queryKW = ['cate','câte','cat','cât','câți','cati','arata','arată','verifica','verifică','situatie','situație'];
+  const queryKW = ['câte ','cate ','câți ','arată-mi','arata-mi','verifică stoc','verifica stoc','situatie stoc','situație stoc','câte avem','cate avem'];
   const norm = normalizeText(text.toLowerCase());
   if (!queryKW.some(k => norm.includes(k))) return false;
   
@@ -9167,7 +9163,7 @@ function hideAutocomplete() {
 // 21. COMANDĂ VOCALĂ SITUAȚIE COMPLETĂ
 async function handleFullStatusCommand(text) {
   const norm = normalizeText(text.toLowerCase());
-  if (!norm.includes('situatie') && !norm.includes('situație') && !norm.includes('status complet') && !norm.includes('raport complet')) return false;
+    if (!norm.includes('situatie completa') && !norm.includes('cum sta') && !norm.includes('status complet') && !norm.includes('raport vocal')) return false;
   
   speak('Generez situația completă...');
   
