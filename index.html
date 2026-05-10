@@ -1313,11 +1313,7 @@ function renderStock(){
     const pct=Math.min(100,Math.round((p.qty/(p.maxQty||Math.max(p.qty*2,100)))*100));
     const isLow=p.qty<=p.min,isZero=p.qty===0;
     const cls=isZero?'zero-stock':(isLow?'low-stock':'');const qc=isZero?'zero':(isLow?'low':'');
-    return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">
-      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">
-        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>
-        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>
-        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
+    return `<div class="stock-card ${cls}" id="card-${p.id}" style="position:relative">\n      <div style="position:absolute;top:8px;right:8px;display:flex;gap:5px;opacity:0;transition:opacity .2s" class="card-actions" id="actions-${p.id}">\n        <button onclick="openCardZoom(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Detalii">🔍</button>\n        <button onclick="openEditModal(${p.id})" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Editează">✏️</button>\n        <button onclick="deleteProduct(${p.id},'${p.name.replace(/'/g,"&#39;")}')" style="background:#181d24;border:1px solid #1e2530;border-radius:5px;color:#99a8b8;font-size:12px;padding:3px 7px;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#ff4757';this.style.color='#ff4757'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#99a8b8'" title="Șterge">🗑️</button>
       </div>
       <div class="card-category">${p.cat||'General'}${p.sensitive?' 🔒':''}</div>
       ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px">` : ''}
@@ -1331,11 +1327,7 @@ function renderStock(){
         <button onclick="openNotesModal(${p.id})" style="flex:1;background:none;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.background='rgba(167,139,250,0.1)'" onmouseout="this.style.background='none'">💬 NOTE</button>
         <button onclick="openHistoryModal(${p.id})" style="flex:1;background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px;cursor:pointer;transition:all .15s;letter-spacing:1px" onmouseover="this.style.borderColor='#00e5a0';this.style.color='#00e5a0'" onmouseout="this.style.borderColor='#1e2530';this.style.color='#6b7a8d'">📋 ISTORIC</button>
       </div>
-    </div>`;
-  }).join('');
-  
-  // Show action buttons on hover
-  document.querySelectorAll('.stock-card').forEach(card => {
+    </div>`;\n  }).join('');\n\n  // Show action buttons on hover\n  document.querySelectorAll('.stock-card').forEach(card => {
     card.addEventListener('mouseenter', () => {
       const actions = card.querySelector('.card-actions');
       if (actions) actions.style.opacity = '1';
@@ -1394,11 +1386,7 @@ function loadAllUsers() {
     if (pending.length === 0) {
       document.getElementById('pending-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Nicio cerere în așteptare. 🎉</div>';
     } else {
-      document.getElementById('pending-users').innerHTML = pending.map(u => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#181d24;border-radius:10px;margin-bottom:10px;border:1px solid #1e2530">
-          <div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">${u.name}</div>
-            <div style="font-size:12px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email}</div>
+      document.getElementById('pending-users').innerHTML = pending.map(u => `\n        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:#181d24;border-radius:10px;margin-bottom:10px;border:1px solid #1e2530">\n          <div>\n            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">${u.name}</div>\n            <div style="font-size:12px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email}</div>
             <div style="font-size:13px;color:#00e5a0;margin-top:3px">🏭 ${u.depot}</div>
           </div>
           <div style="display:flex;gap:10px">
@@ -1406,26 +1394,14 @@ function loadAllUsers() {
             <button onclick="rejectUser('${u.uid}', '${u.name}')" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 18px;cursor:pointer">❌ REFUZĂ</button>
           </div>
         </div>
-      `).join('');
-    }
-
-    // Approved
-    if (approved.length === 0) {
+      `).join('');\n    }\n\n    // Approved\n    if (approved.length === 0) {
       document.getElementById('approved-users').innerHTML = '<div style="color:#6b7a8d;font-size:13px">Niciun utilizator aprobat.</div>';
     } else {
-      document.getElementById('approved-users').innerHTML = approved.map(u => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#181d24;border-radius:10px;margin-bottom:8px;border:1px solid #1e2530">
-          <div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name}</div>
-            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email} · 🏭 ${u.depot}</div>
+      document.getElementById('approved-users').innerHTML = approved.map(u => `\n        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#181d24;border-radius:10px;margin-bottom:8px;border:1px solid #1e2530">\n          <div>\n            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${u.name}</div>\n            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${u.email} · 🏭 ${u.depot}</div>
           </div>
           <button onclick="revokeUser('${u.uid}', '${u.name}')" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 12px;cursor:pointer">REVOCĂ</button>
         </div>
-      `).join('');
-    }
-  });
-}
-
+      `).join('');\n    }\n  });\n}\n
 async function approveUser(uid, name) {
   await db.ref('users/' + uid + '/status').set('approved');
   console.log('Approved:', name);
@@ -2075,10 +2051,7 @@ async function loadDashboardData() {
     chartEl.innerHTML = depotStats.map(d => {
       const h = Math.max(8, Math.round((d.total / maxProducts) * 110));
       const color = d.zero > 0 ? '#ff4757' : d.low > 0 ? '#ffa502' : '#00e5a0';
-      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-        <div style="font-size:11px;color:#e8ecf0;font-family:'Barlow Condensed',sans-serif;font-weight:700">${d.total}</div>
-        <div style="width:100%;height:${h}px;background:${color};border-radius:4px 4px 0 0;opacity:0.85;transition:opacity .2s" title="${d.name}: ${d.total} produse"></div>
-      </div>`;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">\n        <div style="font-size:11px;color:#e8ecf0;font-family:'Barlow Condensed',sans-serif;font-weight:700">${d.total}</div>\n        <div style="width:100%;height:${h}px;background:${color};border-radius:4px 4px 0 0;opacity:0.85;transition:opacity .2s" title="${d.name}: ${d.total} produse"></div>\n      </div>`;
     }).join('');
     
     labelsEl.innerHTML = depotStats.map(d => {
@@ -2093,26 +2066,14 @@ async function loadDashboardData() {
       { label: 'Stoc Scăzut', count: totalLow,      color: '#ffa502', pct: totalProducts ? Math.round(totalLow/totalProducts*100) : 0 },
       { label: 'Epuizat',     count: totalZero,     color: '#ff4757', pct: totalProducts ? Math.round(totalZero/totalProducts*100) : 0 },
     ];
-    document.getElementById('status-chart').innerHTML = statusData.map(s => `
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-          <span style="font-size:12px;color:#99a8b8">${s.label}</span>
-          <span style="font-size:12px;color:${s.color};font-weight:600">${s.count} (${s.pct}%)</span>
+    document.getElementById('status-chart').innerHTML = statusData.map(s => `\n      <div>\n        <div style="display:flex;justify-content:space-between;margin-bottom:5px">\n          <span style="font-size:12px;color:#99a8b8">${s.label}</span>\n          <span style="font-size:12px;color:${s.color};font-weight:600">${s.count} (${s.pct}%)</span>
         </div>
         <div style="height:8px;background:#1e2530;border-radius:4px;overflow:hidden">
           <div style="height:100%;width:${s.pct}%;background:${s.color};border-radius:4px;transition:width .6s ease"></div>
         </div>
       </div>
-    `).join('');
-
-    // All depots cards
-    document.getElementById('all-depots').innerHTML = depotStats.length === 0 
-      ? '<div style="color:#6b7a8d;font-size:13px">Niciun depozit înregistrat.</div>'
-      : depotStats.map(d => `
-        <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:18px;border-left:3px solid ${d.zero>0?'#ff4757':d.low>0?'#ffa502':'#00e5a0'}">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:12px">${d.name}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
+    `).join('');\n\n    // All depots cards\n    document.getElementById('all-depots').innerHTML = depotStats.length === 0 \n      ? '<div style="color:#6b7a8d;font-size:13px">Niciun depozit înregistrat.</div>'
+      : depotStats.map(d => `\n        <div style="background:#111418;border:1px solid #1e2530;border-radius:14px;padding:18px;border-left:3px solid ${d.zero>0?'#ff4757':d.low>0?'#ffa502':'#00e5a0'}">\n          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:12px">${d.name}</div>\n          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">\n            <div style="text-align:center;background:#181d24;border-radius:8px;padding:10px">
               <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${d.total}</div>
               <div style="font-size:10px;color:#6b7a8d">PRODUSE</div>
             </div>
@@ -2129,19 +2090,12 @@ async function loadDashboardData() {
             ${d.stock.slice(0,8).map(p => {
               const isZero = p.qty===0, isLow = p.qty<=p.min;
               const col = isZero?'#ff4757':isLow?'#ffa502':'#99a8b8';
-              return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2530;font-size:12px">
-                <span style="color:#99a8b8">${p.name}</span>
-                <span style="color:${col};font-weight:600;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>
-              </div>`;
+              return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e2530;font-size:12px">\n                <span style="color:#99a8b8">${p.name}</span>\n                <span style="color:${col};font-weight:600;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>\n              </div>`;
             }).join('')}
             ${d.stock.length > 8 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px 0">... și încă ${d.stock.length-8} produse</div>` : ''}
           </div>
         </div>
-      `).join('');
-
-    // Load all clients from all depots
-    const allClientsEl = document.getElementById('dash-clients-list');
-    let allDashClients = [];
+      `).join('');\n\n    // Load all clients from all depots\n    const allClientsEl = document.getElementById('dash-clients-list');\n    let allDashClients = [];
     for (const key of depotKeys) {
       const depotSnap = await db.ref('depozite/' + key + '/clients').once('value');
       const depotClients = depotSnap.val();
@@ -2170,11 +2124,7 @@ function renderDashClients(clientsList) {
     el.innerHTML = '<div style="padding:20px;color:#6b7a8d;font-size:13px;text-align:center">Nicio ieșire client înregistrată.</div>';
     return;
   }
-  el.innerHTML = `
-    <table style="width:100%;border-collapse:collapse;font-size:12px">
-      <thead>
-        <tr style="background:#181d24;border-bottom:1px solid #1e2530">
-          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">ORA</th>
+  el.innerHTML = `\n    <table style="width:100%;border-collapse:collapse;font-size:12px">\n      <thead>\n        <tr style="background:#181d24;border-bottom:1px solid #1e2530">\n          <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">ORA</th>
           <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">CLIENT</th>
           <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">PRODUS</th>
           <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px">CANT.</th>
@@ -2183,18 +2133,11 @@ function renderDashClients(clientsList) {
         </tr>
       </thead>
       <tbody>
-        ${clientsList.slice(0,50).map(c => `
-          <tr style="border-bottom:1px solid #1e253050" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">
-            <td style="padding:9px 14px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px">${c.time||'—'}</td>
-            <td style="padding:9px 14px;color:#e8ecf0;font-weight:600">${c.name||'—'}</td>
-            <td style="padding:9px 14px;color:#99a8b8">${c.product||'—'}</td>
+        ${clientsList.slice(0,50).map(c => `\n          <tr style="border-bottom:1px solid #1e253050" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">\n            <td style="padding:9px 14px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:10px">${c.time||'—'}</td>\n            <td style="padding:9px 14px;color:#e8ecf0;font-weight:600">${c.name||'—'}</td>\n            <td style="padding:9px 14px;color:#99a8b8">${c.product||'—'}</td>
             <td style="padding:9px 14px;color:#00e5a0;font-family:'JetBrains Mono',monospace">${c.qty||'—'}</td>
             <td style="padding:9px 14px;color:#a78bfa">${c.depot||c.user||'—'}</td>
             <td style="padding:9px 14px;color:#6b7a8d">${c.user||'—'}</td>
-          </tr>`).join('')}
-      </tbody>
-    </table>
-    ${clientsList.length > 50 ? `<div style="padding:10px;text-align:center;color:#6b7a8d;font-size:12px">... și încă ${clientsList.length-50} înregistrări</div>` : ''}`;
+          </tr>`).join('')}\n      </tbody>\n    </table>\n    ${clientsList.length > 50 ? `<div style="padding:10px;text-align:center;color:#6b7a8d;font-size:12px">... și încă ${clientsList.length-50} înregistrări</div>` : ''}`;
 }
 
 function filterDashClients() {
@@ -2280,24 +2223,12 @@ function renderDashUsers(filter) {
     // Action buttons based on status
     let actionBtns = '';
     if (u.status === 'pending') {
-      actionBtns = `
-        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:#00e5a0;border:none;border-radius:6px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">\n          ✅ APROBĂ\n        </button>\n        <button onclick="dashReject('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
-          style="background:#ff4757;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">
-          ❌ REFUZĂ
-        </button>`;
+      actionBtns = `\n        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:#00e5a0;border:none;border-radius:6px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">\n          ✅ APROBĂ\n        </button>\n        <button onclick="dashReject('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:#ff4757;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;letter-spacing:1px">\n          ❌ REFUZĂ\n        </button>`;
     } else if (u.status === 'approved') {
-      actionBtns = `
-        <button onclick="dashRevoke('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:none;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">\n          REVOCĂ\n        </button>`;\n    } else {\n      actionBtns = `\n        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" 
-          style="background:none;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">
-          REACTIVEAZĂ
-        </button>`;
+      actionBtns = `\n        <button onclick="dashRevoke('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:none;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">\n          REVOCĂ\n        </button>`;\n    } else {\n      actionBtns = `\n        <button onclick="dashApprove('${u.uid}','${(u.name||'').replace(/'/g,"&#39;")}')" \n          style="background:none;border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">\n          REACTIVEAZĂ\n        </button>`;
     }
 
-    return `
-      <div style="background:#111418;border:1px solid ${statusColor}33;border-radius:12px;padding:16px;border-left:3px solid ${statusColor}">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <div style="width:42px;height:42px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>
-          <div style="flex:1;min-width:0">
+    return `\n      <div style="background:#111418;border:1px solid ${statusColor}33;border-radius:12px;padding:16px;border-left:3px solid ${statusColor}">\n        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">\n          <div style="width:42px;height:42px;border-radius:50%;background:#181d24;border:2px solid ${statusColor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">👤</div>\n          <div style="flex:1;min-width:0">
             <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;color:#e8ecf0">${u.name||'—'}</div>
             <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||'—'}</div>
             <div style="font-size:11px;color:#00e5a0;margin-top:2px">🏭 ${u.depot||'—'}</div>
@@ -2307,11 +2238,7 @@ function renderDashUsers(filter) {
         <div style="display:flex;gap:8px;justify-content:flex-end">
           ${actionBtns}
         </div>
-      </div>`;
-  }).join('');
-}
-
-async function dashApprove(uid, name) {
+      </div>`;\n  }).join('');\n}\n\nasync function dashApprove(uid, name) {
   await db.ref('users/' + uid + '/status').set('approved');
   // Update local data
   const u = (window.dashUsers||[]).find(u => u.uid === uid);
@@ -2388,11 +2315,7 @@ function openHistoryModal(productId) {
   // Stats
   const totalIn  = productLog.filter(e=>e.type==='in').length;
   const totalOut = productLog.filter(e=>e.type==='out').length;
-  document.getElementById('history-stats').innerHTML = `
-    <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#00e5a0">${totalIn}</div>
-      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">INTRĂRI</div>
-    </div>
+  document.getElementById('history-stats').innerHTML = `\n    <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#00e5a0">${totalIn}</div>\n      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">INTRĂRI</div>\n    </div>
     <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ff4757">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ff4757">${totalOut}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">IEȘIRI</div>
@@ -2400,23 +2323,11 @@ function openHistoryModal(productId) {
     <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#a78bfa">${productLog.length}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">TOTAL OPS</div>
-    </div>`;
-
-  // List
-  if (productLog.length === 0) {
-    document.getElementById('history-list').innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:20px;text-align:center">Nicio operație înregistrată pentru acest produs.</div>';
+    </div>`;\n\n  // List\n  if (productLog.length === 0) {\n    document.getElementById('history-list').innerHTML = '<div style="color:#6b7a8d;font-size:13px;padding:20px;text-align:center">Nicio operație înregistrată pentru acest produs.</div>';
   } else {
-    document.getElementById('history-list').innerHTML = productLog.map(e => `
-      <div style="padding:10px;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:10px">
-        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b7a8d;flex-shrink:0">${e.time||'—'}</span>
-        <span class="log-badge ${e.type}" style="flex-shrink:0">${e.type==='in'?'IN':'OUT'}</span>
-        <span style="font-size:12px;color:#99a8b8;flex:1">${e.result||e.cmd||'—'}</span>
+    document.getElementById('history-list').innerHTML = productLog.map(e => `\n      <div style="padding:10px;border-bottom:1px solid #1e2530;display:flex;align-items:center;gap:10px">\n        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#6b7a8d;flex-shrink:0">${e.time||'—'}</span>\n        <span class="log-badge ${e.type}" style="flex-shrink:0">${e.type==='in'?'IN':'OUT'}</span>\n        <span style="font-size:12px;color:#99a8b8;flex:1">${e.result||e.cmd||'—'}</span>
         <span style="font-size:11px;color:#6b7a8d;flex-shrink:0">${e.user||'—'}</span>
-      </div>`).join('');
-  }
-  
-  document.getElementById('history-modal').style.display = 'flex';
-}
+      </div>`).join('');\n  }\n\n  document.getElementById('history-modal').style.display = 'flex';\n}
 
 function closeHistoryModal() {
   document.getElementById('history-modal').style.display = 'none';
@@ -2783,44 +2694,29 @@ async function sendDailyReport() {
   const zeroItems = stock.filter(p => p.qty === 0);
   const okItems = total - lowItems.length - zeroItems.length;
 
-  let msg = `📊 <b>RAPORT ZILNIC</b> — ${now}
-`;
-  msg += `🏭 <b>${depot}</b>
-
-`;
-  msg += `✅ Stoc OK: <b>${okItems}</b> produse
-`;
-  msg += `⚠️ Stoc scăzut: <b>${lowItems.length}</b> produse
-`;
-  msg += `🔴 Epuizat: <b>${zeroItems.length}</b> produse
-`;
-  msg += `📦 Total: <b>${total}</b> produse
-`;
+  let msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n;
+  msg += `🏭 <b>${depot}</b>\n\n;
+  msg += `✅ Stoc OK: <b>${okItems}</b> produse\n;
+  msg += `⚠️ Stoc scăzut: <b>${lowItems.length}</b> produse\n;
+  msg += `🔴 Epuizat: <b>${zeroItems.length}</b> produse\n;
+  msg += `📦 Total: <b>${total}</b> produse\n;
 
   if (lowItems.length > 0) {
-    msg += `
-⚠️ <b>STOCURI SCĂZUTE:</b>
-`;
+    msg += `\n⚠️ <b>STOCURI SCĂZUTE:</b>\n;
     lowItems.slice(0,5).forEach(p => {
-      msg += `• ${p.name}: ${p.qty} ${p.unit} (min: ${p.min})
-`;
+      msg += `• ${p.name}: ${p.qty} ${p.unit} (min: ${p.min})\n;
     });
-    if (lowItems.length > 5) msg += `... și încă ${lowItems.length-5} produse
-`;
+    if (lowItems.length > 5) msg += `... și încă ${lowItems.length-5} produse\n;
   }
 
   if (zeroItems.length > 0) {
-    msg += `
-🔴 <b>EPUIZATE:</b>
-`;
+    msg += `\n🔴 <b>EPUIZATE:</b>\n;
     zeroItems.slice(0,5).forEach(p => {
-      msg += `• ${p.name}
-`;
+      msg += `• ${p.name}\n;
     });
   }
 
-  msg += `
-👤 ${userProfile.name}`;
+  msg += `\n👤 ${userProfile.name}`;
 
   // Send to all operators of this depot with telegram
   try {
@@ -2872,18 +2768,10 @@ function renderNotes(product) {
     el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio notă încă. Adaugă prima notă!</div>';
     return;
   }
-  el.innerHTML = [...notes].reverse().map((n, i) => `
-    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid #a78bfa;position:relative">
-      <div style="font-size:13px;color:#e8ecf0;margin-bottom:8px;line-height:1.5">${n.text}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">👤 ${n.user} · ${n.time}</div>
+  el.innerHTML = [...notes].reverse().map((n, i) => `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid #a78bfa;position:relative">\n      <div style="font-size:13px;color:#e8ecf0;margin-bottom:8px;line-height:1.5">${n.text}</div>\n      <div style="display:flex;justify-content:space-between;align-items:center">\n        <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">👤 ${n.user} · ${n.time}</div>
         ${n.user === (userProfile?userProfile.name:'') ? `<button onclick="deleteNote(${notes.length-1-i})" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:14px;padding:0 4px" title="Șterge">🗑️</button>` : ''}
       </div>
-    </div>`).join('');
-}
-
-function addNote() {
-  const text = document.getElementById('new-note-text').value.trim();
+    </div>`).join('');\n}\n\nfunction addNote() {\n  const text = document.getElementById('new-note-text').value.trim();
   if (!text) return;
   
   const p = stock.find(s => s.id === currentNotesProductId);
@@ -3065,11 +2953,7 @@ function updateChart() {
   const minQty = Math.min(...data);
   const maxQty = Math.max(...data);
   
-  document.getElementById('chart-stats').innerHTML = `
-    <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${avgQty}</div>
-      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MEDIE</div>
-    </div>
+  document.getElementById('chart-stats').innerHTML = `\n    <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#00e5a0">${avgQty}</div>\n      <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MEDIE</div>\n    </div>
     <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ffa502">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#ffa502">${minQty}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MINIM</div>
@@ -3077,11 +2961,7 @@ function updateChart() {
     <div style="background:#111418;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#a78bfa">${maxQty}</div>
       <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px">MAXIM</div>
-    </div>`;
-
-  // Draw chart
-  const ctx = document.getElementById('stock-chart').getContext('2d');
-  if (stockChart) stockChart.destroy();
+    </div>`;\n\n  // Draw chart\n  const ctx = document.getElementById('stock-chart').getContext('2d');\n  if (stockChart) stockChart.destroy();
   
   const isLow = p.qty <= p.min;
   const color = p.qty === 0 ? '#ff4757' : isLow ? '#ffa502' : '#00e5a0';
@@ -3157,11 +3037,7 @@ async function getAIPrediction() {
         max_tokens: 300,
         messages: [{
           role: 'user',
-          content: `Ești un expert în gestiunea stocurilor. Analizează datele și oferă o predicție scurtă în română.
-
-Produs: ${p.name}
-Depozit: ${depot}
-Stoc curent: ${p.qty} ${p.unit}
+          content: `Ești un expert în gestiunea stocurilor. Analizează datele și oferă o predicție scurtă în română.\n\nProdus: ${p.name}\nDepozit: ${depot}\nStoc curent: ${p.qty} ${p.unit}
 Stoc minim: ${p.min} ${p.unit}
 Operații intrare: ${inOps}
 Operații ieșire: ${outOps}
@@ -3172,11 +3048,7 @@ Răspunde în maxim 3 propoziții cu:
 2. Cantitatea recomandată pentru reaprovizionare
 3. Frecvența recomandată de comandă
 
-Fii concis și specific.`
-        }]
-      })
-    });
-
+Fii concis și specific.`\n        }]\n      })\n    });\n
     const data = await response.json();
     const prediction = data.content[0].text;
     predEl.innerHTML = `<strong style="color:#a78bfa">🤖 Predicție AI:</strong><br><br>${prediction}`;
@@ -3213,22 +3085,14 @@ function renderDeliveries() {
     const isSoon = !isOverdue && (dDate-new Date()) < 3*24*3600*1000;
     const statusColor = d.status==='received'?'#00e5a0':isOverdue?'#ff4757':isSoon?'#ffa502':'#6b7a8d';
     const statusText = d.status==='received'?'✅ RECEPȚIONAT':isOverdue?'⚠️ ÎNTÂRZIAT':isSoon?'🔜 CURÂND':'⏳ AȘTEPTARE';
-    return `
-    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid ${statusColor}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${d.product}</div>
+    return `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:10px;border-left:3px solid ${statusColor}">\n      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">\n        <div>\n          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${d.product}</div>
           <div style="font-size:12px;color:#6b7a8d">📦 ${d.qty} unități · 🏭 ${d.supplier||'—'}</div>
           <div style="font-size:11px;color:#6b7a8d;margin-top:2px">📅 ${d.date} · 👤 ${d.user||'—'}</div>
         </div>
         <span style="background:rgba(0,0,0,0.3);border:1px solid ${statusColor};border-radius:6px;padding:2px 8px;font-size:10px;color:${statusColor};font-family:'JetBrains Mono',monospace;flex-shrink:0">${statusText}</span>
       </div>
       ${d.status!=='received'?`<button onclick="markDeliveryReceived(${i})" style="width:100%;background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',monospace;font-size:12px;padding:5px;cursor:pointer;letter-spacing:1px">✅ MARCHEAZĂ RECEPȚIONAT</button>`:''}
-    </div>`;
-  }).join('');
-}
-
-function addDelivery() {
+    </div>`;\n  }).join('');\n}\n\nfunction addDelivery() {
   const product = document.getElementById('del-product').value.trim();
   const qty = document.getElementById('del-qty').value;
   const supplier = document.getElementById('del-supplier').value.trim();
@@ -3286,16 +3150,8 @@ function renderClients() {
     el.innerHTML = '<div style="color:#6b7a8d;font-size:13px;text-align:center;padding:20px">Nicio ieșire înregistrată.</div>';
     return;
   }
-  el.innerHTML = [...clients].reverse().map(c => `
-    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #a78bfa">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${c.name}</div>
-      <div style="font-size:12px;color:#6b7a8d;margin-top:2px">📞 ${c.contact||'—'} · 📦 ${c.product}: ${c.qty} unități</div>
-      <div style="font-size:11px;color:#6b7a8d;margin-top:2px">🕐 ${c.time} · 👤 ${c.user||'—'}</div>
-    </div>`).join('');
-}
-
-function addClient() {
-  const name = document.getElementById('cli-name').value.trim();
+  el.innerHTML = [...clients].reverse().map(c => `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #a78bfa">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${c.name}</div>\n      <div style="font-size:12px;color:#6b7a8d;margin-top:2px">📞 ${c.contact||'—'} · 📦 ${c.product}: ${c.qty} unități</div>\n      <div style="font-size:11px;color:#6b7a8d;margin-top:2px">🕐 ${c.time} · 👤 ${c.user||'—'}</div>
+    </div>`).join('');\n}\n\nfunction addClient() {\n  const name = document.getElementById('cli-name').value.trim();
   const contact = document.getElementById('cli-contact').value.trim();
   const product = document.getElementById('cli-product').value.trim();
   const qty = document.getElementById('cli-qty').value;
@@ -3335,21 +3191,13 @@ let inventarData = {};
 function openInventarModal() {
   inventarData = {};
   const el = document.getElementById('inventar-list');
-  el.innerHTML = stock.map(p => `
-    <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid #1e2530" id="inv-row-${p.id}">
-      <div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>
-        <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Sistem: <span style="color:#00e5a0;font-weight:600">${p.qty} ${p.unit}</span></div>
+  el.innerHTML = stock.map(p => `\n    <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid #1e2530" id="inv-row-${p.id}">\n      <div>\n        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>\n        <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Sistem: <span style="color:#00e5a0;font-weight:600">${p.qty} ${p.unit}</span></div>
       </div>
       <input type="number" id="inv-${p.id}" placeholder="${p.qty}" oninput="checkInventarDiff(${p.id},${p.qty})" 
         style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:7px;outline:none;text-align:center">
       <div id="inv-diff-${p.id}" style="font-size:12px;width:60px;text-align:right">—</div>
     </div>
-  `).join('');
-  document.getElementById('inventar-modal').style.display = 'flex';
-}
-
-function checkInventarDiff(id, systemQty) {
+  `).join('');\n  document.getElementById('inventar-modal').style.display = 'flex';\n}\n\nfunction checkInventarDiff(id, systemQty) {
   const input = document.getElementById('inv-'+id);
   const diffEl = document.getElementById('inv-diff-'+id);
   const row = document.getElementById('inv-row-'+id);
@@ -3401,21 +3249,13 @@ function openComandaModal() {
   } else {
     el.innerHTML = lowProducts.map(p => {
       const needed = Math.max(p.moq || (p.min * 3), p.min * 3 - p.qty);
-      return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#111418;border-radius:8px;margin-bottom:8px;border-left:3px solid ${p.qty===0?'#ff4757':'#ffa502'}">
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>
-          <div style="font-size:11px;color:#6b7a8d">Stoc: <span style="color:${p.qty===0?'#ff4757':'#ffa502'}">${p.qty} ${p.unit}</span> · Min: ${p.min} · Furnizor: ${p.supplier||'Nedefinit'}</div>
+      return `\n      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:#111418;border-radius:8px;margin-bottom:8px;border-left:3px solid ${p.qty===0?'#ff4757':'#ffa502'}">\n        <div>\n          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:11px;color:#6b7a8d">Stoc: <span style="color:${p.qty===0?'#ff4757':'#ffa502'}">${p.qty} ${p.unit}</span> · Min: ${p.min} · Furnizor: ${p.supplier||'Nedefinit'}</div>
         </div>
         <div style="text-align:right">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:#00e5a0">${needed}</div>
           <div style="font-size:10px;color:#6b7a8d">${p.unit} de comandat</div>
         </div>
-      </div>`;
-    }).join('');
-  }
-  document.getElementById('comanda-modal').style.display = 'flex';
-}
+      </div>`;\n    }).join('');\n  }\n  document.getElementById('comanda-modal').style.display = 'flex';\n}
 
 function closeComandaModal() { document.getElementById('comanda-modal').style.display='none'; }
 
@@ -3499,21 +3339,13 @@ function renderRezervari() {
     const isToday = dDate.toDateString() === new Date().toDateString();
     const isOverdue = dDate < new Date() && !isToday;
     const color = isOverdue ? '#ff4757' : isToday ? '#ffa502' : '#a78bfa';
-    return `
-    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid ${color}">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${r.client}</div>
+    return `\n    <div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid ${color}">\n      <div style="display:flex;justify-content:space-between;align-items:flex-start">\n        <div>\n          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${r.client}</div>
           <div style="font-size:12px;color:#99a8b8">📦 ${r.product_name}: <span style="color:#a78bfa;font-weight:600">${r.qty} ${r.unit}</span></div>
           <div style="font-size:11px;color:#6b7a8d;margin-top:2px">📅 ${r.date} · ${isOverdue?'⚠️ EXPIRAT':isToday?'🔔 AZI':'⏰ Programat'}</div>
         </div>
         <button onclick="completeRezervare(${i})" style="background:rgba(0,229,160,0.1);border:1px solid #00e5a0;border-radius:6px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px 10px;cursor:pointer;flex-shrink:0">✅ RIDICĂ</button>
       </div>
-    </div>`;
-  }).join('');
-}
-
-function addRezervare() {
+    </div>`;\n  }).join('');\n}\n\nfunction addRezervare() {
   const client = document.getElementById('rez-client').value.trim();
   const productId = parseInt(document.getElementById('rez-product').value);
   const qty = parseInt(document.getElementById('rez-qty').value);
@@ -3578,17 +3410,9 @@ function selectAllEtichete() {
 
 function renderEticheteGrid(products) {
   const grid = document.getElementById('etichete-grid');
-  grid.innerHTML = products.map(p => `
-    <div onclick="toggleEticheta(${p.id})" id="eticheta-card-${p.id}" 
-      style="background:#181d24;border:2px solid ${selectedEtichete.has(p.id)?'#00e5a0':'#1e2530'};border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;text-align:center">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;margin-bottom:4px;line-height:1.2">${p.name}</div>
-      <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px">📍 ${p.loc||'—'}</div>
+  grid.innerHTML = products.map(p => `\n    <div onclick="toggleEticheta(${p.id})" id="eticheta-card-${p.id}" \n      style="background:#181d24;border:2px solid ${selectedEtichete.has(p.id)?'#00e5a0':'#1e2530'};border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;text-align:center">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;margin-bottom:4px;line-height:1.2">${p.name}</div>\n      <div style="font-size:10px;color:#6b7a8d;margin-bottom:6px">📍 ${p.loc||'—'}</div>
       ${selectedEtichete.has(p.id)?'<div style="color:#00e5a0;font-size:18px">✅</div>':'<div style="color:#1e2530;font-size:18px">○</div>'}
-    </div>`).join('');
-}
-
-function toggleEticheta(id) {
-  if (selectedEtichete.has(id)) selectedEtichete.delete(id);
+    </div>`).join('');\n}\n\nfunction toggleEticheta(id) {\n  if (selectedEtichete.has(id)) selectedEtichete.delete(id);
   else selectedEtichete.add(id);
   filterEtichete();
 }
@@ -3602,17 +3426,10 @@ function printEtichete() {
   
   let eticheteHTML = selected.map(p => {
     const data = JSON.stringify({ id: p.id, name: p.name, depot, sku: p.sku||'' });
-    return `
-    <div class="eticheta">
-      <div class="eticheta-name">${p.name}</div>
-      <div class="eticheta-info">${p.sku ? p.sku + ' · ' : ''}📍 ${p.loc||'—'}</div>
-      <div class="eticheta-depot">${depot}</div>
+    return `\n    <div class="eticheta">\n      <div class="eticheta-name">${p.name}</div>\n      <div class="eticheta-info">${p.sku ? p.sku + ' · ' : ''}📍 ${p.loc||'—'}</div>\n      <div class="eticheta-depot">${depot}</div>
       <div id="qr-${p.id}" class="qr-container"></div>
       <div class="eticheta-min">Min: ${p.min} ${p.unit}</div>
-    </div>`;
-  }).join('');
-
-  printWindow.document.write(`
+    </div>`;\n  }).join('');\n\n  printWindow.document.write(`
     <!DOCTYPE html><html><head>
     <title>Etichete QR - ${depot}</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
@@ -3974,11 +3791,7 @@ function printEtichete() {
   </div>
 </div>
 
-</body></html>`);
-  printWindow.document.close();
-  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');
-}
-
+</body></html>`);\n  printWindow.document.close();\n  setFeedback(`✅ ${selected.length} etichete generate!`, 'ok');\n}\n
 
 // ── MULTI-LANGUAGE (toate limbile UE) ──
 const LANGUAGES = {
@@ -4267,11 +4080,7 @@ function closeLangModal() {
 function initLangModal() {
   const grid = document.getElementById('lang-grid');
   if (!grid) return;
-  grid.innerHTML = Object.entries(LANGUAGES).map(([code, lang]) => `
-    <button onclick="setLanguage('${code}')" style="background:${currentLang===code?'rgba(0,229,160,0.15)':'#181d24'};border:1px solid ${currentLang===code?'#00e5a0':'#1e2530'};border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;color:${currentLang===code?'#00e5a0':'#99a8b8'}" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='${currentLang===code?'#00e5a0':'#1e2530'}'">
-      <div style="font-size:24px;margin-bottom:4px">${lang.flag}</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">${lang.name}</div>
-    </button>`).join('');
+  grid.innerHTML = Object.entries(LANGUAGES).map(([code, lang]) => `\n    <button onclick="setLanguage('${code}')" style="background:${currentLang===code?'rgba(0,229,160,0.15)':'#181d24'};border:1px solid ${currentLang===code?'#00e5a0':'#1e2530'};border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;color:${currentLang===code?'#00e5a0':'#99a8b8'}" onmouseover="this.style.borderColor='#00e5a0'" onmouseout="this.style.borderColor='${currentLang===code?'#00e5a0':'#1e2530'}'">\n      <div style="font-size:24px;margin-bottom:4px">${lang.flag}</div>\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">${lang.name}</div>\n    </button>`).join('');
 }
 
 
@@ -4507,20 +4316,12 @@ function renderCalendar(year, month) {
     const isToday = date.toDateString() === today.toDateString();
     const isPast = date < today && !isToday;
     
-    html += `<div style="
-      min-height:50px;background:${isToday?'rgba(0,229,160,0.15)':'#181d24'};
-      border:1px solid ${isToday?'#00e5a0':'#1e2530'};border-radius:6px;padding:4px;
-      cursor:${dayDeliveries.length?'pointer':'default'};
-      opacity:${isPast?'0.5':'1'}"
+    html += `<div style="\n      min-height:50px;background:${isToday?'rgba(0,229,160,0.15)':'#181d24'};\n      border:1px solid ${isToday?'#00e5a0':'#1e2530'};border-radius:6px;padding:4px;\n      cursor:${dayDeliveries.length?'pointer':'default'};\n      opacity:${isPast?'0.5':'1'}"
       ${dayDeliveries.length?`onclick="showDayDeliveries('${dateStr}')"`:''}
       title="${dayDeliveries.length?dayDeliveries.map(d=>d.product).join(', '):''}">
       <div style="font-size:12px;font-weight:600;color:${isToday?'#00e5a0':'#e8ecf0'};margin-bottom:2px">${day}</div>
       ${dayDeliveries.map(d=>`<div style="font-size:9px;background:${d.status==='received'?'rgba(0,229,160,0.2)':'rgba(255,165,2,0.2)'};border-radius:3px;padding:1px 3px;margin-bottom:1px;color:${d.status==='received'?'#00e5a0':'#ffa502'};overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${d.product}</div>`).join('')}
-    </div>`;
-  }
-  html += '</div>';
-  if (el) el.innerHTML = html;
-}
+    </div>`;\n  }\n  html += '</div>';\n  if (el) el.innerHTML = html;\n}
 
 function showDayDeliveries(dateStr) {
   const dayDels = deliveries.filter(d => d.date === dateStr);
@@ -4814,18 +4615,10 @@ function renderCategoriesModal() {
   
   const el = document.getElementById('cat-list');
   if (!el) return;
-  el.innerHTML = allCats.map(cat => `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px">
-      <input type="color" value="${savedColors[cat]||'#00e5a0'}" 
-        onchange="setCatColor('${cat}', this.value)"
-        style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;background:none">
+  el.innerHTML = allCats.map(cat => `\n    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:8px">\n      <input type="color" value="${savedColors[cat]||'#00e5a0'}" \n        onchange="setCatColor('${cat}', this.value)"\n        style="width:32px;height:32px;border:none;border-radius:6px;cursor:pointer;background:none">
       <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">${cat}</span>
       <span style="font-size:12px;color:#6b7a8d">${stock.filter(p=>p.cat===cat).length} produse</span>
-    </div>`).join('');
-}
-
-function setCatColor(cat, color) {
-  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
+    </div>`).join('');\n}\n\nfunction setCatColor(cat, color) {\n  const colors = JSON.parse(localStorage.getItem('sv_cat_colors') || '{}');
   colors[cat] = color;
   localStorage.setItem('sv_cat_colors', JSON.stringify(colors));
   renderStock();
@@ -4867,10 +4660,7 @@ function renderRaportLunar() {
     return { ...p, moves: moves.length };
   }).sort((a,b) => b.moves - a.moves).slice(0, 5);
   
-  el.innerHTML = `
-    <div style="margin-bottom:20px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:12px">TOP 5 PRODUSE DUPĂ MIȘCĂRI</div>
-      ${productMovement.map((p,i) => `
+  el.innerHTML = `\n    <div style="margin-bottom:20px">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;color:#6b7a8d;text-transform:uppercase;margin-bottom:12px">TOP 5 PRODUSE DUPĂ MIȘCĂRI</div>\n      ${productMovement.map((p,i) => `
         <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:${i===0?'#ffa502':i===1?'#6b7a8d':i===2?'#a78bfa':'#1e2530'};width:30px">${i+1}</div>
           <div style="flex:1">
@@ -4881,8 +4671,7 @@ function renderRaportLunar() {
             <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#00e5a0">${p.qty}</div>
             <div style="font-size:10px;color:#6b7a8d">${p.unit} stoc curent</div>
           </div>
-        </div>`).join('')}
-    </div>`;
+        </div>`).join('')}\n    </div>`;
 }
 
 // 7. TOP 10 PRODUSE
@@ -4917,18 +4706,10 @@ function showStagnant(days) {
   
   const el = document.getElementById('stagnant-list');
   if (el) {
-    el.innerHTML = stagnant.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">
-        <div>
-          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
-          <div style="font-size:12px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
+    el.innerHTML = stagnant.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:12px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
         </div>
         <div style="font-size:12px;color:#ffa502">+${days} zile fără mișcare</div>
-      </div>`).join('');
-    document.getElementById('stagnant-modal').style.display = 'flex';
-  }
-}
-
+      </div>`).join('');\n    document.getElementById('stagnant-modal').style.display = 'flex';\n  }\n}\n
 // 9. RAPORT PER OPERATOR
 function showOperatorReport() {
   const operators = {};
@@ -4942,11 +4723,7 @@ function showOperatorReport() {
   const el = document.getElementById('operator-report-content');
   if (!el) return;
   
-  el.innerHTML = Object.entries(operators).sort((a,b) => b[1].total - a[1].total).map(([user, stats]) => `
-    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #00e5a0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:8px">👤 ${user}</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
+  el.innerHTML = Object.entries(operators).sort((a,b) => b[1].total - a[1].total).map(([user, stats]) => `\n    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #00e5a0">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:8px">👤 ${user}</div>\n      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">\n        <div style="text-align:center;background:#111418;border-radius:6px;padding:8px">
           <div style="font-size:20px;font-weight:900;color:#00e5a0">${stats.in||0}</div>
           <div style="font-size:10px;color:#6b7a8d">INTRĂRI</div>
         </div>
@@ -4963,11 +4740,7 @@ function showOperatorReport() {
           <div style="font-size:10px;color:#6b7a8d">TOTAL</div>
         </div>
       </div>
-    </div>`).join('');
-  
-  document.getElementById('operator-report-modal').style.display = 'flex';
-}
-
+    </div>`).join('');\n\n  document.getElementById('operator-report-modal').style.display = 'flex';\n}\n
 // 10. EXPORT EXCEL COMPLET
 function exportFullExcel() {
   try {
@@ -5031,11 +4804,7 @@ function openClientProfile(clientName) {
   const el = document.getElementById('client-profile-content');
   if (!el) return;
   
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">
-        <div style="font-size:24px;font-weight:900;color:#a78bfa;font-family:'Barlow Condensed',sans-serif">${clientHistory.length}</div>
-        <div style="font-size:10px;color:#6b7a8d">VIZITE</div>
+  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">\n      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #a78bfa">\n        <div style="font-size:24px;font-weight:900;color:#a78bfa;font-family:'Barlow Condensed',sans-serif">${clientHistory.length}</div>\n        <div style="font-size:10px;color:#6b7a8d">VIZITE</div>
       </div>
       <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
         <div style="font-size:24px;font-weight:900;color:#00e5a0;font-family:'Barlow Condensed',sans-serif">${totalQty}</div>
@@ -5047,11 +4816,7 @@ function openClientProfile(clientName) {
       </div>
     </div>
     <div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ISTORIC COMPLET</div>
-    ${clientHistory.reverse().map(c => `
-      <div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">
-        <div>
-          <div style="font-weight:600;color:#e8ecf0">${c.product}</div>
-          <div style="font-size:11px;color:#6b7a8d">${c.time} · ${c.user}</div>
+    ${clientHistory.reverse().map(c => `\n      <div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">\n        <div>\n          <div style="font-weight:600;color:#e8ecf0">${c.product}</div>\n          <div style="font-size:11px;color:#6b7a8d">${c.time} · ${c.user}</div>
         </div>
         <div style="text-align:right">
           <div style="color:#00e5a0;font-weight:700">${c.qty}</div>
@@ -5351,17 +5116,11 @@ async function openGlobalStockModal() {
       const depotUser = Object.values(users).find(u => u.depot && normalizeText(u.depot.toLowerCase().replace(/\s+/g,'_')) === key);
       const depotName = depotUser ? depotUser.depot : key.replace(/_/g,' ');
       
-      html += `<div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:14px;border-left:3px solid #00e5a0">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:10px">🏭 ${depotName} <span style="font-size:13px;color:#6b7a8d;font-weight:400">(${depotStock.length} produse)</span></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
-          ${depotStock.slice(0,6).map(p => `
+      html += `<div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:14px;border-left:3px solid #00e5a0">\n        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0;margin-bottom:10px">🏭 ${depotName} <span style="font-size:13px;color:#6b7a8d;font-weight:400">(${depotStock.length} produse)</span></div>\n        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">\n          ${depotStock.slice(0,6).map(p => `
             <div style="background:#111418;border-radius:8px;padding:10px;border-left:2px solid ${p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#00e5a0'}">
               <div style="font-size:13px;font-weight:600;color:#e8ecf0;margin-bottom:4px">${p.name}</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;color:${p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#00e5a0'}">${p.qty} <span style="font-size:11px">${p.unit}</span></div>
-            </div>`).join('')}
-          ${depotStock.length > 6 ? `<div style="background:#111418;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;color:#6b7a8d;font-size:12px">+${depotStock.length-6} mai multe</div>` : ''}
-        </div>
-      </div>`;
+            </div>`).join('')}\n          ${depotStock.length > 6 ? `<div style="background:#111418;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;color:#6b7a8d;font-size:12px">+${depotStock.length-6} mai multe</div>` : ''}\n        </div>\n      </div>`;
     });
     
     el.innerHTML = html || '<div style="color:#6b7a8d;text-align:center;padding:20px">Niciun depozit găsit.</div>';
@@ -5422,11 +5181,7 @@ async function openComparatieDep() {
       };
     });
     
-    el.innerHTML = `
-      <table style="width:100%;border-collapse:collapse">
-        <thead>
-          <tr style="background:#181d24">
-            <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px">DEPOZIT</th>
+    el.innerHTML = `\n      <table style="width:100%;border-collapse:collapse">\n        <thead>\n          <tr style="background:#181d24">\n            <th style="padding:10px 14px;text-align:left;color:#6b7a8d;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px">DEPOZIT</th>
             <th style="padding:10px 14px;text-align:center;color:#00e5a0;font-size:11px">TOTAL</th>
             <th style="padding:10px 14px;text-align:center;color:#ffa502;font-size:11px">SCĂZUT</th>
             <th style="padding:10px 14px;text-align:center;color:#ff4757;font-size:11px">EPUIZAT</th>
@@ -5434,16 +5189,10 @@ async function openComparatieDep() {
           </tr>
         </thead>
         <tbody>
-          ${depotStats.map(d => `
-            <tr style="border-bottom:1px solid #1e2530">
-              <td style="padding:10px 14px;color:#e8ecf0;font-weight:600">🏭 ${d.name}</td>
-              <td style="padding:10px 14px;text-align:center;color:#00e5a0;font-weight:700">${d.total}</td>
-              <td style="padding:10px 14px;text-align:center;color:#ffa502;font-weight:700">${d.low}</td>
+          ${depotStats.map(d => `\n            <tr style="border-bottom:1px solid #1e2530">\n              <td style="padding:10px 14px;color:#e8ecf0;font-weight:600">🏭 ${d.name}</td>\n              <td style="padding:10px 14px;text-align:center;color:#00e5a0;font-weight:700">${d.total}</td>\n              <td style="padding:10px 14px;text-align:center;color:#ffa502;font-weight:700">${d.low}</td>
               <td style="padding:10px 14px;text-align:center;color:#ff4757;font-weight:700">${d.zero}</td>
               <td style="padding:10px 14px;text-align:center;color:#a78bfa;font-weight:700">${d.value} RON</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
+            </tr>`).join('')}\n        </tbody>\n      </table>`;
   } catch(e) {
     el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la încărcarea datelor.</div>';
   }
@@ -5488,18 +5237,10 @@ async function showConsolidatedStock() {
     
     const sorted = Object.values(consolidated).sort((a,b) => b.total - a.total);
     
-    el.innerHTML = sorted.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1e2530" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">
-        <div style="color:#e8ecf0;font-weight:600">${p.name}</div>
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="font-size:11px;color:#6b7a8d">${p.depots.length} depozite</div>
+    el.innerHTML = sorted.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #1e2530" onmouseover="this.style.background='#181d24'" onmouseout="this.style.background='transparent'">\n        <div style="color:#e8ecf0;font-weight:600">${p.name}</div>\n        <div style="display:flex;align-items:center;gap:14px">\n          <div style="font-size:11px;color:#6b7a8d">${p.depots.length} depozite</div>
           <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;color:#00e5a0">${p.total} <span style="font-size:11px">${p.unit}</span></div>
         </div>
-      </div>`).join('');
-    
-    document.getElementById('consolidat-modal').style.display = 'flex';
-  } catch(e) {
-    console.error('Consolidare error:', e);
+      </div>`).join('');\n\n    document.getElementById('consolidat-modal').style.display = 'flex';\n  } catch(e) {\n    console.error('Consolidare error:', e);
   }
 }
 function closeConsolidatModal() { document.getElementById('consolidat-modal').style.display='none'; }
@@ -5878,21 +5619,13 @@ function showPredictions() {
   
   el.innerHTML = predictions.length === 0 
     ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate produsele au stoc suficient!</div>'
-    : predictions.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid ${p.pred.urgency==='critical'?'#ff4757':p.pred.urgency==='warn'?'#ffa502':'#00e5a0'}">
-        <div>
-          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
-          <div style="font-size:11px;color:#6b7a8d">Stoc: ${p.qty} ${p.unit} · Consum zilnic: ~${p.pred.dailyAvg} ${p.unit}</div>
+    : predictions.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid ${p.pred.urgency==='critical'?'#ff4757':p.pred.urgency==='warn'?'#ffa502':'#00e5a0'}">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:11px;color:#6b7a8d">Stoc: ${p.qty} ${p.unit} · Consum zilnic: ~${p.pred.dailyAvg} ${p.unit}</div>
         </div>
         <div style="text-align:right">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${p.pred.urgency==='critical'?'#ff4757':p.pred.urgency==='warn'?'#ffa502':'#00e5a0'}">${p.pred.days}z</div>
           <div style="font-size:10px;color:#6b7a8d">${p.pred.message}</div>
         </div>
-      </div>`).join('');
-  
-  document.getElementById('predictions-modal').style.display = 'flex';
-}
-
+      </div>`).join('');\n\n  document.getElementById('predictions-modal').style.display = 'flex';\n}\n
 // 8. HEATMAP ACTIVITATE
 function generateHeatmap() {
   const hours = Array(24).fill(0);
@@ -5912,31 +5645,15 @@ function generateHeatmap() {
   const el = document.getElementById('heatmap-content');
   if (!el) return;
   
-  el.innerHTML = `
-    <div style="margin-bottom:20px">
-      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ACTIVITATE PE ORE</div>
-      <div style="display:flex;gap:3px;align-items:flex-end;height:80px">
-        ${hours.map((h, i) => `
+  el.innerHTML = `\n    <div style="margin-bottom:20px">\n      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ACTIVITATE PE ORE</div>\n      <div style="display:flex;gap:3px;align-items:flex-end;height:80px">\n        ${hours.map((h, i) => `
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
             <div style="width:100%;background:rgba(0,229,160,${(h/maxH).toFixed(2)});border-radius:3px 3px 0 0;height:${Math.max(4,Math.round(h/maxH*70))}px;transition:height .3s" title="${h} operații"></div>
             ${i%3===0?`<div style="font-size:9px;color:#6b7a8d">${i}:00</div>`:'<div style="font-size:9px;color:transparent">.</div>'}
-          </div>`).join('')}
-      </div>
-    </div>
-    <div>
-      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ACTIVITATE PE ZILE</div>
+          </div>`).join('')}\n      </div>\n    </div>\n    <div>\n      <div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">ACTIVITATE PE ZILE</div>
       <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
-        ${dayNames.map((d, i) => `
-          <div style="text-align:center">
-            <div style="height:50px;background:rgba(0,229,160,${(days[i]/maxD).toFixed(2)});border-radius:6px;margin-bottom:4px" title="${days[i]} operații"></div>
-            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${d}</div>
-          </div>`).join('')}
+        ${dayNames.map((d, i) => `\n          <div style="text-align:center">\n            <div style="height:50px;background:rgba(0,229,160,${(days[i]/maxD).toFixed(2)});border-radius:6px;margin-bottom:4px" title="${days[i]} operații"></div>\n            <div style="font-size:11px;color:#6b7a8d;font-family:'JetBrains Mono',monospace">${d}</div>\n          </div>`).join('')}
       </div>
-    </div>`;
-  
-  document.getElementById('heatmap-modal').style.display = 'flex';
-}
-
+    </div>`;\n\n  document.getElementById('heatmap-modal').style.display = 'flex';\n}\n
 // 9. EFICIENȚĂ OPERATOR
 function calcOperatorEfficiency() {
   const ops = {};
@@ -6027,21 +5744,11 @@ function renderWarehouseMap() {
   
   const sortedLocs = Object.entries(locations).sort(([a],[b]) => a.localeCompare(b));
   
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
-      ${sortedLocs.map(([loc, products]) => {
-        const hasZero = products.some(p => p.qty === 0);
-        const hasLow = products.some(p => p.qty <= p.min && p.qty > 0);
+  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">\n      ${sortedLocs.map(([loc, products]) => {\n        const hasZero = products.some(p => p.qty === 0);\n        const hasLow = products.some(p => p.qty <= p.min && p.qty > 0);
         const color = hasZero ? '#ff4757' : hasLow ? '#ffa502' : '#00e5a0';
-        return `
-          <div style="background:#181d24;border:2px solid ${color};border-radius:10px;padding:12px;cursor:pointer" onclick="filterByLocation('${loc}')" title="Click pentru filtrare">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:${color};margin-bottom:6px">📍 ${loc}</div>
-            <div style="font-size:12px;color:#99a8b8">${products.length} produse</div>
-            ${products.slice(0,3).map(p => `<div style="font-size:10px;color:#6b7a8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>`).join('')}
+        return `\n          <div style="background:#181d24;border:2px solid ${color};border-radius:10px;padding:12px;cursor:pointer" onclick="filterByLocation('${loc}')" title="Click pentru filtrare">\n            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:${color};margin-bottom:6px">📍 ${loc}</div>\n            <div style="font-size:12px;color:#99a8b8">${products.length} produse</div>\n            ${products.slice(0,3).map(p => `<div style="font-size:10px;color:#6b7a8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>`).join('')}
             ${products.length > 3 ? `<div style="font-size:10px;color:#6b7a8d">+${products.length-3} mai multe</div>` : ''}
-          </div>`;
-      }).join('')}
-    </div>`;
+          </div>`;\n      }).join('')}\n    </div>`;
 }
 
 function filterByLocation(loc) {
@@ -6419,9 +6126,7 @@ async function aiCategorizeNote(noteText) {
         max_tokens: 100,
         messages: [{
           role: "user",
-          content: `Categorizează această notă dintr-un depozit în una din: Hardware, Alimente, Birou, Constructii, Electronice, Textile, Chimic, Altele. Răspunde DOAR cu categoria.
-
-Notă: "${noteText}"`
+          content: `Categorizează această notă dintr-un depozit în una din: Hardware, Alimente, Birou, Constructii, Electronice, Textile, Chimic, Altele. Răspunde DOAR cu categoria.\n\nNotă: "${noteText}"`
         }]
       })
     });
@@ -6476,9 +6181,7 @@ async function aiDetectAnomalies() {
         max_tokens: 400,
         messages: [{
           role: "user",
-          content: `Analizează aceste date de stoc și identifică anomalii sau situații neobișnuite. Răspunde în română, maxim 5 observații concise.
-
-Date stoc: ${JSON.stringify(stockSummary)}`
+          content: `Analizează aceste date de stoc și identifică anomalii sau situații neobișnuite. Răspunde în română, maxim 5 observații concise.\n\nDate stoc: ${JSON.stringify(stockSummary)}`
         }]
       })
     });
@@ -6695,11 +6398,7 @@ function showClientSegments() {
   if (!el) return;
   el.innerHTML = segs.length === 0 
     ? '<div style="color:#6b7a8d;text-align:center;padding:20px">Niciun client înregistrat.</div>'
-    : segs.map(c => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid ${c.color}">
-        <div>
-          <div style="font-weight:700;color:#e8ecf0;display:flex;align-items:center;gap:8px">
-            ${c.name}
+    : segs.map(c => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:8px;border-left:3px solid ${c.color}">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0;display:flex;align-items:center;gap:8px">\n            ${c.name}
             ${isFavoriteClient(c.name) ? '<span style="color:#ffa502">⭐</span>' : ''}
           </div>
           <div style="font-size:11px;color:#6b7a8d">${c.visits} vizite · ${c.totalQty} unități totale</div>
@@ -6709,11 +6408,7 @@ function showClientSegments() {
           <div style="color:${c.color};font-weight:700;font-size:13px">${c.segment}</div>
           <button onclick="toggleFavoriteClient('${c.name.replace(/'/g,"&#39;")}')" style="margin-top:4px;background:none;border:1px solid #1e2530;border-radius:4px;color:#6b7a8d;font-size:11px;padding:2px 8px;cursor:pointer">⭐ FAV</button>\n          <button onclick="exportClientHistoryPDF('${c.name.replace(/'/g,"&#39;")}')" style="margin-top:4px;margin-left:4px;background:none;border:1px solid #1e2530;border-radius:4px;color:#6b7a8d;font-size:11px;padding:2px 8px;cursor:pointer">📄 PDF</button>
         </div>
-      </div>`).join('');
-  document.getElementById('segments-modal').style.display = 'flex';
-}
-
-
+      </div>`).join('');\n  document.getElementById('segments-modal').style.display = 'flex';\n}\n\n
 // ══════════════════════════════════════════
 // RUNDA 1: VOCE & AI (1-10)
 // ══════════════════════════════════════════
@@ -6935,9 +6630,7 @@ function showCategoryPie() {
   const entries = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
   const colors = ['#00e5a0','#a78bfa','#ffa502','#ff4757','#4d9fff','#ff6b6b','#48dbfb','#ff9ff3','#54a0ff','#5f27cd'];
   
-  el.innerHTML = `
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-      ${entries.map(([cat,count],i)=>`
+  el.innerHTML = `\n    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">\n      ${entries.map(([cat,count],i)=>`
         <div style="background:#181d24;border-radius:8px;padding:10px 14px;border-left:3px solid ${colors[i%colors.length]};flex:1;min-width:120px">
           <div style="font-weight:700;color:#e8ecf0;font-size:14px">${cat}</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
@@ -6947,8 +6640,7 @@ function showCategoryPie() {
           <div style="height:4px;background:#1e2530;border-radius:2px;margin-top:6px">
             <div style="height:100%;width:${Math.round(count/total*100)}%;background:${colors[i%colors.length]};border-radius:2px"></div>
           </div>
-        </div>`).join('')}
-    </div>`;
+        </div>`).join('')}\n    </div>`;
   document.getElementById('category-pie-modal').style.display = 'flex';
 }
 
@@ -6987,20 +6679,12 @@ async function screenshotDashboard() {
   const val = calculateStockValue();
   const now = new Date().toLocaleString('ro-RO');
   
-  const msg = `📊 <b>RAPORT ZILNIC</b> — ${now}
-🏭 <b>${depot}</b>
-
-` +
-    `💚 Sănătate: <b>${health}%</b>
-` +
-    `📦 Total produse: <b>${stock.length}</b>
-` +
-    `⚠️ Stoc scăzut: <b>${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}</b>
-` +
-    `🔴 Epuizat: <b>${stock.filter(p=>p.qty===0).length}</b>
-` +
-    `💰 Valoare stoc: <b>${val.totalBuy} RON</b>
-` +
+  const msg = `📊 <b>RAPORT ZILNIC</b> — ${now}\n🏭 <b>${depot}</b>\n\n +
+    `💚 Sănătate: <b>${health}%</b>\n +
+    `📦 Total produse: <b>${stock.length}</b>\n +
+    `⚠️ Stoc scăzut: <b>${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}</b>\n +
+    `🔴 Epuizat: <b>${stock.filter(p=>p.qty===0).length}</b>\n +
+    `💰 Valoare stoc: <b>${val.totalBuy} RON</b>\n +
     `📈 Operații azi: <b>${log.filter(e=>e.time&&e.time.startsWith(new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}))).length}</b>`;
   
   if (userProfile && userProfile.telegram_id) {
@@ -7034,14 +6718,9 @@ function showMonthComparison() {
   
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  const msg = `📊 COMPARAȚIE LUNI
-
-` +
-    `${months[thisMonth]} (curent): ${thisMonthLog.length} operații (IN:${thisIn}, OUT:${thisOut})
-` +
-    `${months[lastMonth]} (precedent): ${lastMonthLog.length} operații (IN:${lastIn}, OUT:${lastOut})
-
-` +
+  const msg = `📊 COMPARAȚIE LUNI\n\n +
+    `${months[thisMonth]} (curent): ${thisMonthLog.length} operații (IN:${thisIn}, OUT:${thisOut})\n +
+    `${months[lastMonth]} (precedent): ${lastMonthLog.length} operații (IN:${lastIn}, OUT:${lastOut})\n\n +
     `Diferență: ${thisMonthLog.length > lastMonthLog.length ? '+' : ''}${thisMonthLog.length - lastMonthLog.length} operații`;
   
   alert(msg);
@@ -7271,16 +6950,8 @@ function showProfitReport() {
   
   const totalProfit = products.reduce((s,p) => s + parseFloat(p.totalProfit||0), 0);
   
-  el.innerHTML = `
-    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;border-top:2px solid #00e5a0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#00e5a0">${totalProfit.toFixed(2)} RON</div>
-      <div style="font-size:12px;color:#6b7a8d">PROFIT TOTAL ESTIMAT (la vânzarea întregului stoc)</div>
-    </div>
-    ${products.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ${parseFloat(p.margin)>30?'#00e5a0':parseFloat(p.margin)>15?'#ffa502':'#ff4757'}">
-        <div>
-          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
-          <div style="font-size:11px;color:#6b7a8d">Achiz: ${p.price_buy} RON · Vânz: ${p.price_sell} RON · Stoc: ${p.qty}</div>
+  el.innerHTML = `\n    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;border-top:2px solid #00e5a0">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#00e5a0">${totalProfit.toFixed(2)} RON</div>\n      <div style="font-size:12px;color:#6b7a8d">PROFIT TOTAL ESTIMAT (la vânzarea întregului stoc)</div>\n    </div>
+    ${products.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ${parseFloat(p.margin)>30?'#00e5a0':parseFloat(p.margin)>15?'#ffa502':'#ff4757'}">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:11px;color:#6b7a8d">Achiz: ${p.price_buy} RON · Vânz: ${p.price_sell} RON · Stoc: ${p.qty}</div>
         </div>
         <div style="text-align:right">
           <div style="font-weight:700;color:#00e5a0">${p.margin}%</div>
@@ -7394,16 +7065,10 @@ function showPLReport() {
   const profit = revenue - costs;
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  alert(`📊 P&L — ${months[now.getMonth()]} ${now.getFullYear()}
-
-` +
-    `💰 Venituri: ${revenue.toFixed(2)} RON
-` +
-    `📦 Costuri: ${costs.toFixed(2)} RON
-` +
-    `${profit >= 0 ? '✅' : '❌'} Profit net: ${profit.toFixed(2)} RON
-
-` +
+  alert(`📊 P&L — ${months[now.getMonth()]} ${now.getFullYear()}\n\n +
+    `💰 Venituri: ${revenue.toFixed(2)} RON\n +
+    `📦 Costuri: ${costs.toFixed(2)} RON\n +
+    `${profit >= 0 ? '✅' : '❌'} Profit net: ${profit.toFixed(2)} RON\n\n +
     `Marjă: ${revenue > 0 ? (profit/revenue*100).toFixed(1) : 0}%`);
 }
 
@@ -7470,15 +7135,10 @@ function calcVATReport() {
   const now = new Date();
   const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
   
-  alert(`📋 RAPORT TVA — ${months[now.getMonth()]} ${now.getFullYear()}
-
-` +
-    `TVA pe intrări (deductibil): ${vatIn.toFixed(2)} RON
-` +
-    `TVA pe ieșiri (colectat): ${vatOut.toFixed(2)} RON
-` +
-    `TVA de plată: ${Math.max(0, vatOut-vatIn).toFixed(2)} RON
-` +
+  alert(`📋 RAPORT TVA — ${months[now.getMonth()]} ${now.getFullYear()}\n\n +
+    `TVA pe intrări (deductibil): ${vatIn.toFixed(2)} RON\n +
+    `TVA pe ieșiri (colectat): ${vatOut.toFixed(2)} RON\n +
+    `TVA de plată: ${Math.max(0, vatOut-vatIn).toFixed(2)} RON\n +
     `TVA de rambursat: ${Math.max(0, vatIn-vatOut).toFixed(2)} RON`);
 }
 
@@ -7528,11 +7188,7 @@ function openProductZoom(productId) {
   const pred = typeof predictStockDepletion === 'function' ? predictStockDepletion(p) : null;
   const el = document.getElementById('zoom-content');
   if (!el) return;
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      ${[
-        ['Cantitate', `${p.qty} ${p.unit}`, '#00e5a0'],
-        ['Stoc Minim', `${p.min} ${p.unit}`, '#ffa502'],
+  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">\n      ${[\n        ['Cantitate', `${p.qty} ${p.unit}`, '#00e5a0'],\n        ['Stoc Minim', `${p.min} ${p.unit}`, '#ffa502'],
         ['Categorie', p.cat||'—', '#a78bfa'],
         ['Locație', p.loc||'—', '#6b7a8d'],
         ['SKU', p.sku||'—', '#6b7a8d'],
@@ -7543,22 +7199,14 @@ function openProductZoom(productId) {
         ['Epuizare', pred ? pred.message : '—', '#ff4757'],
         ['Garanție', p.warranty ? p.warranty+' zile' : '—', '#6b7a8d'],
         ['Expiră', p.expiry||'—', '#6b7a8d'],
-      ].map(([k,v,c]) => `
-        <div style="background:#181d24;border-radius:8px;padding:10px">
-          <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${k}</div>
-          <div style="font-size:14px;font-weight:700;color:${c}">${v}</div>
-        </div>`).join('')}
+      ].map(([k,v,c]) => `\n        <div style="background:#181d24;border-radius:8px;padding:10px">\n          <div style="font-size:10px;color:#6b7a8d;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px">${k}</div>\n          <div style="font-size:14px;font-weight:700;color:${c}">${v}</div>\n        </div>`).join('')}
     </div>
     ${p.note_preview ? `<div style="background:#181d24;border-radius:8px;padding:12px;border-left:3px solid #a78bfa;font-size:13px;color:#99a8b8;margin-bottom:10px">💬 ${p.note_preview}</div>` : ''}
     <div style="display:flex;gap:8px">
       <button onclick="openEditModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
       <button onclick="openNotesModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
       <button onclick="openHistoryModal(${p.id});closeZoom()" style="flex:1;background:#181d24;border:1px solid #6b7a8d;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">📋 ISTORIC</button>
-    </div>`;
-  document.getElementById('product-zoom-modal').style.display = 'flex';
-  document.getElementById('zoom-title').textContent = p.name;
-}
-function closeZoom() { document.getElementById('product-zoom-modal').style.display = 'none'; }
+    </div>`;\n  document.getElementById('product-zoom-modal').style.display = 'flex';\n  document.getElementById('zoom-title').textContent = p.name;\n}\nfunction closeZoom() { document.getElementById('product-zoom-modal').style.display = 'none'; }
 
 // 4. FAVORIT PRODUSE
 let favProducts = JSON.parse(localStorage.getItem('sv_fav_products') || '[]');
@@ -7657,9 +7305,7 @@ function openInlineNote(productId) {
   const noteDiv = document.createElement('div');
   noteDiv.id = 'inline-note-' + productId;
   noteDiv.style.cssText = 'padding:8px;background:#181d24;border-top:1px solid #1e2530';
-  noteDiv.innerHTML = `
-    <textarea id="inline-textarea-${productId}" placeholder="Notă rapidă..." style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:6px;resize:none;height:60px;outline:none">${p.note_preview||''}</textarea>
-    <button onclick="saveInlineNote(${productId})" style="width:100%;margin-top:4px;background:#a78bfa;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px;cursor:pointer">SALVEAZĂ</button>`;
+  noteDiv.innerHTML = `\n    <textarea id="inline-textarea-${productId}" placeholder="Notă rapidă..." style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:12px;padding:6px;resize:none;height:60px;outline:none">${p.note_preview||''}</textarea>\n    <button onclick="saveInlineNote(${productId})" style="width:100%;margin-top:4px;background:#a78bfa;border:none;border-radius:6px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:5px;cursor:pointer">SALVEAZĂ</button>`;
   card.appendChild(noteDiv);
 }
 
@@ -7734,22 +7380,10 @@ function showStagnantReport() {
   const el = document.getElementById('stagnant-full-content');
   if (!el) { showStagnant(30); return; }
   
-  el.innerHTML = result.map(r => `
-    <div style="margin-bottom:16px">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">
-        💤 ${r.days} ZILE FĂRĂ MIȘCARE (${r.count} produse)
-      </div>
-      ${r.products.slice(0,5).map(p => `
-        <div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">
-          <span style="color:#99a8b8">${p.name}</span>
-          <span style="color:#6b7a8d;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>
-        </div>`).join('')}
+  el.innerHTML = result.map(r => `\n    <div style="margin-bottom:16px">\n      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">\n        💤 ${r.days} ZILE FĂRĂ MIȘCARE (${r.count} produse)\n      </div>
+      ${r.products.slice(0,5).map(p => `\n        <div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">\n          <span style="color:#99a8b8">${p.name}</span>\n          <span style="color:#6b7a8d;font-family:'JetBrains Mono',monospace">${p.qty} ${p.unit}</span>\n        </div>`).join('')}
       ${r.products.length > 5 ? `<div style="font-size:11px;color:#6b7a8d;padding:4px">... și încă ${r.products.length-5}</div>` : ''}
-    </div>`).join('');
-  
-  document.getElementById('stagnant-full-modal').style.display = 'flex';
-}
-
+    </div>`).join('');\n\n  document.getElementById('stagnant-full-modal').style.display = 'flex';\n}\n
 // 23. DASHBOARD PRINT FRIENDLY
 
 
@@ -7783,10 +7417,7 @@ async function aiSuggestRename(product) {
     const data = await response.json();
     const suggestion = data.content[0].text.trim();
     if (suggestion !== 'OK' && suggestion !== product.name) {
-      if (confirm(`🤖 AI sugerează redenumirea:
-"${product.name}" → "${suggestion}"
-
-Accepți?`)) {
+      if (confirm(`🤖 AI sugerează redenumirea:\n"${product.name}" → "${suggestion}"\n\nAccepți?`)) {
         product.name = suggestion;
         saveStockToFirebase();
         renderStock();
@@ -7972,11 +7603,7 @@ function openCardZoom(productId) {
   const el = document.getElementById('card-zoom-content');
   if (!el) return;
   
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      ${p.photo_url ? `<img src="${p.photo_url}" style="grid-column:1/-1;width:100%;height:120px;object-fit:cover;border-radius:10px">` : ''}
-      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#00e5a0">${p.qty}</div>
+  el.innerHTML = `\n    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">\n      ${p.photo_url ? `<img src="${p.photo_url}" style="grid-column:1/-1;width:100%;height:120px;object-fit:cover;border-radius:10px">` : ''}\n      <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #00e5a0">\n        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#00e5a0">${p.qty}</div>
         <div style="font-size:11px;color:#6b7a8d">${p.unit} ÎN STOC</div>
       </div>
       <div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid #ffa502">
@@ -7996,19 +7623,11 @@ function openCardZoom(productId) {
       ${margin ? `<div>📈 <b>Marjă:</b> ${margin.margin}%</div>` : ''}
       ${pred && pred.days !== Infinity ? `<div>🔮 <b>Epuizare:</b> ~${pred.days} zile</div>` : ''}
     </div>
-    ${p.notes && p.notes.length > 0 ? `
-      <div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:10px">
-        <div style="font-size:11px;color:#6b7a8d;margin-bottom:6px;letter-spacing:1px">NOTE</div>
-        ${p.notes.slice(-2).map(n => `<div style="font-size:12px;color:#99a8b8;border-left:2px solid #a78bfa;padding-left:8px;margin-bottom:4px">${n.text}</div>`).join('')}
-      </div>` : ''}
+    ${p.notes && p.notes.length > 0 ? `\n      <div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:10px">\n        <div style="font-size:11px;color:#6b7a8d;margin-bottom:6px;letter-spacing:1px">NOTE</div>\n        ${p.notes.slice(-2).map(n => `<div style="font-size:12px;color:#99a8b8;border-left:2px solid #a78bfa;padding-left:8px;margin-bottom:4px">${n.text}</div>`).join('')}\n      </div>` : ''}
     <div style="display:flex;gap:8px">
       <button onclick="openEditModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#00e5a0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">✏️ EDITEAZĂ</button>
       <button onclick="openNotesModal(${p.id});closeCardZoom()" style="flex:1;background:#181d24;border:1px solid #a78bfa;border-radius:8px;color:#a78bfa;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px;cursor:pointer">💬 NOTE</button>
-    </div>`;
-  
-  document.getElementById('card-zoom-name').textContent = p.name;
-  document.getElementById('card-zoom-modal').style.display = 'flex';
-}
+    </div>`;\n\n  document.getElementById('card-zoom-name').textContent = p.name;\n  document.getElementById('card-zoom-modal').style.display = 'flex';\n}
 function closeCardZoom() { document.getElementById('card-zoom-modal').style.display='none'; }
 
 // 5. FAVORITE PRODUSE
@@ -8092,18 +7711,11 @@ function sendWeeklyDigest() {
     return (today - d) <= 7 * 24 * 3600000;
   });
   
-  const msg = `📊 <b>DIGEST SĂPTĂMÂNAL</b>
-🏭 ${depot}
-
-` +
-    `📦 Produse totale: ${stock.length}
-` +
-    `📈 Operații săptămâna: ${weekLog.length}
-` +
-    `⚠️ Stoc scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}
-` +
-    `🔴 Epuizat: ${stock.filter(p=>p.qty===0).length}
-` +
+  const msg = `📊 <b>DIGEST SĂPTĂMÂNAL</b>\n🏭 ${depot}\n\n +
+    `📦 Produse totale: ${stock.length}\n +
+    `📈 Operații săptămâna: ${weekLog.length}\n +
+    `⚠️ Stoc scăzut: ${stock.filter(p=>p.qty<=p.min&&p.qty>0).length}\n +
+    `🔴 Epuizat: ${stock.filter(p=>p.qty===0).length}\n +
     `💰 Valoare stoc: ${calculateStockValue().totalBuy} RON`;
   
   if (userProfile && userProfile.telegram_id) {
@@ -8202,21 +7814,13 @@ function showSupplierReport() {
   
   const sorted = Object.entries(suppliers).sort((a,b) => b[1].totalValue - a[1].totalValue);
   
-  el.innerHTML = sorted.map(([sup, data]) => `
-    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #ffa502">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">🏭 ${sup}</div>
-        <div style="text-align:right">
+  el.innerHTML = sorted.map(([sup, data]) => `\n    <div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:3px solid #ffa502">\n      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">\n        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#e8ecf0">🏭 ${sup}</div>\n        <div style="text-align:right">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#ffa502">${data.totalValue.toFixed(0)} RON</div>
           <div style="font-size:11px;color:#6b7a8d">${data.products} produse</div>
         </div>
       </div>
       <div style="font-size:12px;color:#6b7a8d">${data.items.slice(0,3).join(', ')}${data.items.length>3?'...':''}</div>
-    </div>`).join('');
-  
-  document.getElementById('supplier-report-modal').style.display = 'flex';
-}
-
+    </div>`).join('');\n\n  document.getElementById('supplier-report-modal').style.display = 'flex';\n}\n
 // 18. RAPORT LOCAȚII
 function showLocationReport() {
   const locs = {};
@@ -8232,8 +7836,7 @@ function showLocationReport() {
   
   let msg = '📍 RAPORT LOCAȚII\n\n';
   sorted.forEach(([loc, data]) => {
-    msg += `${loc}: ${data.products} produse, ${data.low} critice
-`;
+    msg += `${loc}: ${data.products} produse, ${data.low} critice\n;
   });
   alert(msg);
 }
@@ -8282,16 +7885,8 @@ function setupAutocomplete() {
       input.parentNode.appendChild(ac);
     }
     
-    ac.innerHTML = matches.map((p,idx) => `
-      <div onclick="selectAutocomplete(${idx})" 
-        style="padding:10px 14px;cursor:pointer;font-size:13px;color:#e8ecf0;border-bottom:1px solid #1e2530"
-        onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='transparent'">
-        ${p.name} <span style="color:#6b7a8d;font-size:11px">(${p.qty} ${p.unit})</span>
-      </div>`).join('');
-    window._autocompleteMatches = matches;
-    ac.style.display = 'block';
-  });
-  
+    ac.innerHTML = matches.map((p,idx) => `\n      <div onclick="selectAutocomplete(${idx})" \n        style="padding:10px 14px;cursor:pointer;font-size:13px;color:#e8ecf0;border-bottom:1px solid #1e2530"\n        onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='transparent'">\n        ${p.name} <span style="color:#6b7a8d;font-size:11px">(${p.qty} ${p.unit})</span>
+      </div>`).join('');\n    window._autocompleteMatches = matches;\n    ac.style.display = 'block';\n  });\n
   document.addEventListener('click', e => {
     if (!input.contains(e.target)) hideAutocomplete();
   });
@@ -8403,39 +7998,25 @@ function showNoMovementReport() {
   
   el.innerHTML = stagnant.length === 0 
     ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate produsele au avut mișcare în ultimele 30 zile!</div>'
-    : stagnant.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">
-        <div>
-          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>
-          <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
+    : stagnant.map(p => `\n      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #6b7a8d">\n        <div>\n          <div style="font-weight:700;color:#e8ecf0">${p.name}</div>\n          <div style="font-size:11px;color:#6b7a8d">📍 ${p.loc||'—'} · Stoc: ${p.qty} ${p.unit}</div>
         </div>
         <div style="text-align:right">
           <div style="color:#6b7a8d;font-size:12px">💤 ${p.daysSince}+ zile</div>
           <button onclick="toggleArchive(${p.id})" style="background:none;border:1px solid #6b7a8d;border-radius:4px;color:#6b7a8d;font-size:10px;padding:2px 6px;cursor:pointer;margin-top:2px">📦 ARHIVEAZĂ</button>
         </div>
-      </div>`).join('');
-  
-  document.getElementById('no-movement-modal').style.display = 'flex';
-}
-
+      </div>`).join('');\n\n  document.getElementById('no-movement-modal').style.display = 'flex';\n}\n
 // 26. DASHBOARD PRINT-FRIENDLY
 function printDashboard() {
   const depot = userProfile ? userProfile.depot : 'Depozit';
   const now = new Date().toLocaleDateString('ro-RO');
   
   const printWindow = window.open('', '_blank');
-  const stockHTML = stock.map(p => `
-    <tr>
-      <td>${p.name}</td>
-      <td>${p.cat||'—'}</td>
-      <td><b>${p.qty}</b></td>
+  const stockHTML = stock.map(p => `\n    <tr>\n      <td>${p.name}</td>\n      <td>${p.cat||'—'}</td>\n      <td><b>${p.qty}</b></td>
       <td>${p.unit}</td>
       <td>${p.loc||'—'}</td>
       <td>${p.min}</td>
       <td>${p.qty===0?'EPUIZAT':p.qty<=p.min?'SCĂZUT':'OK'}</td>
-    </tr>`).join('');
-  
-  printWindow.document.write(`
+    </tr>`).join('');\n\n  printWindow.document.write(`
     <!DOCTYPE html><html><head>
     <title>StocVoce — ${depot} — ${now}</title>
     <style>
@@ -8489,11 +8070,7 @@ function printDashboard() {
   </div>
 </div>
 
-</body></html>`);
-  printWindow.document.close();
-}
-
-// Initialize on app load
+</body></html>`);\n  printWindow.document.close();\n}\n\n// Initialize on app load
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     initTouchGestures();
