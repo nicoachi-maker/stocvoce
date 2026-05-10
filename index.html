@@ -1295,8 +1295,7 @@ function renderLog(){
   el.innerHTML=filtered.slice(0,80).map(e=>`<div class="log-entry"><div class="log-time">${e.time}</div><div class="log-cmd">"${e.cmd}"</div><div class="log-result ${e.type}"><span class="log-badge ${e.type}">${e.type.toUpperCase()}</span> ${e.result}</div>${e.client?`<div style="font-size:11px;color:#a78bfa;margin-top:2px;font-family:'JetBrains Mono',monospace">👥 Client: ${e.client}</div>`:''}<div class="log-user">👤 ${e.user||'—'}</div></div>`).join('');
 }
 function exportLog(){
-  const csv=['Timp,Comandă,Rezultat,Tip,Utilizator,Depozit'].concat(log.map(e=>`"${e.time}","${(e.cmd||'').replace(/"/g,'""')}","${(e.result||'').replace(/"/g,'""')}","${e.type}","${e.user||''}","${e.depot||''}"`)).join('
-');
+  const csv=['Timp,Comandă,Rezultat,Tip,Utilizator,Depozit'].concat(log.map(e=>`"${e.time}","${(e.cmd||'').replace(/"/g,'""')}","${(e.result||'').replace(/"/g,'""')}","${e.type}","${e.user||''}","${e.depot||''}"`)).join('');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`stocvoce_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
