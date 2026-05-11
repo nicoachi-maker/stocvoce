@@ -182,6 +182,12 @@ function closeAdjustModal() {
   document.getElementById('adjust-modal').style.display = 'none';
 }
 
+
+function initStockValueLive() {
+  updateStockValueDisplay();
+  setInterval(updateStockValueDisplay, 30000);
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -2533,29 +2539,26 @@ function processCommand(text){
     undoLastOperation();return;
   }
   // Check handlers - log which one catches it
-  const handlers = [
-    ['handlePercentCommand', handlePercentCommand],
-    ['handleVoiceTransfer', handleVoiceTransfer],
-    ['handleVoiceReport', handleVoiceReport],
-    ['handleVoiceNote', handleVoiceNote],
-    ['handleVoiceQuery', handleVoiceQuery],
-    ['handleFullStatusCommand', handleFullStatusCommand],
-    ['handleFullAIStatus', handleFullAIStatus],
-    ['handleStatsVoiceCommand', handleStatsVoiceCommand],
-    ['handleEnglishVoiceCommand', handleEnglishVoiceCommand],
-    ['handleHalfCommand', handleHalfCommand],
-    ['handleDailyReportCommand', handleDailyReportCommand],
-    ['handleRepeatedCommand', handleRepeatedCommand],
-    ['handleLocationCommand', handleLocationCommand],
-    ['handleClientMixedCommand', handleClientMixedCommand],
-    ['handleApproxQty', handleApproxQty],
+  // Check handlers - only SYNC boolean results count
+  const syncHandlers = [
+    ['handlePercentCommand', typeof handlePercentCommand==='function'?handlePercentCommand:null],
+    ['handleVoiceTransfer', typeof handleVoiceTransfer==='function'?handleVoiceTransfer:null],
+    ['handleVoiceReport', typeof handleVoiceReport==='function'?handleVoiceReport:null],
+    ['handleVoiceNote', typeof handleVoiceNote==='function'?handleVoiceNote:null],
+    ['handleVoiceQuery', typeof handleVoiceQuery==='function'?handleVoiceQuery:null],
+    ['handleHalfCommand', typeof handleHalfCommand==='function'?handleHalfCommand:null],
+    ['handleRepeatedCommand', typeof handleRepeatedCommand==='function'?handleRepeatedCommand:null],
+    ['handleLocationCommand', typeof handleLocationCommand==='function'?handleLocationCommand:null],
+    ['handleApproxQty', typeof handleApproxQty==='function'?handleApproxQty:null],
   ];
-  for(const [name, fn] of handlers){
-    if(typeof fn === 'function'){
+  for(const [name, fn] of syncHandlers){
+    if(fn){
       const result = fn(text);
-      if(result){ console.log('[processCommand] caught by handler:', name); return; }
+      if(result === true){ console.log('[processCommand] caught by:', name); return; }
     }
   }
+  // Async handlers - don't block
+  if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text)===true)return;
   console.log('[processCommand] passed all handlers, detecting opType...');
   
   // Use multilingual keywords
