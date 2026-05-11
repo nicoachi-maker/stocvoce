@@ -86,11 +86,11 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 .stock-area{grid-column:1/2;grid-row:2/3;padding:18px 20px;overflow-y:auto;padding-bottom:50px}
 .section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;display:flex;align-items:center;gap:10px}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
-.search-bar{display:flex;gap:8px;margin-bottom:16px}
+.search-bar{gap:8px;margin-bottom:16px}
 #stock-search{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color .2s}
 #stock-search:focus{border-color:var(--accent)}
 #stock-search::placeholder{color:var(--text-dim)}
-.add-btn{background:var(--surface);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:8px 14px;cursor:pointer;text-transform:uppercase;transition:all .15s}
+.add-btn{flex-shrink:0;white-space:nowrap;background:var(--surface);border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;padding:8px 14px;cursor:pointer;text-transform:uppercase;transition:all .15s}
 .add-btn:hover{background:var(--accent);color:#000}
 .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 .stock-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;transition:all .2s;position:relative;overflow:hidden}
@@ -164,6 +164,29 @@ main{position:relative;z-index:1;display:grid;grid-template-columns:1fr 320px;gr
 /* Loading spinner */
 .spinner{width:40px;height:40px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toolbar scrollable tabs */
+#toolbar-stoc, #toolbar-rapoarte, #toolbar-clienti, #toolbar-depozit, #toolbar-global {
+  scrollbar-width: thin;
+  scrollbar-color: #1e2530 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+#toolbar-stoc::-webkit-scrollbar,
+#toolbar-rapoarte::-webkit-scrollbar,
+#toolbar-clienti::-webkit-scrollbar,
+#toolbar-depozit::-webkit-scrollbar,
+#toolbar-global::-webkit-scrollbar {
+  height: 3px;
+}
+#toolbar-stoc::-webkit-scrollbar-thumb,
+#toolbar-rapoarte::-webkit-scrollbar-thumb,
+#toolbar-clienti::-webkit-scrollbar-thumb,
+#toolbar-depozit::-webkit-scrollbar-thumb,
+#toolbar-global::-webkit-scrollbar-thumb {
+  background: #1e2530;
+  border-radius: 3px;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
 // ── ADJUST INVENTAR ──
@@ -471,7 +494,7 @@ function initStockValueLive() {
       </div>
       
       <!-- Tab: RAPOARTE -->
-      <div id="toolbar-rapoarte" style="display:none;gap:6px;flex-wrap:wrap">
+      <div id="toolbar-rapoarte" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
         <button class="add-btn" onclick="openRaportLunarModal()" style="border-color:#ffa502;color:#ffa502">📈 Raport Lunar</button>
         <button class="add-btn" onclick="showTop10()" style="border-color:#ffa502;color:#ffa502">🏆 Top 10</button>
         <button class="add-btn" onclick="showStagnant(30)" style="border-color:#6b7a8d;color:#6b7a8d">💤 Stagnante</button>
@@ -533,7 +556,7 @@ function initStockValueLive() {
       </div>
       
       <!-- Tab: CLIENȚI -->
-      <div id="toolbar-clienti" style="display:none;gap:6px;flex-wrap:wrap">
+      <div id="toolbar-clienti" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
         <button class="add-btn" onclick="openClientsModal()" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
         <button class="add-btn" onclick="openRezervariModal()" style="border-color:#a78bfa;color:#a78bfa">⏰ Rezervări</button>
         <button class="add-btn" onclick="openBonReturModal()" style="border-color:#ff4757;color:#ff4757">🔄 Bon Retur</button>
@@ -549,7 +572,7 @@ function initStockValueLive() {
       </div>
       
       <!-- Tab: DEPOZIT -->
-      <div id="toolbar-depozit" style="display:none;gap:6px;flex-wrap:wrap">
+      <div id="toolbar-depozit" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
         <button class="add-btn" onclick="openDeliveryModal()" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
         <button class="add-btn" onclick="openCalendarModal()" style="border-color:#ffa502;color:#ffa502">📅 Calendar</button>
         <button class="add-btn" onclick="doAutoBackup()" style="border-color:#6b7a8d;color:#6b7a8d">💾 Backup</button>
@@ -572,7 +595,7 @@ function initStockValueLive() {
       </div>
       
       <!-- Tab: GLOBAL -->
-      <div id="toolbar-global" style="display:none;gap:6px;flex-wrap:wrap">
+      <div id="toolbar-global" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
         <button class="add-btn" onclick="openGlobalStockModal()" style="border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
         <button class="add-btn" onclick="openComparatieDep()" style="border-color:#a78bfa;color:#a78bfa">📊 Compară Depozite</button>
         <button class="add-btn" onclick="showConsolidatedStock()" style="border-color:#00e5a0;color:#00e5a0">🔢 Stoc Consolidat</button>
