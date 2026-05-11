@@ -2085,7 +2085,7 @@ auth.onAuthStateChanged(async (user) => {
     loadStockFromFirebase();
     logLoginDevice();
     resetLoginAttempts();
-    setTimeout(initStockValueLive, 2000);
+    setTimeout(() => { if(typeof initStockValueLive === "function") initStockValueLive(); }, 2000);
     loadLogFromFirebase();
 
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
@@ -2507,10 +2507,22 @@ function extractClientName(text, norm) {
   return null;
 }
 
+// Debounce: prevent same command from running twice within 2 seconds
+let _lastCmd = '', _lastCmdTime = 0;
+
 function processCommand(text){
   console.log('[processCommand] called with:', text);
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
-  const norm=normalizeText(text.toLowerCase());
+  
+  // Deduplicate: skip if same command within 2 seconds
+  const now = Date.now();
+  const norm=normalizeText(text.toLowerCase().trim());
+  if(norm === _lastCmd && now - _lastCmdTime < 2000){
+    console.log('[processCommand] DUPLICATE skipped:', norm);
+    return;
+  }
+  _lastCmd = norm;
+  _lastCmdTime = now;
   console.log('[processCommand] norm:', norm);
   
   // Apply dialect normalization
@@ -2520,38 +2532,31 @@ function processCommand(text){
   if(norm.includes('anuleaza')||norm.includes('undo')||norm.includes('inapoi')){
     undoLastOperation();return;
   }
-  // Check percentage command
-  if(typeof handlePercentCommand==='function'&&handlePercentCommand(text))return;
-  // Check transfer command  
-  if(typeof handleVoiceTransfer==='function'&&handleVoiceTransfer(text))return;
-  // Check report command
-  if(typeof handleVoiceReport==='function'&&handleVoiceReport(text))return;
-  // Check note dictation
-  if(typeof handleVoiceNote==='function'&&handleVoiceNote(text))return;
-  // Check voice query
-  if(typeof handleVoiceQuery==='function'&&handleVoiceQuery(text))return;
-  // Check full status command
-  if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text))return;
-  if(typeof handleFullAIStatus==='function'&&handleFullAIStatus(text))return;
-  // AI voice is a fallback only - normal processing runs first
-  // Check category query
-  if(typeof handleCategoryQuery==='function'&&handleCategoryQuery(text))return;
-  // Check stats voice
-  if(typeof handleStatsVoiceCommand==='function'&&handleStatsVoiceCommand(text))return;
-  // English voice
-  if(typeof handleEnglishVoiceCommand==='function'&&handleEnglishVoiceCommand(text))return;
-  // Half/quarter command
-  if(typeof handleHalfCommand==='function'&&handleHalfCommand(text))return;
-  // Daily report command
-  if(typeof handleDailyReportCommand==='function'&&handleDailyReportCommand(text))return;
-  // Check repeated command
-  if(typeof handleRepeatedCommand==='function'&&handleRepeatedCommand(text))return;
-  // Check location command
-  if(typeof handleLocationCommand==='function'&&handleLocationCommand(text))return;
-  // Check client mixed
-  if(typeof handleClientMixedCommand==='function'&&handleClientMixedCommand(text))return;
-  // Check approximate qty
-  if(typeof handleApproxQty==='function'&&handleApproxQty(text))return;
+  // Check handlers - log which one catches it
+  const handlers = [
+    ['handlePercentCommand', handlePercentCommand],
+    ['handleVoiceTransfer', handleVoiceTransfer],
+    ['handleVoiceReport', handleVoiceReport],
+    ['handleVoiceNote', handleVoiceNote],
+    ['handleVoiceQuery', handleVoiceQuery],
+    ['handleFullStatusCommand', handleFullStatusCommand],
+    ['handleFullAIStatus', handleFullAIStatus],
+    ['handleStatsVoiceCommand', handleStatsVoiceCommand],
+    ['handleEnglishVoiceCommand', handleEnglishVoiceCommand],
+    ['handleHalfCommand', handleHalfCommand],
+    ['handleDailyReportCommand', handleDailyReportCommand],
+    ['handleRepeatedCommand', handleRepeatedCommand],
+    ['handleLocationCommand', handleLocationCommand],
+    ['handleClientMixedCommand', handleClientMixedCommand],
+    ['handleApproxQty', handleApproxQty],
+  ];
+  for(const [name, fn] of handlers){
+    if(typeof fn === 'function'){
+      const result = fn(text);
+      if(result){ console.log('[processCommand] caught by handler:', name); return; }
+    }
+  }
+  console.log('[processCommand] passed all handlers, detecting opType...');
   
   // Use multilingual keywords
   const cmds = getVoiceCommands();
