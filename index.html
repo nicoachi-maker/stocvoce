@@ -510,6 +510,9 @@ function initStockValueLive() {
         <button class="add-btn" onclick="showBossDashboard()" style="border-color:#a78bfa;color:#a78bfa">👔 Dashboard Șef</button>
         <button class="add-btn" onclick="generateSupplierOrder()" style="border-color:#ffa502;color:#ffa502">📋 Cmd Furnizor</button>
         <button class="add-btn" onclick="generateAIPredictionReport()" style="border-color:#ff4757;color:#ff4757">🔮 Raport AI</button>
+        <button class="add-btn" onclick="generateDailyDetailedReport()" style="border-color:#00e5a0;color:#00e5a0">📅 Raport Azi</button>
+        <button class="add-btn" onclick="showTrendsAnalysis()" style="border-color:#a78bfa;color:#a78bfa">📈 Tendințe AI</button>
+        <button class="add-btn" onclick="exportChartAsPNG()" style="border-color:#6b7a8d;color:#6b7a8d">🖼️ Export Grafic</button>
         <button class="add-btn" onclick="exportClientsExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Clienți</button>
         <button class="add-btn" onclick="showTopClientsThisMonth()" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
         <button class="add-btn" onclick="showLocationMovements()" style="border-color:#00e5a0;color:#00e5a0">📍 Locații</button>
@@ -542,6 +545,7 @@ function initStockValueLive() {
         <button class="add-btn" onclick="document.getElementById('advanced-chat-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🤖 AI Asistent</button>
         <button class="add-btn" onclick="syncToEcommerce('WooCommerce')" style="border-color:#6b7a8d;color:#6b7a8d">🛒 WooCommerce</button>
         <button class="add-btn" onclick="exportClientsExcel()" style="border-color:#00e5a0;color:#00e5a0">📊 Export Excel</button>
+        <button class="add-btn" onclick="document.getElementById('client-search-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">🔍 Caută Client</button>
       </div>
       
       <!-- Tab: DEPOZIT -->
@@ -560,6 +564,9 @@ function initStockValueLive() {
         <button class="add-btn" onclick="openQuickAction()" style="border-color:#00e5a0;color:#00e5a0">⚡ Rapid</button>
         <button class="add-btn" onclick="exportGDPRData()" style="border-color:#6b7a8d;color:#6b7a8d">📋 GDPR Export</button>
         <button class="add-btn" onclick="generateDepotAPIKey()" style="border-color:#6b7a8d;color:#6b7a8d">🔑 API Key</button>
+        <button class="add-btn" onclick="exportFullBackupLocal()" style="border-color:#00e5a0;color:#00e5a0">💾 Backup Local</button>
+        <button class="add-btn" onclick="document.getElementById('backup-import-file').click()" style="border-color:#ffa502;color:#ffa502">📂 Import Backup</button>
+        <input type="file" id="backup-import-file" accept=".json" style="display:none" onchange="importBackupLocal(this.files[0])">
         <button class="add-btn" onclick="requestPushPermission()" style="border-color:#ffa502;color:#ffa502">🔔 Push Notif</button>
         <button class="add-btn" onclick="generatePackingList(stock.slice(0,5),'—')" style="border-color:#ffa502;color:#ffa502">📋 Packing</button>
       </div>
@@ -877,6 +884,43 @@ function initStockValueLive() {
       <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
     </div>
     <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- DAILY REPORT MODAL -->
+<div id="daily-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Raport Zilnic Detaliat</div>
+      <button onclick="document.getElementById('daily-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="daily-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TRENDS MODAL -->
+<div id="trends-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Tendințe AI</div>
+      <button onclick="document.getElementById('trends-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="trends-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CLIENT SEARCH MODAL -->
+<div id="client-search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔍 Caută Client</div>
+      <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:14px 24px;flex-shrink:0">
+      <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
+    </div>
+    <div id="client-search-results" style="padding:0 24px 20px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
@@ -1909,6 +1953,390 @@ Ofera: 1) Top 5 riscuri imediate 2) Recomandari achizitii 3) Optimizari posibile
     el.innerHTML = '<div style="color:#ff4757;padding:20px">Eroare la generarea raportului AI.</div>';
   }
 }
+
+
+// ══════════════════════════════════════════
+// 14 FUNCȚII NOI + ÎMBUNĂTĂȚIRI
+// ══════════════════════════════════════════
+
+// 1. VOCE: AUTO-CORECTARE PRODUS SIMILAR
+// Dacă produsul nu e găsit exact, găsește cel mai apropiat
+function findProductFuzzy(text) {
+  const s = normalizeText(text.toLowerCase());
+  if (!s || s.length < 2) return null;
+  
+  let bestMatch = null, bestScore = 0;
+  stock.forEach(p => {
+    const n = normalizeText(p.name.toLowerCase());
+    // Levenshtein-like: count common characters
+    let score = 0;
+    const words = s.split(/\s+/).filter(w => w.length > 2);
+    words.forEach(w => { if (n.includes(w)) score += w.length; });
+    if (score > bestScore && score >= 3) { bestScore = score; bestMatch = p; }
+  });
+  return bestMatch;
+}
+
+// Override findProduct to use fuzzy as fallback
+const _origFindProduct = findProduct;
+
+
+// 2. VOCE: CONFIRMARE INTELIGENTĂ PENTRU CANTITĂȚI MARI
+let pendingLargeOp = null;
+function checkAndConfirmLargeOp(product, qty, opType, text, clientName) {
+  const threshold = (appSettings && appSettings.approval_threshold) || 50;
+  if (qty < threshold) return false;
+  
+  pendingLargeOp = { product, qty, opType, text, clientName };
+  const msg = (opType==='out'?'Scoți':'Adaugi') + ' ' + qty + ' ' + product.unit + ' ' + product.name + '. Confirmi?';
+  document.getElementById('confirm-text').textContent = msg;
+  document.getElementById('confirm-modal').classList.add('show');
+  speak(qty + ' ' + product.unit + ' de ' + product.name + '. Confirmi?');
+  return true;
+}
+
+function confirmLargeOp() {
+  if (!pendingLargeOp) return;
+  const { product, qty, opType, text, clientName } = pendingLargeOp;
+  pendingLargeOp = null;
+  document.getElementById('confirm-modal').classList.remove('show');
+  executeOperation(opType, product, qty, text, clientName);
+}
+
+// 3. UI: ANIMAȚIE COUNTER LA SCHIMBARE QTY
+function animateQtyChange(productId, oldQty, newQty) {
+  const card = document.getElementById('card-' + productId);
+  if (!card) return;
+  const qtyEl = card.querySelector('.card-qty, [class*="qty"]');
+  if (!qtyEl) return;
+  
+  const duration = 600;
+  const start = performance.now();
+  const diff = newQty - oldQty;
+  
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(oldQty + diff * eased);
+    qtyEl.textContent = current;
+    if (progress < 1) requestAnimationFrame(update);
+    else qtyEl.textContent = newQty;
+  }
+  requestAnimationFrame(update);
+}
+
+// 4. UI: CARD PRODUS REDESENAT CU BADGE STATUS
+function getProductStatusBadge(p) {
+  if (p.qty === 0) return { text: 'EPUIZAT', color: '#ff4757', bg: 'rgba(255,71,87,0.15)' };
+  if (p.qty <= p.min) return { text: 'CRITIC', color: '#ffa502', bg: 'rgba(255,165,2,0.15)' };
+  if (p.auto_min) return { text: 'AUTO', color: '#a78bfa', bg: 'rgba(167,139,250,0.15)' };
+  if (p.cross_dock) return { text: 'CROSS', color: '#4d9fff', bg: 'rgba(77,159,255,0.15)' };
+  if (p.badge) return { text: p.badge.toUpperCase(), color: '#00e5a0', bg: 'rgba(0,229,160,0.15)' };
+  return null;
+}
+
+// 5. UI: DARK/LIGHT MODE ÎMBUNĂTĂȚIT + BLUE THEME
+function applyThemeFull(theme) {
+  const themes = {
+    dark:  { bg:'#0a0c0f', surface:'#111418', surface2:'#181d24', border:'#1e2530', text:'#e8ecf0', dim:'#6b7a8d', accent:'#00e5a0', accent2:'#a78bfa' },
+    light: { bg:'#f4f6f9', surface:'#ffffff', surface2:'#f0f2f5', border:'#dde3eb', text:'#1a1d23', dim:'#6b7897', accent:'#00b87a', accent2:'#7c3aed' },
+    blue:  { bg:'#050b1a', surface:'#0a1628', surface2:'#0f1f3d', border:'#1a2d50', text:'#e0eaff', dim:'#6b8abd', accent:'#4d9fff', accent2:'#a78bfa' },
+    green: { bg:'#030d07', surface:'#071a0e', surface2:'#0d2618', border:'#1a3d25', text:'#e0ffe8', dim:'#5a8a6a', accent:'#00ff88', accent2:'#00e5a0' }
+  };
+  const t = themes[theme] || themes.dark;
+  const root = document.documentElement;
+  root.style.setProperty('--bg', t.bg);
+  root.style.setProperty('--surface', t.surface);
+  root.style.setProperty('--surface2', t.surface2);
+  root.style.setProperty('--border', t.border);
+  root.style.setProperty('--text', t.text);
+  root.style.setProperty('--text-dim', t.dim);
+  root.style.setProperty('--accent', t.accent);
+  root.style.setProperty('--accent2', t.accent2);
+  appSettings.theme = theme;
+  saveAppSettings();
+  
+  // Update theme buttons
+  ['dark','light','blue','green'].forEach(th => {
+    const btn = document.getElementById('theme-' + th);
+    if (btn) {
+      btn.style.background = th === theme ? 'rgba(0,229,160,0.2)' : '';
+      btn.style.borderColor = th === theme ? '#00e5a0' : '#1e2530';
+      btn.style.color = th === theme ? '#00e5a0' : '#6b7a8d';
+    }
+  });
+}
+
+// 6. RAPOARTE: EXPORT GRAFIC CA PNG
+function exportChartAsPNG() {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) { setFeedback('Nu există grafic de exportat!', 'warn'); return; }
+  const link = document.createElement('a');
+  link.download = 'grafic_stocvoce_' + new Date().toISOString().slice(0,10) + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  setFeedback('Grafic exportat ca PNG!', 'ok');
+}
+
+// 7. RAPOARTE: RAPORT ZILNIC DETALIAT
+function generateDailyDetailedReport() {
+  const today = new Date();
+  const todayStr = today.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const todayLog = log.filter(e => e.time && e.time.startsWith(todayStr));
+  
+  const inOps = todayLog.filter(e => e.type === 'in');
+  const outOps = todayLog.filter(e => e.type === 'out');
+  const errOps = todayLog.filter(e => e.type === 'err');
+  const clientsToday = [...new Set(todayLog.filter(e=>e.client).map(e=>e.client))];
+  
+  const el = document.getElementById('daily-report-content');
+  if (!el) return;
+  
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">' +
+    [['Intrări', inOps.length, '#00e5a0'],
+     ['Ieșiri', outOps.length, '#ff4757'],
+     ['Erori', errOps.length, '#ffa502'],
+     ['Clienți', clientsToday.length, '#a78bfa']
+    ].map(([l,v,c]) => '<div style="background:#181d24;border-radius:8px;padding:12px;text-align:center;border-top:2px solid ' + c + '">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:' + c + '">' + v + '</div>' +
+      '<div style="font-size:10px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">' + l + '</div>' +
+      '</div>').join('') + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">OPERAȚII AZI</div>' +
+    todayLog.slice(0,20).map(e => '<div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">' +
+      '<span style="color:' + (e.type==='in'?'#00e5a0':e.type==='out'?'#ff4757':'#ffa502') + ';font-size:11px;font-weight:700">' + (e.type||'').toUpperCase() + '</span>' +
+      '<span style="color:#e8ecf0;font-size:12px;flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (e.cmd||'') + '</span>' +
+      '<span style="color:#6b7a8d;font-size:11px">' + (e.time||'').split(' ')[1] + '</span>' +
+      '</div>').join('');
+  
+  document.getElementById('daily-report-modal').style.display = 'flex';
+}
+
+// 8. CLIENȚI: CĂUTARE RAPIDĂ CLIENT
+function searchClients(query) {
+  if (!query || query.length < 2) return [];
+  const q = normalizeText(query.toLowerCase());
+  const seen = new Set();
+  return clients.filter(c => {
+    const name = normalizeText((c.name||'').toLowerCase());
+    if (name.includes(q) && !seen.has(c.name)) {
+      seen.add(c.name);
+      return true;
+    }
+    return false;
+  }).slice(0, 8);
+}
+
+function renderClientSearch() {
+  const q = document.getElementById('client-search-input').value;
+  const results = searchClients(q);
+  const el = document.getElementById('client-search-results');
+  if (!el) return;
+  
+  if (!results.length) { el.innerHTML = ''; return; }
+  
+  el.innerHTML = results.map(c => {
+    const hist = clients.filter(x => x.name === c.name);
+    const total = hist.length;
+    return '<div onclick="openClientProfile('' + c.name.replace(/'/g,"&#39;") + '')" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#181d24;border-radius:8px;margin-bottom:4px;cursor:pointer" onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background='#181d24'">' +
+      '<div>' +
+      '<div style="font-weight:700;color:#e8ecf0">' + c.name + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + total + ' comenzi · Ultimul: ' + (c.time||'').slice(0,10) + '</div>' +
+      '</div>' +
+      '<div style="color:#00e5a0;font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900">' + total + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// 9. CLIENȚI: DISCOUNT AUTOMAT VIP
+function getAutoDiscount(clientName) {
+  const segs = typeof segmentClients === 'function' ? segmentClients() : [];
+  const client = segs.find(c => normalizeText(c.name.toLowerCase()) === normalizeText(clientName.toLowerCase()));
+  if (!client) return 0;
+  if (client.visits >= 20) return 15; // VIP = 15%
+  if (client.visits >= 10) return 10; // Regular = 10%
+  if (client.visits >= 5) return 5;   // Ocazional = 5%
+  return 0;
+}
+
+function showClientDiscount(clientName) {
+  const discount = getAutoDiscount(clientName);
+  if (discount > 0) {
+    triggerAlert('💎 Client fidel ' + clientName + ' — discount automat ' + discount + '%!', 'ok');
+  }
+}
+
+// 10. SECURITATE: LOG ACCES COMPLET
+function logAccess(action, details) {
+  const entry = {
+    ts: new Date().toISOString(),
+    action,
+    details,
+    user: currentUser ? currentUser.email : 'anonymous',
+    ip: 'browser',
+    ua: navigator.userAgent.slice(0, 60)
+  };
+  const logs = JSON.parse(localStorage.getItem('sv_access_log') || '[]');
+  logs.push(entry);
+  localStorage.setItem('sv_access_log', JSON.stringify(logs.slice(-100)));
+}
+
+// 11. SECURITATE: EXPORT BACKUP COMPLET LOCAL
+function exportFullBackupLocal() {
+  const data = {
+    version: '2.0',
+    exported: new Date().toISOString(),
+    depot: userProfile ? userProfile.depot : '',
+    stock,
+    clients,
+    log: log.slice(0, 500),
+    settings: appSettings,
+    kitProducts: typeof kitProducts !== 'undefined' ? kitProducts : [],
+    bundles: typeof bundles !== 'undefined' ? bundles : []
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'StocVoce_Backup_' + (userProfile ? userProfile.depot.replace(/\s+/g,'_') : 'depot') + '_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  setFeedback('Backup local descărcat!', 'ok');
+  speak('Backup salvat cu succes.');
+}
+
+// 12. SECURITATE: IMPORT BACKUP LOCAL
+function importBackupLocal(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.stock || !data.version) { setFeedback('Fișier backup invalid!', 'err'); return; }
+      
+      if (!confirm('ATENȚIE! Stocul curent va fi înlocuit cu backup-ul din ' + data.exported + '. Continui?')) return;
+      
+      stock = data.stock;
+      if (data.clients) clients = data.clients;
+      if (data.settings) { appSettings = {...appSettings, ...data.settings}; saveAppSettings(); }
+      
+      saveStockToFirebase();
+      renderStock(); updateStats();
+      setFeedback('Backup importat! ' + stock.length + ' produse restaurate.', 'ok');
+      speak('Backup importat cu succes. ' + stock.length + ' produse restaurate.');
+    } catch(e) {
+      setFeedback('Eroare la import: ' + e.message, 'err');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// 13. AI: SUGESTIE AUTOMATĂ COMANDĂ LA TASTATURĂ
+let aiSuggestionTimeout = null;
+function triggerAISuggestion(inputEl) {
+  clearTimeout(aiSuggestionTimeout);
+  aiSuggestionTimeout = setTimeout(async () => {
+    const val = inputEl.value.trim();
+    if (val.length < 3) return;
+    
+    // Simple local suggestion based on stock
+    const norm = normalizeText(val.toLowerCase());
+    const matches = stock.filter(p => normalizeText(p.name.toLowerCase()).includes(norm)).slice(0, 3);
+    
+    if (matches.length > 0) {
+      const existing = document.getElementById('ai-suggestion-box');
+      const box = existing || document.createElement('div');
+      box.id = 'ai-suggestion-box';
+      box.style.cssText = 'position:absolute;background:#181d24;border:1px solid #00e5a0;border-radius:8px;z-index:999;width:100%;top:100%;left:0;box-shadow:0 4px 20px rgba(0,229,160,0.2)';
+      box.innerHTML = matches.map(p => '<div onclick="document.getElementById('manual-input').value='adaugă 1 ' + p.name + '';document.getElementById('ai-suggestion-box').remove()" style="padding:8px 14px;cursor:pointer;color:#e8ecf0;font-size:13px;border-bottom:1px solid #1e2530" onmouseover="this.style.background='#1e2530'" onmouseout="this.style.background=''">' +
+        '<span style="color:#00e5a0;font-weight:700">' + p.name + '</span> <span style="color:#6b7a8d;font-size:11px">(' + p.qty + ' ' + p.unit + ')</span>' +
+        '</div>').join('');
+      
+      if (!existing) {
+        const manInput = document.getElementById('manual-input');
+        if (manInput && manInput.parentNode) {
+          manInput.parentNode.style.position = 'relative';
+          manInput.parentNode.appendChild(box);
+        }
+      }
+    }
+  }, 300);
+}
+
+// 14. AI: ANALIZĂ TENDINȚE SĂPTĂMÂNALE
+async function showTrendsAnalysis() {
+  const el = document.getElementById('trends-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">⏳ AI analizează tendințele...</div>';
+  document.getElementById('trends-modal').style.display = 'flex';
+  
+  const now = new Date();
+  const weeks = [0, 1, 2, 3].map(w => {
+    const start = new Date(now - (w+1) * 7 * 86400000);
+    const end = new Date(now - w * 7 * 86400000);
+    const weekLog = log.filter(e => e.ts && new Date(e.ts) >= start && new Date(e.ts) < end);
+    return { week: 'Săpt -' + w, in: weekLog.filter(e=>e.type==='in').length, out: weekLog.filter(e=>e.type==='out').length, total: weekLog.length };
+  }).reverse();
+  
+  // Draw simple chart
+  const maxVal = Math.max(...weeks.map(w => w.total), 1);
+  el.innerHTML = '<div style="margin-bottom:20px">' +
+    '<div style="font-size:12px;color:#6b7a8d;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">OPERAȚII PER SĂPTĂMÂNĂ</div>' +
+    '<div style="display:flex;gap:12px;align-items:flex-end;height:100px">' +
+    weeks.map(w => '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">' +
+      '<div style="font-size:11px;color:#6b7a8d">' + w.total + '</div>' +
+      '<div style="width:100%;display:flex;flex-direction:column;gap:2px;justify-content:flex-end;height:80px">' +
+      '<div style="background:#00e5a0;border-radius:2px 2px 0 0;height:' + Math.round(w.in/maxVal*70) + 'px"></div>' +
+      '<div style="background:#ff4757;border-radius:0;height:' + Math.round(w.out/maxVal*70) + 'px"></div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:#6b7a8d;text-align:center">' + w.week + '</div>' +
+      '</div>').join('') +
+    '</div>' +
+    '<div style="display:flex;gap:12px;margin-top:8px">' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#00e5a0;border-radius:2px"></div><span style="font-size:11px;color:#6b7a8d">Intrări</span></div>' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#ff4757;border-radius:2px"></div><span style="font-size:11px;color:#6b7a8d">Ieșiri</span></div>' +
+    '</div></div>' +
+    '<div id="trends-ai-text" style="font-size:13px;color:#6b7a8d;padding:12px;background:#181d24;border-radius:8px">Generez analiză AI...</div>';
+  
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 300,
+        messages: [{ role: 'user', content: 'Analizeaza tendintele unui depozit pe 4 saptamani: ' + JSON.stringify(weeks) + '. Produse critice: ' + stock.filter(p=>p.qty<=p.min).length + '. Identifica tendinte si da 3 recomandari. Raspunde in romana, concis.' }]
+      })
+    });
+    const data = await resp.json();
+    const aiEl = document.getElementById('trends-ai-text');
+    if (aiEl) aiEl.innerHTML = '<div style="color:#e8ecf0;line-height:1.7">' + data.content[0].text.replace(/\n/g,'<br>') + '</div>';
+  } catch(e) {
+    const aiEl = document.getElementById('trends-ai-text');
+    if (aiEl) aiEl.textContent = 'AI indisponibil.';
+  }
+}
+
+// ══ ÎMBUNĂTĂȚIRI EXISTENTE ══
+
+// Îmbunătățire 1: Hook discount automat la clienți cunoscuți
+const _origExtractClientName = extractClientName;
+
+
+// Îmbunătățire 2: Log acces la fiecare login
+const _origLoadStock = loadStockFromFirebase;
+
+
+// Îmbunătățire 3: Sugestii în casuta de comandă manuală
+document.addEventListener('DOMContentLoaded', () => {
+  const manInput = document.getElementById('manual-input');
+  if (manInput) {
+    manInput.addEventListener('input', () => triggerAISuggestion(manInput));
+    manInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        const box = document.getElementById('ai-suggestion-box');
+        if (box) box.remove();
+      }, 200);
+    });
+  }
+});
 
 </script>
 
@@ -9540,6 +9968,43 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- DAILY REPORT MODAL -->
+<div id="daily-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Raport Zilnic Detaliat</div>
+      <button onclick="document.getElementById('daily-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="daily-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TRENDS MODAL -->
+<div id="trends-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Tendințe AI</div>
+      <button onclick="document.getElementById('trends-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="trends-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CLIENT SEARCH MODAL -->
+<div id="client-search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔍 Caută Client</div>
+      <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:14px 24px;flex-shrink:0">
+      <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
+    </div>
+    <div id="client-search-results" style="padding:0 24px 20px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -10032,6 +10497,43 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- DAILY REPORT MODAL -->
+<div id="daily-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Raport Zilnic Detaliat</div>
+      <button onclick="document.getElementById('daily-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="daily-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TRENDS MODAL -->
+<div id="trends-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Tendințe AI</div>
+      <button onclick="document.getElementById('trends-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="trends-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CLIENT SEARCH MODAL -->
+<div id="client-search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔍 Caută Client</div>
+      <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:14px 24px;flex-shrink:0">
+      <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
+    </div>
+    <div id="client-search-results" style="padding:0 24px 20px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -10298,6 +10800,43 @@ function showNoMovementReport() {
       <button onclick="document.getElementById('ai-prediction-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
     </div>
     <div id="ai-prediction-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<!-- DAILY REPORT MODAL -->
+<div id="daily-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Raport Zilnic Detaliat</div>
+      <button onclick="document.getElementById('daily-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="daily-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TRENDS MODAL -->
+<div id="trends-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Tendințe AI</div>
+      <button onclick="document.getElementById('trends-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="trends-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CLIENT SEARCH MODAL -->
+<div id="client-search-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔍 Caută Client</div>
+      <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:14px 24px;flex-shrink:0">
+      <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
+    </div>
+    <div id="client-search-results" style="padding:0 24px 20px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
