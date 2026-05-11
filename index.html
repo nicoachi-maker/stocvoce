@@ -2508,8 +2508,10 @@ function extractClientName(text, norm) {
 }
 
 function processCommand(text){
+  console.log('[processCommand] called with:', text);
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   const norm=normalizeText(text.toLowerCase());
+  console.log('[processCommand] norm:', norm);
   
   // Apply dialect normalization
   const normDialect = typeof normalizeDialect === 'function' ? normalizeDialect(text) : norm;
@@ -2589,6 +2591,7 @@ function processCommand(text){
   const product=findProduct(text.split(/\s+/), clientName);
   if(!product){const dbg='⚠️ Produs negăsit: "'+text+'"';setFeedback(dbg,'warn');speak('Produsul nu a fost gasit in stoc.');addLog(text,'Produs negasit','err');console.warn('findProduct failed for:',text,'stock names:',stock.map(p=>p.name));return;}
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
+  console.log('[processCommand] FOUND product:', product.name, 'qty:', qty, 'opType:', opType);
   if(opType==='out'){
     if(product.qty<qty){const msg=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}.`;setFeedback(`❌ ${msg}`,'err');speak(msg);addLog(text,msg,'err');const c=document.getElementById(`card-${product.id}`);if(c){c.classList.add('flash-out');setTimeout(()=>c.classList.remove('flash-out'),600);}return;}
     if(product.sensitive||qty>50){pendingAction={opType,product,qty,text,clientName:clientName};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
@@ -2629,14 +2632,7 @@ function executeOperation(opType,product,qty,originalText,clientName){
     clients.push(clientEntry);
     localStorage.setItem('sv_clients', JSON.stringify(clients));
     if(window.fbReady===true) db.ref('depozite/' + getDepotKey() + '/clients').set(clients);
-    // Auto generate bon if client has name
-    setTimeout(()=>{
-      try {
-        if(confirm(`Generezi bon de livrare pentru ${clientName}?`)){
-          generateBonLivrare(clientName, [{name:product.name,qty,unit:product.unit,price_sell:product.price_sell}]);
-        }
-      } catch(e) { console.error('Bon error:', e); }
-    }, 800);
+    // No auto-confirm dialog - user can generate bon manually
   }
   
   // Check suspicious movement
