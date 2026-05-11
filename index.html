@@ -2517,19 +2517,16 @@ function extractClientName(text, norm) {
 let _lastCmd = '', _lastCmdTime = 0;
 
 function processCommand(text){
-  console.log('[processCommand] called with:', text);
   if(!currentUser){setFeedback('Conectați-vă mai întâi!','err');return;}
   
   // Deduplicate: skip if same command within 2 seconds
   const now = Date.now();
   const norm=normalizeText(text.toLowerCase().trim());
   if(norm === _lastCmd && now - _lastCmdTime < 2000){
-    console.log('[processCommand] DUPLICATE skipped:', norm);
     return;
   }
   _lastCmd = norm;
   _lastCmdTime = now;
-  console.log('[processCommand] norm:', norm);
   
   // Apply dialect normalization
   const normDialect = typeof normalizeDialect === 'function' ? normalizeDialect(text) : norm;
@@ -2554,12 +2551,11 @@ function processCommand(text){
   for(const [name, fn] of syncHandlers){
     if(fn){
       const result = fn(text);
-      if(result === true){ console.log('[processCommand] caught by:', name); return; }
+      if(result === true){ return; }
     }
   }
   // Async handlers - don't block
   if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text)===true)return;
-  console.log('[processCommand] passed all handlers, detecting opType...');
   
   // Use multilingual keywords
   const cmds = getVoiceCommands();
@@ -2599,7 +2595,6 @@ function processCommand(text){
   const product=findProduct(text.split(/\s+/), clientName);
   if(!product){const dbg='⚠️ Produs negăsit: "'+text+'"';setFeedback(dbg,'warn');speak('Produsul nu a fost gasit in stoc.');addLog(text,'Produs negasit','err');console.warn('findProduct failed for:',text,'stock names:',stock.map(p=>p.name));return;}
   if(!qty||qty<=0){setFeedback('⚠️ Cantitate nevalidă.','warn');speak('Cantitate nevalidă.');addLog(text,'Cantitate nevalidă','err');return;}
-  console.log('[processCommand] FOUND product:', product.name, 'qty:', qty, 'opType:', opType);
   if(opType==='out'){
     if(product.qty<qty){const msg=`Stoc insuficient! Disponibil: ${product.qty} ${product.unit}.`;setFeedback(`❌ ${msg}`,'err');speak(msg);addLog(text,msg,'err');const c=document.getElementById(`card-${product.id}`);if(c){c.classList.add('flash-out');setTimeout(()=>c.classList.remove('flash-out'),600);}return;}
     if(product.sensitive||qty>50){pendingAction={opType,product,qty,text,clientName:clientName};document.getElementById('confirm-text').textContent=`Scoți ${qty} ${product.unit} de ${product.name}? Rămân: ${product.qty-qty}.`;document.getElementById('confirm-modal').classList.add('show');speak(`Confirmare! Scoți ${qty} ${product.unit} de ${product.name}?`);return;}
