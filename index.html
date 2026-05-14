@@ -321,17 +321,7 @@ function openInventarAdjust(productId) {
 
 // ── FUNCȚII MODAL LIPSĂ ──
 
-function openInventarModal() {
-  const el = document.getElementById('inventar-list');
-  if (el) {
-    el.innerHTML = stock.map(p => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
-      '<div><div style="color:#e8ecf0;font-weight:700">' + p.name + '</div>' +
-      '<div style="font-size:11px;color:#6b7a8d">Sistem: ' + p.qty + ' ' + p.unit + '</div></div>' +
-      '<input type="number" value="' + p.qty + '" data-id="' + p.id + '" style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#00e5a0;font-size:16px;font-weight:700;padding:6px;text-align:center;outline:none">' +
-      '</div>').join('');
-  }
-  document.getElementById('inventar-modal').style.display = 'flex';
-}
+
 
 function confirmInventar() {
   const inputs = document.querySelectorAll('#inventar-list input[data-id]');
@@ -353,31 +343,9 @@ function confirmInventar() {
   speak(adjusted + ' produse ajustate la inventar.');
 }
 
-function openEticheteModal() {
-  renderEticheteGrid();
-  document.getElementById('etichete-modal').style.display = 'flex';
-}
 
-function renderEticheteGrid() {
-  const el = document.getElementById('etichete-grid');
-  if (!el) return;
-  el.innerHTML = stock.map(p => '<div style="border:1px solid #1e2530;border-radius:8px;padding:10px;background:#181d24;text-align:center">' +
-    '<div style="font-weight:700;color:#e8ecf0;font-size:12px;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + p.name + '</div>' +
-    '<div id="qr-' + p.id + '" style="display:flex;justify-content:center;margin-bottom:6px"></div>' +
-    '<div style="font-size:10px;color:#6b7a8d">' + p.qty + ' ' + p.unit + ' · ' + (p.loc||'—') + '</div>' +
-    '</div>').join('');
-  
-  if (typeof QRCode !== 'undefined') {
-    stock.forEach(p => {
-      const el2 = document.getElementById('qr-' + p.id);
-      if (el2) {
-        try {
-          new QRCode(el2, { text: JSON.stringify({id:p.id, name:p.name, sku:p.sku||''}), width:80, height:80 });
-        } catch(e) {}
-      }
-    });
-  }
-}
+
+
 
 function processQRCode(code) {
   const el = document.getElementById('qr-result');
@@ -391,21 +359,7 @@ function processQRCode(code) {
   }
 }
 
-function doTransfer() {
-  const productId = parseInt(document.getElementById('transfer-product').value);
-  const qty = parseInt(document.getElementById('transfer-qty').value) || 0;
-  const dest = document.getElementById('transfer-dest').value.trim();
-  const p = stock.find(s => s.id === productId);
-  if (!p || !qty || !dest) { setFeedback('Completați toate câmpurile!', 'warn'); return; }
-  if (qty > p.qty) { setFeedback('Stoc insuficient!', 'err'); return; }
-  p.qty -= qty;
-  saveStockToFirebase(); renderStock(); updateStats();
-  addLog('Transfer: ' + p.name + ' → ' + dest, 'OUT ' + qty + ' ' + p.unit, 'out');
-  db.ref('depozite/' + normalizeText(dest.toLowerCase().replace(/\s+/g,'_')) + '/stock').push({ name: p.name, qty, unit: p.unit, cat: p.cat||'', loc: p.loc||'' });
-  document.getElementById('transfer-modal').style.display = 'none';
-  setFeedback('✅ ' + qty + ' ' + p.unit + ' ' + p.name + ' transferat la ' + dest, 'ok');
-  speak(qty + ' ' + p.unit + ' transferat la ' + dest + '.');
-}
+
 
 let importedProducts = [];
 function handleExcelImport(file) {
@@ -1296,6 +1250,82 @@ function confirmImport() {
       <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
       <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">📥 IMPORTĂ →</button>
     </div>
+  </div>
+</div>
+
+
+<!-- SUPPLIER EMAIL MODAL -->
+<div id="supplier-email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📧 Email Furnizor AI</div>
+      <button onclick="document.getElementById('supplier-email-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-email-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PIE CHART MODAL -->
+<div id="pie-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:420px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('pie-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="pie-chart-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MONTHLY COMPARE MODAL -->
+<div id="monthly-compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Comparație Luni</div>
+      <button onclick="document.getElementById('monthly-compare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="monthly-compare-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- HEATMAP MODAL -->
+<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
+      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="heatmap-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PAYMENT SCHEDULE MODAL -->
+<div id="payment-schedule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💳 Scadențar Plăți</div>
+      <button onclick="document.getElementById('payment-schedule-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="payment-schedule-list" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- KIOSK MODAL -->
+<div id="kiosk-modal" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:1000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0">⚡ KIOSK MODE</div>
+    <input id="kiosk-search" placeholder="Caută produs..." oninput="renderKioskProducts(this.value)" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 16px;outline:none;width:250px">
+    <button onclick="closeKioskMode()" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 18px;cursor:pointer">✕ IEȘI</button>
+  </div>
+  <div id="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px;overflow-y:auto;flex:1"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:800;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;padding:32px;text-align:center;max-width:300px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0;margin-bottom:20px">🔒 INTRODU PIN</div>
+    <input id="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="width:100%;background:#181d24;border:2px solid #00e5a0;border-radius:10px;color:#00e5a0;font-size:32px;font-weight:900;padding:14px;text-align:center;outline:none;margin-bottom:16px;letter-spacing:8px">
+    <button onclick="verifyPIN(document.getElementById('pin-input').value)" style="width:100%;background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:14px;cursor:pointer">CONFIRMĂ →</button>
+    <button onclick="document.getElementById('pin-modal').style.display='none'" style="width:100%;background:none;border:none;color:#6b7a8d;font-size:13px;padding:10px;cursor:pointer;margin-top:6px">Anulează</button>
   </div>
 </div>
 
@@ -2638,6 +2668,10 @@ function triggerAISuggestion(inputEl) {
 
 // 14. AI: ANALIZĂ TENDINȚE SĂPTĂMÂNALE
 async function showTrendsAnalysis() {
+        <button class="add-btn" onclick="safeCall('showCategoryPieChart')" style="border-color:#a78bfa;color:#a78bfa">🥧 Categorii</button>
+        <button class="add-btn" onclick="safeCall('showMonthlyComparison')" style="border-color:#00e5a0;color:#00e5a0">📅 3 Luni</button>
+        <button class="add-btn" onclick="safeCall('showActivityHeatmap')" style="border-color:#a78bfa;color:#a78bfa">🔥 Heatmap</button>
+        <button class="add-btn" onclick="safeCall('exportTelegramWithDetails')" style="border-color:#00e5a0;color:#00e5a0">📡 Screenshot TG</button>
   const el = document.getElementById('trends-content');
   if (!el) return;
   el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">⏳ AI analizează tendințele...</div>';
@@ -2712,6 +2746,666 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+// ══════════════════════════════════════════
+// BLOC 1: AI & AUTOMATIZĂRI
+// ══════════════════════════════════════════
+
+// 18. AI DENUMIRE PRODUS DIN POZĂ
+async function aiNameFromPhoto(file) {
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    const mediaType = file.type || 'image/jpeg';
+    setFeedback('🤖 AI identifică produsul...', 'ok');
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 150,
+          messages: [{ role: 'user', content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: 'Identifica acest produs de depozit/magazin. Raspunde STRICT cu JSON: {"name":"nume produs","cat":"categorie","unit":"UM"} fara alt text.' }
+          ]}]
+        })
+      });
+      const data = await resp.json();
+      const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+      const result = JSON.parse(raw);
+      const setV = (id, v) => { const el = document.getElementById(id); if(el && v) el.value = v; };
+      setV('new-name', result.name);
+      setV('new-cat', result.cat);
+      setV('new-unit', result.unit);
+      setFeedback('✅ AI a identificat: ' + result.name, 'ok');
+      speak('Produs identificat: ' + result.name);
+    } catch(e) { setFeedback('❌ AI nu a putut identifica produsul.', 'err'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+// 19. AI EMAIL FURNIZOR AUTOMAT
+async function aiGenerateSupplierEmail() {
+  const low = stock.filter(p => p.qty <= p.min && p.supplier);
+  if (!low.length) { setFeedback('Niciun produs sub minim cu furnizor!', 'warn'); return; }
+
+  const grouped = {};
+  low.forEach(p => {
+    if (!grouped[p.supplier]) grouped[p.supplier] = [];
+    grouped[p.supplier].push({ name: p.name, qty: p.qty, min: p.min, unit: p.unit, toOrder: Math.max(p.moq||p.min*3, p.min*3-p.qty) });
+  });
+
+  const el = document.getElementById('supplier-email-content');
+  if (el) { el.innerHTML = '<div style="color:#6b7a8d;padding:20px;text-align:center">⏳ AI generează emailul...</div>'; }
+  document.getElementById('supplier-email-modal').style.display = 'flex';
+
+  for (const [supplier, products] of Object.entries(grouped)) {
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 400,
+          messages: [{ role: 'user', content: 'Scrie un email profesional de comanda catre furnizorul "' + supplier + '" pentru urmatoarele produse: ' + JSON.stringify(products) + '. Depozit: ' + (userProfile?userProfile.depot:'') + '. Email scurt, politicos, in romana, cu lista clara.' }]
+        })
+      });
+      const data = await resp.json();
+      const emailText = data.content[0].text;
+      if (el) {
+        el.innerHTML += '<div style="background:#181d24;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid #ffa502">' +
+          '<div style="font-weight:700;color:#ffa502;margin-bottom:8px">📧 ' + supplier + '</div>' +
+          '<pre style="color:#e8ecf0;font-size:12px;white-space:pre-wrap;font-family:inherit">' + emailText + '</pre>' +
+          '<button onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent).then(()=>setFeedback('Copiat!','ok'))" style="margin-top:8px;background:#ffa502;border:none;border-radius:6px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;padding:6px 12px;cursor:pointer">📋 COPIAZĂ</button>' +
+          '</div>';
+      }
+    } catch(e) { if(el) el.innerHTML += '<div style="color:#ff4757">Eroare AI pentru ' + supplier + '</div>'; }
+  }
+}
+
+// 20. AI REZUMAT ZILNIC VOCAL
+async function aiDailySummaryVocal() {
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const todayLog = log.filter(e => e.time && e.time.startsWith(todayStr));
+  const zero = stock.filter(p => p.qty === 0).length;
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
+  const val = typeof calculateStockValue === 'function' ? calculateStockValue() : { totalBuy: 0 };
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 200,
+        messages: [{ role: 'user', content: 'Genereaza un rezumat vocal scurt (max 3 propozitii) pentru depozitul ' + (userProfile?userProfile.depot:'') + ': ' + todayLog.length + ' operatii azi, ' + zero + ' produse epuizate, ' + low + ' stoc scazut, valoare stoc ' + val.totalBuy + ' RON. Ton prietenos, in romana.' }]
+      })
+    });
+    const data = await resp.json();
+    const summary = data.content[0].text;
+    speak(summary);
+    setFeedback('🤖 ' + summary, 'ok');
+  } catch(e) {
+    const fallback = 'Astazi ai avut ' + todayLog.length + ' operatii. ' + zero + ' produse epuizate, ' + low + ' cu stoc scazut.';
+    speak(fallback);
+    setFeedback('📊 ' + fallback, 'ok');
+  }
+}
+
+// Auto-trigger la ora 18:00
+function checkAIDailySummaryTime() {
+  const now = new Date();
+  if (now.getHours() !== 18 || now.getMinutes() !== 0) return;
+  const today = now.toISOString().slice(0,10);
+  if (localStorage.getItem('sv_ai_summary_' + today)) return;
+  localStorage.setItem('sv_ai_summary_' + today, '1');
+  aiDailySummaryVocal();
+}
+setInterval(function(){ if(typeof checkAIDailySummaryTime==='function') checkAIDailySummaryTime(); }, 60000);
+
+
+// ══════════════════════════════════════════
+// BLOC 2: VOCE & COMENZI VOCALE
+// ══════════════════════════════════════════
+
+// 1. "câți bani am în stoc?"
+function handleMoneyQuery(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('bani') && !norm.includes('valoare') && !norm.includes('cat valorez') && !norm.includes('cat face')) return false;
+  const val = typeof calculateStockValue === 'function' ? calculateStockValue() : { totalBuy: 0, totalSell: 0 };
+  const buy = parseFloat(val.totalBuy || 0).toFixed(0);
+  const sell = parseFloat(val.totalSell || 0).toFixed(0);
+  const msg = 'Valoare stoc la cost: ' + buy + ' lei. Valoare la vanzare: ' + sell + ' lei.';
+  speak(msg);
+  setFeedback('💰 ' + msg, 'ok');
+  return true;
+}
+
+// 2. "ce produse sunt critice?"
+function handleCriticalQuery(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('critic') && !norm.includes('urgente') && !norm.includes('urgent') && !norm.includes('lipsa') && !norm.includes('lipseste')) return false;
+  const zero = stock.filter(p => p.qty === 0).slice(0,3);
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).slice(0,3);
+  let msg = '';
+  if (zero.length) msg += 'Epuizate: ' + zero.map(p=>p.name).join(', ') + '. ';
+  if (low.length) msg += 'Stoc scazut: ' + low.map(p=>p.name+' '+p.qty+' '+p.unit).join(', ') + '.';
+  if (!msg) msg = 'Toate produsele au stoc suficient!';
+  speak(msg);
+  setFeedback('⚠️ ' + msg, low.length+zero.length > 0 ? 'warn' : 'ok');
+  return true;
+}
+
+// 3. CORECȚIE VOCALĂ "nu, anulează" → undo instant
+function handleVoiceUndo(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('nu anula') && !norm.includes('anuleaza') && !norm.includes('undo') && !norm.includes('gresit') && !norm.includes('inapoi')) return false;
+  if (typeof undoLastOperation === 'function') undoLastOperation();
+  return true;
+}
+
+// 4. COMANDĂ VOCALĂ NUMĂR ORDINAL
+function handleOrdinalCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const ordinals = { 'primul':1,'prima':1,'al doilea':2,'a doua':2,'al treilea':3,'a treia':3,'al patrulea':4,'al cincilea':5 };
+  let found = null;
+  for (const [word, num] of Object.entries(ordinals)) {
+    if (norm.includes(normalizeText(word))) { found = num; break; }
+  }
+  if (!found) return false;
+  const sorted = [...stock].sort((a,b) => a.name.localeCompare(b.name));
+  const product = sorted[found - 1];
+  if (!product) return false;
+
+  const inKW = ['adauga','adaugă','pune','baga'];
+  const outKW = ['scoate','scade','ia','minus'];
+  const opType = inKW.some(k => norm.includes(normalizeText(k))) ? 'in' : outKW.some(k => norm.includes(normalizeText(k))) ? 'out' : null;
+  if (!opType) return false;
+
+  const qty = parseQuantity(norm) || 1;
+  if (opType === 'in') product.qty += qty;
+  else product.qty = Math.max(0, product.qty - qty);
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog(text, opType.toUpperCase() + ' ' + qty + ' ' + product.unit + ' ' + product.name, opType);
+  speak('OK. ' + (opType==='in'?'Adaugat':'Scos') + ' ' + qty + ' ' + product.unit + ' ' + product.name + '.');
+  setFeedback('✅ ' + product.name + ': ' + (opType==='in'?'+':'-') + qty + ' ' + product.unit, 'ok');
+  return true;
+}
+
+
+// ══════════════════════════════════════════
+// BLOC 3: PRODUSE & STOC
+// ══════════════════════════════════════════
+
+// 5. PRODUS CU VARIANTE
+let productVariants = JSON.parse(localStorage.getItem('sv_variants') || '{}');
+
+function addVariant(parentId, variantName, variantQty, variantUnit) {
+  const parent = stock.find(p => p.id === parentId);
+  if (!parent) return;
+  if (!productVariants[parentId]) productVariants[parentId] = [];
+  productVariants[parentId].push({ name: variantName, qty: variantQty, unit: variantUnit||parent.unit, id: Date.now() });
+  localStorage.setItem('sv_variants', JSON.stringify(productVariants));
+  setFeedback('✅ Variantă adăugată: ' + variantName + ' la ' + parent.name, 'ok');
+}
+
+function getVariants(productId) {
+  return productVariants[String(productId)] || [];
+}
+
+// 6. STOC NEGATIV BLOCAT CU SUGESTIE
+function checkNegativeStock(product, qty) {
+  if (product.qty >= qty) return true;
+  const alts = stock.filter(p => p.id !== product.id &&
+    normalizeText(p.cat||'').toLowerCase() === normalizeText(product.cat||'').toLowerCase() &&
+    p.qty > 0).slice(0,3);
+  let msg = '❌ Stoc insuficient! ' + product.name + ': ' + product.qty + ' ' + product.unit + ' disponibil.';
+  if (alts.length) msg += ' Alternativ: ' + alts.map(p=>p.name+' ('+p.qty+')').join(', ');
+  setFeedback(msg, 'err');
+  speak('Stoc insuficient. Disponibil: ' + product.qty + ' ' + product.unit + '.' + (alts.length ? ' Alternativa: ' + alts[0].name : ''));
+  return false;
+}
+
+// 7. BADGE EXPIRARE PE CARD
+function getExpiryBadge(product) {
+  if (!product.expiry) return null;
+  const today = new Date();
+  const exp = new Date(product.expiry);
+  const days = Math.ceil((exp - today) / 86400000);
+  if (days < 0) return { text: 'EXPIRAT', color: '#ff4757', bg: 'rgba(255,71,87,0.2)' };
+  if (days <= 7) return { text: days + 'z', color: '#ff4757', bg: 'rgba(255,71,87,0.15)' };
+  if (days <= 14) return { text: days + 'z', color: '#ffa502', bg: 'rgba(255,165,2,0.15)' };
+  if (days <= 30) return { text: days + 'z', color: '#a78bfa', bg: 'rgba(167,139,250,0.15)' };
+  return null;
+}
+
+// 8. COST MEDIU PONDERAT
+function updateWeightedAvgCost(product, newQty, newPrice) {
+  if (!newPrice || !newQty) return;
+  const existingValue = (product.price_buy || 0) * product.qty;
+  const newValue = newPrice * newQty;
+  const totalQty = product.qty + newQty;
+  if (totalQty > 0) {
+    product.price_buy = parseFloat(((existingValue + newValue) / totalQty).toFixed(4));
+    setFeedback('📊 Cost mediu ponderat actualizat: ' + product.price_buy.toFixed(2) + ' RON/' + product.unit, 'ok');
+  }
+}
+
+// 9. PRODUS SEZONIER
+function toggleSeasonalProduct(productId, activeSeason) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.seasonal = !p.seasonal;
+  p.active_season = activeSeason || null;
+  saveStockToFirebase(); renderStock();
+  setFeedback((p.seasonal ? '🌸 Produs marcat ca sezonier: ' : '✅ Sezonier eliminat: ') + p.name, 'ok');
+}
+
+function getSeasonalStatus(product) {
+  if (!product.seasonal) return null;
+  const month = new Date().getMonth();
+  const seasons = { vara: [5,6,7], iarna: [11,0,1], primavara: [2,3,4], toamna: [8,9,10] };
+  const activeSeason = product.active_season ? product.active_season.toLowerCase() : null;
+  if (!activeSeason) return { text: 'SEZON', color: '#a78bfa', active: true };
+  const monthsForSeason = seasons[activeSeason] || [];
+  const isActive = monthsForSeason.includes(month);
+  return { text: isActive ? 'IN SEZON' : 'OFF SEZON', color: isActive ? '#00e5a0' : '#6b7a8d', active: isActive };
+}
+
+
+// ══════════════════════════════════════════
+// BLOC 4: CLIENȚI & VÂNZĂRI
+// ══════════════════════════════════════════
+
+// 10. FACTURĂ PROFORMA PDF
+async 
+
+// 11. COMANDĂ PE WHATSAPP
+function generateWhatsAppOrder(clientName, items) {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  let msg = 'Buna ziua ' + clientName + '!%0A%0AComanda dumneavoastra din ' + now + ':%0A%0A';
+  items.forEach((item, i) => {
+    msg += (i+1) + '. ' + item.name + ': ' + item.qty + ' ' + (item.unit||'buc');
+    if (item.price) msg += ' x ' + item.price + ' RON = ' + (item.qty*item.price).toFixed(2) + ' RON';
+    msg += '%0A';
+  });
+  const total = items.reduce((s,i) => s + (i.price||0)*i.qty, 0);
+  if (total > 0) msg += '%0ATotal: ' + total.toFixed(2) + ' RON';
+  msg += '%0A%0AVa multumim! ' + depot;
+
+  const phone = prompt('Numar telefon client (fara 0, ex: 7XXXXXXXX):');
+  if (!phone) return;
+  const url = 'https://wa.me/40' + phone.replace(/\D/g,'') + '?text=' + msg;
+  window.open(url, '_blank');
+  setFeedback('✅ WhatsApp deschis pentru ' + clientName, 'ok');
+}
+
+// 12. CLIENT CU ADRESĂ DE LIVRARE
+let clientAddresses = JSON.parse(localStorage.getItem('sv_addresses') || '{}');
+
+function setClientAddress(clientName, address, city, county) {
+  const key = normalizeText(clientName.toLowerCase());
+  clientAddresses[key] = { address, city, county, updated: new Date().toISOString() };
+  localStorage.setItem('sv_addresses', JSON.stringify(clientAddresses));
+  setFeedback('✅ Adresă salvată pentru ' + clientName, 'ok');
+}
+
+function getClientAddress(clientName) {
+  return clientAddresses[normalizeText(clientName.toLowerCase())] || null;
+}
+
+// 13. SCADENȚAR PLĂȚI
+let paymentSchedule = JSON.parse(localStorage.getItem('sv_payments') || '[]');
+
+function addPaymentSchedule(clientName, amount, dueDate, description) {
+  paymentSchedule.push({ id: Date.now(), clientName, amount: parseFloat(amount), dueDate, description: description||'', paid: false, created: new Date().toISOString() });
+  localStorage.setItem('sv_payments', JSON.stringify(paymentSchedule));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/payments').set(paymentSchedule);
+  setFeedback('💳 Scadență adăugată: ' + clientName + ' — ' + amount + ' RON până la ' + dueDate, 'ok');
+}
+
+function markPaymentPaid(paymentId) {
+  const p = paymentSchedule.find(x => x.id === paymentId);
+  if (p) { p.paid = true; p.paidDate = new Date().toISOString(); }
+  localStorage.setItem('sv_payments', JSON.stringify(paymentSchedule));
+  renderPaymentSchedule();
+  setFeedback('✅ Plată marcată ca încasată!', 'ok');
+}
+
+function getOverduePayments() {
+  const today = new Date().toISOString().slice(0,10);
+  return paymentSchedule.filter(p => !p.paid && p.dueDate < today);
+}
+
+function renderPaymentSchedule() {
+  const el = document.getElementById('payment-schedule-list');
+  if (!el) return;
+  const pending = paymentSchedule.filter(p => !p.paid).sort((a,b) => a.dueDate.localeCompare(b.dueDate));
+  const today = new Date().toISOString().slice(0,10);
+  el.innerHTML = pending.length === 0
+    ? '<div style="color:#6b7a8d;text-align:center;padding:20px">Nicio plată în așteptare! 🎉</div>'
+    : pending.map(p => {
+        const overdue = p.dueDate < today;
+        const color = overdue ? '#ff4757' : p.dueDate === today ? '#ffa502' : '#00e5a0';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ' + color + '">' +
+          '<div><div style="font-weight:700;color:#e8ecf0">' + p.clientName + '</div>' +
+          '<div style="font-size:11px;color:#6b7a8d">' + (p.description||'') + ' · Scadent: ' + p.dueDate + (overdue?' ⚠️ RESTANT':'') + '</div></div>' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+          '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:' + color + '">' + p.amount.toFixed(0) + ' RON</div>' +
+          '<button onclick="markPaymentPaid(' + p.id + ')" style="background:#00e5a0;border:none;border-radius:6px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:11px;padding:5px 8px;cursor:pointer">✓ PLĂTIT</button>' +
+          '</div></div>';
+      }).join('');
+}
+
+function checkOverduePayments() {
+  const overdue = getOverduePayments();
+  if (overdue.length > 0) {
+    triggerAlert('💳 ' + overdue.length + ' plăți restante! Total: ' + overdue.reduce((s,p)=>s+p.amount,0).toFixed(0) + ' RON', 'warn');
+  }
+}
+setInterval(function(){ if(typeof checkOverduePayments==='function') checkOverduePayments(); }, 3600000);
+
+
+// ══════════════════════════════════════════
+// BLOC 5: RAPOARTE & GRAFICE
+// ══════════════════════════════════════════
+
+// 14. GRAFIC PIE CATEGORII
+function showCategoryPieChart() {
+  const cats = {};
+  stock.forEach(p => {
+    const cat = p.cat || 'General';
+    if (!cats[cat]) cats[cat] = 0;
+    cats[cat] += (p.price_buy || 0) * p.qty;
+  });
+  const entries = Object.entries(cats).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const total = entries.reduce((s,[,v]) => s+v, 0);
+  const colors = ['#00e5a0','#a78bfa','#ffa502','#ff4757','#4d9fff','#ff6b9d','#26de81','#fd9644'];
+
+  const el = document.getElementById('pie-chart-content');
+  if (!el) return;
+
+  let pieHTML = '<svg viewBox="0 0 200 200" style="width:180px;height:180px;display:block;margin:0 auto 16px">';
+  let startAngle = -Math.PI/2;
+  entries.forEach(([cat, val], i) => {
+    const pct = val / total;
+    const angle = pct * Math.PI * 2;
+    const x1 = 100 + 90*Math.cos(startAngle);
+    const y1 = 100 + 90*Math.sin(startAngle);
+    const x2 = 100 + 90*Math.cos(startAngle+angle);
+    const y2 = 100 + 90*Math.sin(startAngle+angle);
+    const large = angle > Math.PI ? 1 : 0;
+    pieHTML += '<path d="M100,100 L' + x1.toFixed(1) + ',' + y1.toFixed(1) + ' A90,90 0 ' + large + ',1 ' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' Z" fill="' + colors[i] + '" opacity="0.9"/>';
+    startAngle += angle;
+  });
+  pieHTML += '</svg>';
+
+  pieHTML += '<div style="display:flex;flex-direction:column;gap:6px">';
+  entries.forEach(([cat, val], i) => {
+    const pct = (val/total*100).toFixed(1);
+    pieHTML += '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div style="display:flex;align-items:center;gap:6px">' +
+      '<div style="width:10px;height:10px;border-radius:2px;background:' + colors[i] + '"></div>' +
+      '<span style="font-size:12px;color:#e8ecf0">' + cat + '</span></div>' +
+      '<span style="font-size:12px;color:' + colors[i] + ';font-weight:700">' + pct + '%</span>' +
+      '</div>';
+  });
+  pieHTML += '</div>';
+
+  el.innerHTML = pieHTML;
+  document.getElementById('pie-chart-modal').style.display = 'flex';
+}
+
+// 15. RAPORT LUNAR COMPARAT
+function showMonthlyComparison() {
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const thisYear = now.getFullYear();
+  const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+  const thisLog = log.filter(e => e.ts && new Date(e.ts).getMonth()===thisMonth && new Date(e.ts).getFullYear()===thisYear);
+  const lastLog = log.filter(e => e.ts && new Date(e.ts).getMonth()===lastMonth && new Date(e.ts).getFullYear()===lastYear);
+
+  const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+  const el = document.getElementById('monthly-compare-content');
+  if (!el) return;
+
+  const stats = (logs) => ({
+    total: logs.length,
+    in: logs.filter(e=>e.type==='in').length,
+    out: logs.filter(e=>e.type==='out').length,
+    clients: new Set(logs.filter(e=>e.client).map(e=>e.client)).size
+  });
+
+  const curr = stats(thisLog);
+  const prev = stats(lastLog);
+  const diff = (a,b) => b===0 ? 0 : Math.round((a-b)/b*100);
+
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' +
+    [['Luna curentă', months[thisMonth], curr, '#00e5a0'],
+     ['Luna precedentă', months[lastMonth], prev, '#6b7a8d']
+    ].map(([label, month, s, color]) =>
+      '<div style="background:#181d24;border-radius:10px;padding:14px;border-top:2px solid ' + color + '">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:' + color + ';margin-bottom:8px">' + label + ' (' + month + ')</div>' +
+      '<div style="font-size:12px;color:#99a8b8;line-height:1.8">' +
+      'Total ops: <b style="color:#e8ecf0">' + s.total + '</b><br>' +
+      'Intrări: <b style="color:#00e5a0">' + s.in + '</b><br>' +
+      'Ieșiri: <b style="color:#ff4757">' + s.out + '</b><br>' +
+      'Clienți: <b style="color:#a78bfa">' + s.clients + '</b>' +
+      '</div></div>').join('') + '</div>' +
+    '<div style="background:#181d24;border-radius:10px;padding:14px;text-align:center">' +
+    '<div style="font-size:12px;color:#6b7a8d;margin-bottom:6px">SCHIMBARE FAȚĂ DE LUNA TRECUTĂ</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:' + (diff(curr.total,prev.total)>=0?'#00e5a0':'#ff4757') + '">' +
+    (diff(curr.total,prev.total)>=0?'+':'') + diff(curr.total,prev.total) + '%</div>' +
+    '</div>';
+
+  document.getElementById('monthly-compare-modal').style.display = 'flex';
+}
+
+// 16. HEAT MAP ACTIVITATE ZILNICĂ
+function showActivityHeatmap() {
+  const dayNames = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum'];
+  const dayCounts = new Array(7).fill(0);
+  const hourCounts = new Array(24).fill(0);
+
+  log.filter(e => e.ts).forEach(e => {
+    const d = new Date(e.ts);
+    const day = (d.getDay()+6) % 7;
+    dayCounts[day]++;
+    hourCounts[d.getHours()]++;
+  });
+
+  const maxDay = Math.max(...dayCounts, 1);
+  const maxHour = Math.max(...hourCounts, 1);
+
+  const el = document.getElementById('heatmap-content');
+  if (!el) return;
+
+  el.innerHTML = '<div style="margin-bottom:16px">' +
+    '<div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">ACTIVITATE PER ZI</div>' +
+    '<div style="display:flex;gap:6px;align-items:flex-end;height:80px">' +
+    dayCounts.map((c, i) => '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">' +
+      '<div style="font-size:10px;color:#6b7a8d">' + c + '</div>' +
+      '<div style="width:100%;background:rgba(0,229,160,' + (c/maxDay).toFixed(2) + ');border-radius:3px 3px 0 0;min-height:3px;height:' + Math.max(3,Math.round(c/maxDay*60)) + 'px"></div>' +
+      '<div style="font-size:10px;color:#6b7a8d">' + dayNames[i] + '</div>' +
+      '</div>').join('') +
+    '</div></div>' +
+    '<div><div style="font-size:11px;color:#6b7a8d;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">ACTIVITATE PER ORĂ</div>' +
+    '<div style="display:flex;gap:2px;align-items:flex-end;height:60px">' +
+    hourCounts.map((c, i) => '<div style="flex:1;background:rgba(167,139,250,' + (c/maxHour).toFixed(2) + ');border-radius:2px 2px 0 0;min-height:2px;height:' + Math.max(2,Math.round(c/maxHour*50)) + 'px" title="' + i + ':00 - ' + c + ' ops"></div>').join('') +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;margin-top:4px">' +
+    ['0','6','12','18','23'].map(h => '<span style="font-size:10px;color:#6b7a8d">' + h + ':00</span>').join('') +
+    '</div></div>';
+
+  document.getElementById('heatmap-modal').style.display = 'flex';
+}
+
+// 17. EXPORT TELEGRAM CU GRAFIC DETALIAT
+async function exportTelegramWithDetails() {
+  if (!userProfile || !userProfile.telegram_id) { setFeedback('Setați ID Telegram în profil!', 'warn'); return; }
+  const now = new Date().toLocaleDateString('ro-RO');
+  const val = typeof calculateStockValue === 'function' ? calculateStockValue() : { totalBuy: 0 };
+  const zero = stock.filter(p => p.qty === 0).length;
+  const low = stock.filter(p => p.qty > 0 && p.qty <= p.min).length;
+  const todayStr = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const todayOps = log.filter(e => e.time && e.time.startsWith(todayStr));
+
+  const msg = '<b>📊 RAPORT DETALIAT — ' + now + '</b>
+' +
+    '<b>🏭 ' + userProfile.depot + '</b>
+
+' +
+    '📦 Total produse: <b>' + stock.length + '</b>
+' +
+    '🔴 Epuizate: <b>' + zero + '</b>
+' +
+    '⚠️ Stoc scăzut: <b>' + low + '</b>
+' +
+    '💰 Valoare stoc: <b>' + parseFloat(val.totalBuy||0).toFixed(0) + ' RON</b>
+
+' +
+    '📈 Operații azi: <b>' + todayOps.length + '</b>
+' +
+    '➕ Intrări: <b>' + todayOps.filter(e=>e.type==='in').length + '</b>
+' +
+    '➖ Ieșiri: <b>' + todayOps.filter(e=>e.type==='out').length + '</b>
+
+' +
+    (zero > 0 ? '🔴 <b>Epuizate:</b> ' + stock.filter(p=>p.qty===0).slice(0,5).map(p=>p.name).join(', ') + '
+' : '') +
+    (low > 0 ? '⚠️ <b>Critice:</b> ' + stock.filter(p=>p.qty>0&&p.qty<=p.min).slice(0,5).map(p=>p.name+' ('+p.qty+')').join(', ') : '');
+
+  await sendTelegramAlert(msg, userProfile.telegram_id);
+  setFeedback('✅ Raport detaliat trimis pe Telegram!', 'ok');
+  speak('Raport trimis pe Telegram.');
+}
+
+
+// ══════════════════════════════════════════
+// BLOC 6-8: UI, SECURITATE, INTEGRĂRI
+// ══════════════════════════════════════════
+
+// 21. CARDURI CU IMAGINE DIN FIREBASE STORAGE
+function uploadProductPhoto(productId, file) {
+  if (!window.firebase || !firebase.storage) { setFeedback('Firebase Storage nu e disponibil!', 'warn'); return; }
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const storageRef = firebase.storage().ref('products/' + getDepotKey() + '/' + productId + '_' + file.name);
+  setFeedback('⏳ Se încarcă poza...', 'ok');
+  storageRef.put(file).then(snapshot => {
+    snapshot.ref.getDownloadURL().then(url => {
+      p.photo_url = url;
+      saveStockToFirebase(); renderStock();
+      setFeedback('✅ Poza salvată pentru ' + p.name, 'ok');
+    });
+  }).catch(e => setFeedback('❌ Eroare upload: ' + e.message, 'err'));
+}
+
+// 22. MOD KIOSK
+function openKioskMode() {
+  document.getElementById('kiosk-modal').style.display = 'flex';
+  renderKioskProducts('');
+  document.getElementById('kiosk-search').focus();
+  try { document.documentElement.requestFullscreen(); } catch(e) {}
+}
+function closeKioskMode() {
+  document.getElementById('kiosk-modal').style.display = 'none';
+  try { document.exitFullscreen(); } catch(e) {}
+}
+function renderKioskProducts(search) {
+  const el = document.getElementById('kiosk-grid');
+  if (!el) return;
+  const filtered = stock.filter(p => !search || normalizeText(p.name.toLowerCase()).includes(normalizeText(search.toLowerCase()))).slice(0,20);
+  el.innerHTML = filtered.map(p => '<div style="background:#181d24;border-radius:12px;padding:20px;text-align:center;border:2px solid ' + (p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#1e2530') + '">' +
+    (p.photo_url ? '<img src="' + p.photo_url + '" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-bottom:8px"><br>' : '') +
+    '<div style="font-weight:700;color:#e8ecf0;font-size:14px;margin-bottom:4px">' + p.name + '</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;color:' + (p.qty===0?'#ff4757':p.qty<=p.min?'#ffa502':'#00e5a0') + '">' + p.qty + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d;margin-bottom:12px">' + p.unit + '</div>' +
+    '<div style="display:flex;gap:8px;justify-content:center">' +
+    '<button onclick="kioskOp(' + p.id + ','out')" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:20px;padding:10px 18px;cursor:pointer;min-width:50px">−</button>' +
+    '<button onclick="kioskOp(' + p.id + ','in')" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:20px;padding:10px 18px;cursor:pointer;min-width:50px">+</button>' +
+    '</div></div>').join('');
+}
+function kioskOp(productId, opType) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  if (opType === 'in') p.qty++;
+  else { if (p.qty <= 0) return; p.qty--; }
+  saveStockToFirebase(); updateStats();
+  addLog('Kiosk: ' + p.name, opType.toUpperCase() + ' 1 ' + p.unit, opType);
+  renderKioskProducts(document.getElementById('kiosk-search').value);
+}
+
+// 23. PIN RAPID OPERATOR
+let operatorPINs = JSON.parse(localStorage.getItem('sv_pins') || '{}');
+let currentPINOperator = null;
+
+function setOperatorPIN(name, pin) {
+  if (pin.length !== 4 || isNaN(pin)) { setFeedback('PIN-ul trebuie să fie 4 cifre!', 'err'); return; }
+  operatorPINs[normalizeText(name.toLowerCase())] = { name, pin, created: new Date().toISOString() };
+  localStorage.setItem('sv_pins', JSON.stringify(operatorPINs));
+  setFeedback('✅ PIN setat pentru ' + name, 'ok');
+}
+
+function verifyPIN(pin) {
+  for (const [key, op] of Object.entries(operatorPINs)) {
+    if (op.pin === pin) {
+      currentPINOperator = op.name;
+      setFeedback('✅ Bun venit, ' + op.name + '!', 'ok');
+      speak('Bun venit, ' + op.name);
+      document.getElementById('pin-modal').style.display = 'none';
+      return true;
+    }
+  }
+  logFailedLogin(pin);
+  setFeedback('❌ PIN greșit!', 'err');
+  return false;
+}
+
+// 24. LOG ÎNCERCĂRI EȘUATE
+let failedLogins = JSON.parse(localStorage.getItem('sv_failed_logins') || '[]');
+
+function logFailedLogin(attempt) {
+  const entry = { ts: new Date().toISOString(), attempt: attempt.replace(/./g, '*'), ua: navigator.userAgent.slice(0,60) };
+  failedLogins.push(entry);
+  localStorage.setItem('sv_failed_logins', JSON.stringify(failedLogins.slice(-20)));
+  const recentFails = failedLogins.filter(e => Date.now() - new Date(e.ts).getTime() < 300000);
+  if (recentFails.length >= 3 && userProfile && userProfile.telegram_id) {
+    sendTelegramAlert('ATENTIE! 3 incercari esuate de autentificare in ultimele 5 minute. Depozit: ' + (userProfile.depot||''), userProfile.telegram_id);
+    setFeedback('⚠️ Alertă securitate trimisă pe Telegram!', 'warn');
+  }
+}
+
+// 25. WEBHOOK ZAPIER/MAKE
+let webhookUrl = localStorage.getItem('sv_webhook_url') || '';
+
+
+
+async function fireWebhook(event, data) {
+  if (!webhookUrl) return;
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      body: JSON.stringify({ event, data, depot: userProfile ? userProfile.depot : '', ts: new Date().toISOString() })
+    });
+  } catch(e) { console.log('Webhook error:', e.message); }
+}
+
+function openWebhookSettings() {
+        <button class="add-btn" onclick="safeCall('openKioskMode')" style="border-color:#00e5a0;color:#00e5a0">📺 Kiosk</button>
+        <button class="add-btn" onclick="document.getElementById('pin-modal').style.display='flex'" style="border-color:#ffa502;color:#ffa502">🔒 PIN Login</button>
+        <button class="add-btn" onclick="safeCall('openWebhookSettings')" style="border-color:#6b7a8d;color:#6b7a8d">🔗 Webhook</button>
+        <button class="add-btn" onclick="safeCall('aiDailySummaryVocal')" style="border-color:#a78bfa;color:#a78bfa">🎙️ Rezumat AI</button>
+  const url = prompt('Introdu URL webhook (Zapier/Make/n8n):
+
+Exemplu: https://hooks.zapier.com/hooks/catch/...', webhookUrl);
+  if (url !== null) { setWebhookUrl(url); }
+}
 
 </script>
 
@@ -3962,6 +4656,8 @@ function deleteProduct(productId, productName) {
   saveStockToFirebase();
   renderStock();
   updateStats();
+  // Fire webhook if configured
+  if(typeof fireWebhook==='function') fireWebhook('stock_operation', {type:opType, product:product.name, qty, depot: userProfile?userProfile.depot:''});
   
   addLog(`Șters: ${productName}`, 'Produs eliminat din stoc', 'out');
   speak(`Produs ${productName} șters din stoc.`);
@@ -10515,6 +11211,82 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- SUPPLIER EMAIL MODAL -->
+<div id="supplier-email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📧 Email Furnizor AI</div>
+      <button onclick="document.getElementById('supplier-email-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-email-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PIE CHART MODAL -->
+<div id="pie-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:420px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('pie-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="pie-chart-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MONTHLY COMPARE MODAL -->
+<div id="monthly-compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Comparație Luni</div>
+      <button onclick="document.getElementById('monthly-compare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="monthly-compare-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- HEATMAP MODAL -->
+<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
+      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="heatmap-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PAYMENT SCHEDULE MODAL -->
+<div id="payment-schedule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💳 Scadențar Plăți</div>
+      <button onclick="document.getElementById('payment-schedule-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="payment-schedule-list" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- KIOSK MODAL -->
+<div id="kiosk-modal" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:1000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0">⚡ KIOSK MODE</div>
+    <input id="kiosk-search" placeholder="Caută produs..." oninput="renderKioskProducts(this.value)" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 16px;outline:none;width:250px">
+    <button onclick="closeKioskMode()" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 18px;cursor:pointer">✕ IEȘI</button>
+  </div>
+  <div id="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px;overflow-y:auto;flex:1"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:800;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;padding:32px;text-align:center;max-width:300px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0;margin-bottom:20px">🔒 INTRODU PIN</div>
+    <input id="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="width:100%;background:#181d24;border:2px solid #00e5a0;border-radius:10px;color:#00e5a0;font-size:32px;font-weight:900;padding:14px;text-align:center;outline:none;margin-bottom:16px;letter-spacing:8px">
+    <button onclick="verifyPIN(document.getElementById('pin-input').value)" style="width:100%;background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:14px;cursor:pointer">CONFIRMĂ →</button>
+    <button onclick="document.getElementById('pin-modal').style.display='none'" style="width:100%;background:none;border:none;color:#6b7a8d;font-size:13px;padding:10px;cursor:pointer;margin-top:6px">Anulează</button>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -11164,6 +11936,82 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- SUPPLIER EMAIL MODAL -->
+<div id="supplier-email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📧 Email Furnizor AI</div>
+      <button onclick="document.getElementById('supplier-email-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-email-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PIE CHART MODAL -->
+<div id="pie-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:420px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('pie-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="pie-chart-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MONTHLY COMPARE MODAL -->
+<div id="monthly-compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Comparație Luni</div>
+      <button onclick="document.getElementById('monthly-compare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="monthly-compare-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- HEATMAP MODAL -->
+<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
+      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="heatmap-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PAYMENT SCHEDULE MODAL -->
+<div id="payment-schedule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💳 Scadențar Plăți</div>
+      <button onclick="document.getElementById('payment-schedule-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="payment-schedule-list" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- KIOSK MODAL -->
+<div id="kiosk-modal" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:1000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0">⚡ KIOSK MODE</div>
+    <input id="kiosk-search" placeholder="Caută produs..." oninput="renderKioskProducts(this.value)" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 16px;outline:none;width:250px">
+    <button onclick="closeKioskMode()" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 18px;cursor:pointer">✕ IEȘI</button>
+  </div>
+  <div id="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px;overflow-y:auto;flex:1"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:800;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;padding:32px;text-align:center;max-width:300px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0;margin-bottom:20px">🔒 INTRODU PIN</div>
+    <input id="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="width:100%;background:#181d24;border:2px solid #00e5a0;border-radius:10px;color:#00e5a0;font-size:32px;font-weight:900;padding:14px;text-align:center;outline:none;margin-bottom:16px;letter-spacing:8px">
+    <button onclick="verifyPIN(document.getElementById('pin-input').value)" style="width:100%;background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:14px;cursor:pointer">CONFIRMĂ →</button>
+    <button onclick="document.getElementById('pin-modal').style.display='none'" style="width:100%;background:none;border:none;color:#6b7a8d;font-size:13px;padding:10px;cursor:pointer;margin-top:6px">Anulează</button>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -11462,6 +12310,8 @@ function showNoMovementReport() {
     <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
       <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔍 Caută Client</div>
       <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+        <button class="add-btn" onclick="document.getElementById('payment-schedule-modal').style.display='flex';renderPaymentSchedule()" style="border-color:#00e5a0;color:#00e5a0">💳 Scadențar</button>
+        <button class="add-btn" onclick="safeCall('aiGenerateSupplierEmail')" style="border-color:#ffa502;color:#ffa502">📧 Email Furnizor</button>
     </div>
     <div style="padding:14px 24px;flex-shrink:0">
       <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
@@ -11587,6 +12437,82 @@ function showNoMovementReport() {
       <button onclick="closeTextImportModal()" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer">ANULEAZĂ</button>
       <button onclick="importFromText()" style="flex:2;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">📥 IMPORTĂ →</button>
     </div>
+  </div>
+</div>
+
+
+<!-- SUPPLIER EMAIL MODAL -->
+<div id="supplier-email-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📧 Email Furnizor AI</div>
+      <button onclick="document.getElementById('supplier-email-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="supplier-email-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PIE CHART MODAL -->
+<div id="pie-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:420px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🥧 Distribuție Categorii</div>
+      <button onclick="document.getElementById('pie-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="pie-chart-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MONTHLY COMPARE MODAL -->
+<div id="monthly-compare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📅 Comparație Luni</div>
+      <button onclick="document.getElementById('monthly-compare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="monthly-compare-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- HEATMAP MODAL -->
+<div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🔥 Heatmap Activitate</div>
+      <button onclick="document.getElementById('heatmap-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="heatmap-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PAYMENT SCHEDULE MODAL -->
+<div id="payment-schedule-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💳 Scadențar Plăți</div>
+      <button onclick="document.getElementById('payment-schedule-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="payment-schedule-list" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- KIOSK MODAL -->
+<div id="kiosk-modal" style="display:none;position:fixed;inset:0;background:#0a0c0f;z-index:1000;flex-direction:column">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0">⚡ KIOSK MODE</div>
+    <input id="kiosk-search" placeholder="Caută produs..." oninput="renderKioskProducts(this.value)" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 16px;outline:none;width:250px">
+    <button onclick="closeKioskMode()" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 18px;cursor:pointer">✕ IEȘI</button>
+  </div>
+  <div id="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px;overflow-y:auto;flex:1"></div>
+</div>
+
+<!-- PIN MODAL -->
+<div id="pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:800;align-items:center;justify-content:center">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;padding:32px;text-align:center;max-width:300px;width:90%">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#00e5a0;margin-bottom:20px">🔒 INTRODU PIN</div>
+    <input id="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="width:100%;background:#181d24;border:2px solid #00e5a0;border-radius:10px;color:#00e5a0;font-size:32px;font-weight:900;padding:14px;text-align:center;outline:none;margin-bottom:16px;letter-spacing:8px">
+    <button onclick="verifyPIN(document.getElementById('pin-input').value)" style="width:100%;background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:14px;cursor:pointer">CONFIRMĂ →</button>
+    <button onclick="document.getElementById('pin-modal').style.display='none'" style="width:100%;background:none;border:none;color:#6b7a8d;font-size:13px;padding:10px;cursor:pointer;margin-top:6px">Anulează</button>
   </div>
 </div>
 
