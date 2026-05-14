@@ -231,7 +231,7 @@ function checkExpiryAlerts() {
     }
   });
 }
-if(typeof checkExpiryAlerts === "function") setInterval(checkExpiryAlerts, 3600000);
+if(typeof checkExpiryAlerts === "function") setInterval(function(){if(typeof checkExpiryAlerts==="function")checkExpiryAlerts();}, 3600000);
 
 function openTextImportModal() {
   document.getElementById('text-import-modal').style.display = 'flex';
@@ -1586,7 +1586,7 @@ function checkStalenessWeekly() {
     sendTelegramAlert(msg, userProfile.telegram_id);
   }
 }
-setInterval(checkStalenessWeekly, 3600000);
+setInterval(function(){if(typeof checkStalenessWeekly==="function")checkStalenessWeekly();}, 3600000);
 
 // 9. ALERTĂ VALOARE STOC SCĂZUTĂ
 let stockValueThreshold = parseFloat(localStorage.getItem('sv_value_threshold') || '0');
@@ -1629,7 +1629,7 @@ function sendDailyTop5Critical() {
 ');
   sendTelegramAlert(msg, userProfile.telegram_id);
 }
-setInterval(sendDailyTop5Critical, 3600000);
+setInterval(function(){if(typeof sendDailyTop5Critical==="function")sendDailyTop5Critical();}, 3600000);
 
 // 11. FIDELITATE CLIENT — PUNCTE
 let loyaltyPoints = JSON.parse(localStorage.getItem('sv_loyalty') || '{}');
@@ -1670,7 +1670,7 @@ function checkPlannedOrders() {
     }
   });
 }
-setInterval(checkPlannedOrders, 3600000);
+setInterval(function(){if(typeof checkPlannedOrders==="function")checkPlannedOrders();}, 3600000);
 
 // 13. SMS/WHATSAPP TEMPLATE COMANDĂ
 function generateOrderWhatsApp(clientName, items) {
@@ -1702,7 +1702,7 @@ function checkWeeklyReport() {
   if (userProfile && userProfile.telegram_id) screenshotDashboard();
   setFeedback('Raport saptamanal generat automat!', 'ok');
 }
-setInterval(checkWeeklyReport, 60000);
+setInterval(function(){if(typeof checkWeeklyReport==="function")checkWeeklyReport();}, 60000);
 
 // 15. GRAFIC TOP 10 PRODUSE VÂNDUTE
 function showTop10Chart() {
@@ -1936,7 +1936,7 @@ function checkRecurringDeliveries() {
     setFeedback(processed + ' livrari recurente procesate!', 'ok');
   }
 }
-setInterval(checkRecurringDeliveries, 3600000);
+setInterval(function(){if(typeof checkRecurringDeliveries==="function")checkRecurringDeliveries();}, 3600000);
 
 // 23. RAPORT ANOMALII AI SĂPTĂMÂNAL
 async function sendWeeklyAnomaliesAI() {
@@ -9215,7 +9215,7 @@ let sortField = null, sortDir = 1;
 
 // 2. MOD NOAPTE AUTOMAT
 
-setInterval(checkAutoNightMode, 60000);
+setInterval(function(){if(typeof checkAutoNightMode==="function")checkAutoNightMode();}, 60000);
 
 // 3. ZOOM PE CARD
 function openProductZoom(productId) {
@@ -9308,11 +9308,11 @@ function removeAutocomplete() { const el = document.getElementById('autocomplete
 
 // 7. REMINDER REZERVĂRI
 
-setInterval(checkReservationReminders, 300000); // every 5 min
+setInterval(function(){if(typeof checkReservationReminders==="function")checkReservationReminders();}, 300000); // every 5 min
 
 // 8. DIGEST SĂPTĂMÂNAL TELEGRAM
 
-setInterval(sendWeeklyDigest, 3600000); // check every hour
+setInterval(function(){if(typeof sendWeeklyDigest==="function")sendWeeklyDigest();}, 3600000); // check every hour
 
 // 9. ALERTĂ STOC RECORD
 let stockRecords = JSON.parse(localStorage.getItem('sv_stock_records') || '{}');
@@ -9627,7 +9627,7 @@ function checkAutoNightMode() {
     setTheme('light', false);
   }
 }
-setInterval(checkAutoNightMode, 60000);
+setInterval(function(){if(typeof checkAutoNightMode==="function")checkAutoNightMode();}, 60000);
 
 // 3. SHAKE TO REFRESH
 let lastShake = 0;
@@ -9736,7 +9736,7 @@ function checkReservationReminders() {
     }
   });
 }
-setInterval(checkReservationReminders, 300000); // check every 5 min
+setInterval(function(){if(typeof checkReservationReminders==="function")checkReservationReminders();}, 300000); // check every 5 min
 
 // 9. ALERTĂ STOC RECORD
 function checkStockRecord(product) {
@@ -9780,7 +9780,7 @@ function sendWeeklyDigest() {
     sendTelegramAlert(msg, userProfile.telegram_id);
   }
 }
-setInterval(sendWeeklyDigest, 3600000); // check every hour
+setInterval(function(){if(typeof sendWeeklyDigest==="function")sendWeeklyDigest();}, 3600000); // check every hour
 
 // 11. ALERTĂ BUGET DEPĂȘIT
 function setMonthlyBudget(amount) {
