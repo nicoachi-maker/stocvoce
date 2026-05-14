@@ -211,7 +211,7 @@ function closeAdjustModal() {
 
 function initStockValueLive() {
   updateStockValueDisplay();
-  setInterval(updateStockValueDisplay, 30000);
+  setInterval(function(){if(typeof updateStockValueDisplay==="function")updateStockValueDisplay();},30000);
 }
 
 
@@ -1968,7 +1968,7 @@ async function sendWeeklyAnomaliesAI() {
     }
   } catch(e) {}
 }
-setInterval(sendWeeklyAnomaliesAI, 3600000);
+setInterval(function(){if(typeof sendWeeklyAnomaliesAI==="function")sendWeeklyAnomaliesAI();},3600000);
 
 // 24. ASISTENT VOCAL COMPLET AI
 async function handleFullAIStatus(text) {
@@ -2287,7 +2287,7 @@ Scrie un raport profesional in romana, maxim 300 cuvinte, cu sectiuni clare: Rez
     console.error('AI report error:', e);
   }
 }
-setInterval(generateAIWeeklyReport, 3600000);
+setInterval(function(){if(typeof generateAIWeeklyReport==="function")generateAIWeeklyReport();},3600000);
 
 async function generateAIPredictionReport() {
   const el = document.getElementById('ai-prediction-report-content');
@@ -2915,8 +2915,8 @@ auth.onAuthStateChanged(async (user) => {
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
-    setTimeout(checkDailySummary, 3000);
-    setTimeout(initNewFeatures, 1500);
+    setTimeout(function(){if(typeof checkDailySummary==="function")checkDailySummary();},3000);
+    setTimeout(function(){if(typeof initNewFeatures==="function")initNewFeatures();},1500);
     // Load preferred language
     if (userProfile.preferred_lang) {
       currentLang = userProfile.preferred_lang;
@@ -2924,8 +2924,8 @@ auth.onAuthStateChanged(async (user) => {
     }
     initLangModal();
     applyTranslations();
-    setTimeout(checkExpiryAlerts, 3000);
-    setTimeout(updateStockValueDisplay, 2000);
+    setTimeout(function(){if(typeof checkExpiryAlerts==='function')checkExpiryAlerts();}, 3000);
+    setTimeout(function(){if(typeof updateStockValueDisplay==="function")updateStockValueDisplay();},2000);
     setFeedback(`✅ ${userProfile.depot} – gata de comenzi!`, 'ok');
   } else {
     currentUser = null;
@@ -3047,7 +3047,7 @@ function setMode(mode) {
   ['continuous','wake','manual'].forEach(m=>document.getElementById('btn-'+m).classList.toggle('active',m===mode));
   document.getElementById('wake-indicator').classList.toggle('hidden',mode!=='wake');
   if(mode==='manual'){stopEngine();setMicState('off');setFeedback('Mod manual – câmp text sau buton 🎤','');}
-  else{if(isRunning){stopEngine();setTimeout(startEngine,300);}else startEngine();}
+  else{if(isRunning){stopEngine();setTimeout(function(){if(typeof startEngine==="function")startEngine();},300);}else startEngine();}
 }
 function toggleMainMic(){if(isRunning){stopEngine();setFeedback('Microfon oprit.','');}else startEngine();}
 function startEngine(){
@@ -3481,7 +3481,7 @@ function executeOperation(opType,product,qty,originalText,clientName){
   addAudit(opType==='in'?'INTRARE':`IEȘIRE${clientName?' CLIENT':''}`, `${product.name}: ${qty} ${product.unit} · ${oldQty}→${product.qty}${clientName?' → '+clientName:''}`);
   
   // Update stock value display
-  setTimeout(updateStockValueDisplay, 500);
+  setTimeout(function(){if(typeof updateStockValueDisplay==="function")updateStockValueDisplay();},500);
   
   const clientMsg = clientName ? ` → Client: ${clientName}` : '';
   let msg=`OK! ${opType==='in'?'Adăugat':'Scos'} ${qty} ${product.unit} ${product.name}${clientMsg}. Stoc: ${product.qty} ${product.unit}.`;
@@ -4606,14 +4606,14 @@ function showNextAlert() {
     : 'linear-gradient(90deg,#ffa502,#ffb732)';
   banner.style.display = 'flex';
   // Auto hide after 5 seconds
-  setTimeout(closeAlert, 5000);
+  setTimeout(function(){if(typeof closeAlert==="function")closeAlert();},5000);
   // Try to play sound
   try { new Audio('data:audio/wav;base64,UklGRl9vT1dBVkVmbXQgEAAAAQABAGALAADACwAAAgAQAGRhdGE/bw==').play().catch(()=>{}); } catch(e) {}
 }
 
 function closeAlert() {
   document.getElementById('alert-banner').style.display = 'none';
-  setTimeout(showNextAlert, 500);
+  setTimeout(function(){if(typeof showNextAlert==="function")showNextAlert();},500);
 }
 
 // Alerts are now integrated directly in executeOperation below
@@ -6054,7 +6054,7 @@ function setLanguage(lang) {
   // Restart recognition with new language
   if (isRunning) {
     if (recognition) { try { recognition.abort(); } catch(e) {} }
-    setTimeout(buildRecognition, 500);
+    setTimeout(function(){if(typeof buildRecognition==="function")buildRecognition();},500);
   }
   speak(LANGUAGES[lang]?.translations?.welcome || 'OK');
 }
@@ -6998,7 +6998,7 @@ function checkInventarSchedule() {
     }
   }
 }
-setInterval(checkInventarSchedule, 60000);
+setInterval(function(){if(typeof checkInventarSchedule==="function")checkInventarSchedule();},60000);
 
 // 18. ALERTĂ MIȘCARE SUSPECTĂ
 const SUSPICIOUS_THRESHOLD = 100; // qty above this triggers alert
@@ -8516,7 +8516,7 @@ function checkDailySummary() {
   
   if (lastSummary !== today && now.getHours() >= 8) {
     localStorage.setItem('sv_last_summary', today);
-    setTimeout(startDailyVoiceSummary, 2000);
+    setTimeout(function(){if(typeof startDailyVoiceSummary==="function")startDailyVoiceSummary();},2000);
   }
 }
 
@@ -9564,8 +9564,8 @@ function initNewFeatures() {
   }
   
   // Check budget and records periodically
-  setInterval(checkBudgetAlert, 3600000);
-  setInterval(checkAllDeliveriesReceived, 300000);
+  setInterval(function(){if(typeof checkBudgetAlert==="function")checkBudgetAlert();},3600000);
+  setInterval(function(){if(typeof checkAllDeliveriesReceived==="function")checkAllDeliveriesReceived();},300000);
 }
 
 
