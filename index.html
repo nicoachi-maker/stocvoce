@@ -1329,6 +1329,166 @@ function confirmImport() {
   </div>
 </div>
 
+
+<!-- CART MODAL -->
+<div id="cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🛒 Coș Cumpărături <span id="cart-badge" style="background:#ff4757;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center">0</span></div>
+      <button onclick="document.getElementById('cart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cart-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="cart-client-name" placeholder="Nume client (opțional)" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <button onclick="processCart(document.getElementById('cart-client-name').value)" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">✅ PROCESEAZĂ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MASS MOVE MODAL -->
+<div id="mass-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📦 Mișcare Masivă</div>
+      <button onclick="document.getElementById('mass-move-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <input id="mass-move-loc" placeholder="Locație nouă (ex: B3)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div id="mass-move-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmMassMove()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">MUTĂ SELECȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHYSICAL INVENTORY MODAL -->
+<div id="physical-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚖️ Inventar Fizic vs Sistem</div>
+      <button onclick="document.getElementById('physical-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="physical-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="applyPhysicalInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ APLICĂ DIFERENȚELE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABC MODAL -->
+<div id="abc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Analiză ABC</div>
+      <button onclick="document.getElementById('abc-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="abc-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- ROI MODAL -->
+<div id="roi-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💹 ROI per Produs</div>
+      <button onclick="document.getElementById('roi-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="roi-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI CAT FORECAST MODAL -->
+<div id="ai-cat-forecast-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Forecast AI per Categorie</div>
+      <button onclick="document.getElementById('ai-cat-forecast-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-cat-forecast-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CASHFLOW MODAL -->
+<div id="cashflow-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💸 Cashflow 12 Luni</div>
+      <button onclick="document.getElementById('cashflow-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cashflow-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO SUPPLIER MODAL -->
+<div id="no-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">⚠️ Fără Furnizor</div>
+      <button onclick="document.getElementById('no-supplier-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-supplier-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS VALUE MODAL -->
+<div id="top-clients-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffd700;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffd700;text-transform:uppercase">🏆 Top Clienți Valoare</div>
+      <button onclick="document.getElementById('top-clients-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- EXPIRATION LOSSES MODAL -->
+<div id="expiration-losses-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">📅 Pierderi Expirare</div>
+      <button onclick="document.getElementById('expiration-losses-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="expiration-losses-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MOBILE DASH MODAL -->
+<div id="mobile-dash-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#e8ecf0">📱 Dashboard Șef</div>
+      <button onclick="document.getElementById('mobile-dash-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="mobile-dash-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+  </div>
+</div>
+
+<!-- OPERATOR INACTIVITY MODAL -->
+<div id="operator-inactivity-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">👤 Inactivitate Operatori</div>
+      <button onclick="document.getElementById('operator-inactivity-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-inactivity-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BARCODE SCAN MODAL -->
+<div id="barcode-scan-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📷 Scan Cod de Bare</div>
+      <button onclick="document.getElementById('barcode-scan-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <input id="barcode-input" placeholder="Scanează sau introdu codul EAN..." oninput="handleBarcodeScanned(this.value)" autofocus style="width:100%;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#e8ecf0;font-size:14px;padding:12px;outline:none;margin-bottom:12px;font-family:'JetBrains Mono',monospace">
+      <div id="barcode-result"></div>
+    </div>
+  </div>
+</div>
+
 </body></html>');
   pw.document.close();
 }
@@ -3113,6 +3273,15 @@ setInterval(function(){ if(typeof checkOverduePayments==='function') checkOverdu
 
 // 14. GRAFIC PIE CATEGORII
 function showCategoryPieChart() {
+        <button class="add-btn" onclick="safeCall('showABCAnalysis')" style="border-color:#00e5a0;color:#00e5a0">📊 ABC</button>
+        <button class="add-btn" onclick="safeCall('showROIReport')" style="border-color:#ffa502;color:#ffa502">💹 ROI</button>
+        <button class="add-btn" onclick="safeCall('showCashflowChart')" style="border-color:#ffa502;color:#ffa502">💸 Cashflow</button>
+        <button class="add-btn" onclick="safeCall('showTopClientsByValue')" style="border-color:#ffd700;color:#ffd700">🏆 Top Clienți</button>
+        <button class="add-btn" onclick="safeCall('showProductsWithoutSupplier')" style="border-color:#6b7a8d;color:#6b7a8d">⚠️ Fără Furnizor</button>
+        <button class="add-btn" onclick="safeCall('showExpirationLosses')" style="border-color:#ff4757;color:#ff4757">📅 Pierderi</button>
+        <button class="add-btn" onclick="safeCall('showMobileDashboard')" style="border-color:#a78bfa;color:#a78bfa">📱 Dash Șef</button>
+        <button class="add-btn" onclick="safeCall('showOperatorInactivity')" style="border-color:#6b7a8d;color:#6b7a8d">👤 Inactivitate</button>
+        <button class="add-btn" onclick="safeCall('aiForecastByCategory')" style="border-color:#a78bfa;color:#a78bfa">🤖 Forecast Cat.</button>
   const cats = {};
   stock.forEach(p => {
     const cat = p.cat || 'General';
@@ -3401,10 +3570,1134 @@ function openWebhookSettings() {
         <button class="add-btn" onclick="document.getElementById('pin-modal').style.display='flex'" style="border-color:#ffa502;color:#ffa502">🔒 PIN Login</button>
         <button class="add-btn" onclick="safeCall('openWebhookSettings')" style="border-color:#6b7a8d;color:#6b7a8d">🔗 Webhook</button>
         <button class="add-btn" onclick="safeCall('aiDailySummaryVocal')" style="border-color:#a78bfa;color:#a78bfa">🎙️ Rezumat AI</button>
+        <button class="add-btn" onclick="safeCall('exportToGoogleSheets')" style="border-color:#00e5a0;color:#00e5a0">📊 G.Sheets</button>
+        <button class="add-btn" onclick="safeCall('getAPILink')" style="border-color:#6b7a8d;color:#6b7a8d">🔗 API Link</button>
+        <button class="add-btn" onclick="safeCall('importWooCommerceOrders')" style="border-color:#a78bfa;color:#a78bfa">🛒 WooCommerce</button>
   const url = prompt('Introdu URL webhook (Zapier/Make/n8n):
 
 Exemplu: https://hooks.zapier.com/hooks/catch/...', webhookUrl);
   if (url !== null) { setWebhookUrl(url); }
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC A: STOC AVANSAT (1-8)
+// ══════════════════════════════════════════
+
+// 1. STOC PE MAI MULTE LOCAȚII SIMULTANE
+let multiLocations = JSON.parse(localStorage.getItem('sv_multi_loc') || '{}');
+
+function addProductLocation(productId, location, qty) {
+  const key = String(productId);
+  if (!multiLocations[key]) multiLocations[key] = {};
+  multiLocations[key][location] = (multiLocations[key][location] || 0) + qty;
+  localStorage.setItem('sv_multi_loc', JSON.stringify(multiLocations));
+  const p = stock.find(s => s.id === productId);
+  setFeedback('📍 ' + (p?p.name:'Produs') + ' adăugat în ' + location + ': ' + qty + ' buc', 'ok');
+}
+
+function getProductLocations(productId) {
+  return multiLocations[String(productId)] || {};
+}
+
+function renderProductLocations(productId) {
+  const locs = getProductLocations(productId);
+  const entries = Object.entries(locs).filter(([,q]) => q > 0);
+  if (!entries.length) return '<span style="color:#6b7a8d">Locație nedefinită</span>';
+  return entries.map(([loc, q]) =>
+    '<span style="background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:4px;padding:2px 6px;font-size:11px;color:#00e5a0;margin-right:4px">' + loc + ':' + q + '</span>'
+  ).join('');
+}
+
+// 2. COȘ DE CUMPĂRĂTURI SALVAT
+let savedCart = JSON.parse(localStorage.getItem('sv_cart') || '[]');
+
+function addToCart(productId, qty) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const existing = savedCart.find(i => i.productId === productId);
+  if (existing) existing.qty += qty;
+  else savedCart.push({ productId, name: p.name, qty, unit: p.unit, price: p.price_sell || 0 });
+  localStorage.setItem('sv_cart', JSON.stringify(savedCart));
+  updateCartBadge();
+  setFeedback('🛒 ' + p.name + ' adăugat în coș (' + savedCart.length + ' produse)', 'ok');
+}
+
+function updateCartBadge() {
+  const el = document.getElementById('cart-badge');
+  if (el) el.textContent = savedCart.length > 0 ? savedCart.length : '';
+  el && (el.style.display = savedCart.length > 0 ? 'flex' : 'none');
+}
+
+function processCart(clientName) {
+  if (!savedCart.length) { setFeedback('Coșul este gol!', 'warn'); return; }
+  savedCart.forEach(item => {
+    const p = stock.find(s => s.id === item.productId);
+    if (p && p.qty >= item.qty) {
+      p.qty -= item.qty;
+      addLog('Coș: ' + (clientName||'client'), 'OUT ' + item.qty + ' ' + item.unit + ' ' + item.name, 'out', clientName||null);
+      if (clientName) clients.push({ name: clientName, product: item.name, qty: item.qty, unit: item.unit, time: new Date().toLocaleString('ro-RO'), user: userProfile?userProfile.name:'', depot: userProfile?userProfile.depot:'' });
+    }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  const client = clientName || '';
+  setFeedback('✅ Coș procesat' + (client?' pentru '+client:'') + '! ' + savedCart.length + ' produse livrate.', 'ok');
+  speak('Cos procesat. ' + savedCart.length + ' produse livrate.');
+  savedCart = [];
+  localStorage.setItem('sv_cart', JSON.stringify(savedCart));
+  updateCartBadge();
+  document.getElementById('cart-modal').style.display = 'none';
+}
+
+function openCartModal() {
+  renderCartList();
+  document.getElementById('cart-modal').style.display = 'flex';
+}
+
+function renderCartList() {
+  const el = document.getElementById('cart-list');
+  if (!el) return;
+  const total = savedCart.reduce((s,i) => s + i.qty*(i.price||0), 0);
+  el.innerHTML = savedCart.length === 0
+    ? '<div style="color:#6b7a8d;text-align:center;padding:20px">Coșul este gol.</div>'
+    : savedCart.map((item,i) => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+        '<div><div style="font-weight:700;color:#e8ecf0">' + item.name + '</div>' +
+        '<div style="font-size:11px;color:#6b7a8d">' + item.qty + ' ' + item.unit + (item.price?' · '+(item.qty*item.price).toFixed(2)+' RON':'') + '</div></div>' +
+        '<button onclick="savedCart.splice('+i+',1);localStorage.setItem('sv_cart',JSON.stringify(savedCart));updateCartBadge();renderCartList()" style="background:none;border:none;color:#ff4757;cursor:pointer;font-size:16px">✕</button>' +
+        '</div>').join('') +
+    (total>0?'<div style="text-align:right;padding:8px;color:#ffa502;font-weight:700;font-family:Barlow Condensed,sans-serif;font-size:20px">TOTAL: '+total.toFixed(2)+' RON</div>':'');
+}
+
+// 3. PRODUS COMPUS (KIT)
+let compositeProducts = JSON.parse(localStorage.getItem('sv_composites') || '[]');
+
+function createCompositeProduct(name, components) {
+  compositeProducts.push({ id: Date.now(), name, components, created: new Date().toISOString() });
+  localStorage.setItem('sv_composites', JSON.stringify(compositeProducts));
+  setFeedback('✅ Produs compus creat: ' + name, 'ok');
+}
+
+function applyCompositeProduct(compositeId, qty, clientName) {
+  const comp = compositeProducts.find(c => c.id === compositeId);
+  if (!comp) return;
+  for (const c of comp.components) {
+    const p = stock.find(s => s.id === c.productId);
+    if (!p || p.qty < c.qty * qty) { setFeedback('❌ Stoc insuficient pentru ' + (p?p.name:'component'), 'err'); return; }
+  }
+  comp.components.forEach(c => {
+    const p = stock.find(s => s.id === c.productId);
+    if (p) { p.qty -= c.qty * qty; addLog('Kit: ' + comp.name, 'OUT ' + c.qty*qty + ' ' + p.unit, 'out', clientName||null); }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('✅ Kit aplicat: ' + comp.name + ' x' + qty, 'ok');
+  speak('Kit ' + comp.name + ' aplicat. ' + qty + ' seturi.');
+}
+
+// 4. STOC REZERVAT
+let reservedStock = JSON.parse(localStorage.getItem('sv_reserved') || '{}');
+
+function reserveStock(productId, qty, reason, dueDate) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  if (p.qty < qty) { setFeedback('❌ Stoc insuficient pentru rezervare!', 'err'); return; }
+  const key = String(productId);
+  if (!reservedStock[key]) reservedStock[key] = [];
+  reservedStock[key].push({ qty, reason: reason||'Rezervat', dueDate, reserved: new Date().toISOString(), id: Date.now() });
+  localStorage.setItem('sv_reserved', JSON.stringify(reservedStock));
+  setFeedback('🔒 ' + qty + ' ' + p.unit + ' ' + p.name + ' rezervate: ' + (reason||''), 'ok');
+}
+
+function getTotalReserved(productId) {
+  const key = String(productId);
+  return (reservedStock[key] || []).reduce((s,r) => s + r.qty, 0);
+}
+
+function getAvailableStock(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return 0;
+  return Math.max(0, p.qty - getTotalReserved(productId));
+}
+
+// 5. MIȘCARE MASIVĂ PRODUSE
+function openMassMovementModal() {
+  const el = document.getElementById('mass-move-list');
+  if (el) el.innerHTML = stock.map(p => '<div style="display:flex;align-items:center;gap:8px;padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px">' +
+    '<input type="checkbox" id="mm-'+p.id+'" style="accent-color:#00e5a0;width:16px;height:16px">' +
+    '<label for="mm-'+p.id+'" style="flex:1;color:#e8ecf0;cursor:pointer">' + p.name + ' <span style="color:#6b7a8d">('+p.loc||'?'+')</span></label>' +
+    '</div>').join('');
+  document.getElementById('mass-move-modal').style.display = 'flex';
+}
+
+function confirmMassMove() {
+  const newLoc = document.getElementById('mass-move-loc').value.trim();
+  if (!newLoc) { setFeedback('Introduceți locația nouă!', 'warn'); return; }
+  const checkboxes = document.querySelectorAll('#mass-move-list input[type="checkbox"]:checked');
+  let moved = 0;
+  checkboxes.forEach(cb => {
+    const id = parseInt(cb.id.replace('mm-',''));
+    const p = stock.find(s => s.id === id);
+    if (p) { p.loc = newLoc; moved++; }
+  });
+  saveStockToFirebase(); renderStock();
+  document.getElementById('mass-move-modal').style.display = 'none';
+  setFeedback('✅ ' + moved + ' produse mutate în ' + newLoc, 'ok');
+  speak(moved + ' produse mutate in ' + newLoc + '.');
+}
+
+// 6. COMPARAȚIE STOC FIZIC VS SISTEM
+function openPhysicalInventoryModal() {
+  const el = document.getElementById('physical-inv-list');
+  if (!el) return;
+  el.innerHTML = stock.map(p => '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + p.name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">Sistem: ' + p.qty + ' ' + p.unit + '</div></div>' +
+    '<div style="display:flex;align-items:center;gap:8px">' +
+    '<input type="number" placeholder="Fizic" data-id="'+p.id+'" data-system="'+p.qty+'" style="width:80px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#ffa502;font-size:14px;font-weight:700;padding:6px;text-align:center;outline:none" oninput="highlightDiff(this)">' +
+    '</div></div>').join('');
+  document.getElementById('physical-inv-modal').style.display = 'flex';
+}
+
+function highlightDiff(input) {
+  const system = parseInt(input.dataset.system) || 0;
+  const physical = parseInt(input.value) || 0;
+  const diff = physical - system;
+  input.style.color = diff === 0 ? '#00e5a0' : diff > 0 ? '#a78bfa' : '#ff4757';
+  input.title = diff === 0 ? 'OK' : (diff > 0 ? '+' : '') + diff + ' diferență';
+}
+
+function applyPhysicalInventory() {
+  const inputs = document.querySelectorAll('#physical-inv-list input[data-id]');
+  let adjusted = 0;
+  inputs.forEach(input => {
+    if (!input.value) return;
+    const id = parseInt(input.dataset.id);
+    const newQty = parseInt(input.value);
+    const p = stock.find(s => s.id === id);
+    if (p && newQty !== p.qty) {
+      const diff = newQty - p.qty;
+      addLog('Inventar fizic: ' + p.name, (diff>0?'+':'')+diff+' '+p.unit, diff>0?'in':'out');
+      p.qty = newQty; adjusted++;
+    }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  document.getElementById('physical-inv-modal').style.display = 'none';
+  setFeedback('✅ Inventar aplicat: ' + adjusted + ' produse ajustate.', 'ok');
+  speak(adjusted + ' produse ajustate la inventar fizic.');
+}
+
+// 7. PRODUS CU NUMĂR DE SERIE
+let serialNumbers = JSON.parse(localStorage.getItem('sv_serials') || '{}');
+
+function addSerialNumber(productId, serial, notes) {
+  const key = String(productId);
+  if (!serialNumbers[key]) serialNumbers[key] = [];
+  if (serialNumbers[key].find(s => s.serial === serial)) { setFeedback('❌ Serial ' + serial + ' există deja!', 'err'); return; }
+  serialNumbers[key].push({ serial, notes: notes||'', added: new Date().toISOString(), status: 'in_stock' });
+  localStorage.setItem('sv_serials', JSON.stringify(serialNumbers));
+  setFeedback('✅ Serial ' + serial + ' înregistrat!', 'ok');
+}
+
+function getSerialNumbers(productId) {
+  return serialNumbers[String(productId)] || [];
+}
+
+function markSerialSold(productId, serial, clientName) {
+  const key = String(productId);
+  const s = (serialNumbers[key] || []).find(x => x.serial === serial);
+  if (s) { s.status = 'sold'; s.soldTo = clientName||''; s.soldDate = new Date().toISOString(); }
+  localStorage.setItem('sv_serials', JSON.stringify(serialNumbers));
+  setFeedback('✅ Serial ' + serial + ' marcat ca vândut.', 'ok');
+}
+
+// 8. REAPROVIZIONARE AUTOMATĂ PDF
+function checkAutoReplenishPDF() {
+  const toReplenish = stock.filter(p => p.auto_replenish && p.qty <= p.min && p.supplier);
+  if (!toReplenish.length) return;
+  const today = new Date().toISOString().slice(0,10);
+  const already = localStorage.getItem('sv_auto_replenish_' + today);
+  if (already) return;
+  localStorage.setItem('sv_auto_replenish_' + today, '1');
+  generateSupplierOrder();
+  if (userProfile && userProfile.telegram_id) {
+    sendTelegramAlert('🔄 REAPROVIZIONARE AUTOMATĂ generată! ' + toReplenish.length + ' produse sub minim.', userProfile.telegram_id);
+  }
+}
+setInterval(function(){ if(typeof checkAutoReplenishPDF==='function') checkAutoReplenishPDF(); }, 3600000);
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC B: VOCE AVANSATĂ (9-14)
+// ══════════════════════════════════════════
+
+// 9. VOCE MULTILINGVĂ AUTO-DETECT
+function detectAndSetLanguage(text) {
+  const patterns = {
+    ro: ['adauga','scoate','stoc','produse','inventar'],
+    en: ['add','remove','stock','product','inventory'],
+    fr: ['ajouter','enlever','stock','produit'],
+    de: ['hinzufügen','entfernen','bestand','produkt'],
+    es: ['añadir','quitar','inventario','producto'],
+    it: ['aggiungi','togli','scorte','prodotto']
+  };
+  const norm = text.toLowerCase();
+  for (const [lang, words] of Object.entries(patterns)) {
+    if (words.some(w => norm.includes(w))) {
+      if (lang !== currentLang) {
+        currentLang = lang;
+        localStorage.setItem('sv_lang', lang);
+        setFeedback('🌐 Limbă detectată: ' + lang.toUpperCase(), 'ok');
+      }
+      return lang;
+    }
+  }
+  return currentLang;
+}
+
+// 10. VOCE RAPORT TELEGRAM
+function handleVoiceTelegramReport(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('trimite raport') && !norm.includes('send report') && !norm.includes('raport telegram')) return false;
+  if (typeof exportTelegramWithDetails === 'function') exportTelegramWithDetails();
+  else if (typeof screenshotDashboard === 'function') screenshotDashboard();
+  return true;
+}
+
+// 11. DICTARE NOTĂ VOCALĂ PE PRODUS
+function handleVoiceNoteOnProduct(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('noteaza la') && !norm.includes('notează la') && !norm.includes('scrie la')) return false;
+  const afterAt = text.replace(/not[eează]+\s+la\s*/i, '').replace(/scrie\s+la\s*/i, '');
+  const product = findProduct(afterAt.split(' '));
+  if (!product) return false;
+  const noteText = afterAt.replace(new RegExp(normalizeText(product.name), 'gi'), '').trim();
+  if (!noteText) return false;
+  if (!product.notes) product.notes = [];
+  product.notes.push({ text: noteText, time: new Date().toLocaleString('ro-RO'), user: userProfile?userProfile.name:'' });
+  product.note_preview = noteText.substring(0,50);
+  saveStockToFirebase(); renderStock();
+  speak('Nota adaugata la ' + product.name + '.');
+  setFeedback('💬 Notă adăugată la ' + product.name + ': ' + noteText, 'ok');
+  return true;
+}
+
+// 12. VOCE ISTORIC AZI
+function handleVoiceHistoryToday(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('ce am adaugat azi') && !norm.includes('ce am facut azi') && !norm.includes('istoric azi')) return false;
+  const todayStr = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const todayLog = log.filter(e => e.time && e.time.startsWith(todayStr));
+  if (!todayLog.length) { speak('Nu ai facut nicio operatie astazi.'); setFeedback('📋 Nicio operație azi.', 'ok'); return true; }
+  const inOps = todayLog.filter(e => e.type==='in').length;
+  const outOps = todayLog.filter(e => e.type==='out').length;
+  const msg = 'Astazi: ' + todayLog.length + ' operatii. ' + inOps + ' intrari, ' + outOps + ' iesiri.';
+  speak(msg);
+  setFeedback('📋 ' + msg, 'ok');
+  return true;
+}
+
+// 13. VOCE TRANSFER ÎNTRE DEPOZITE
+function handleVoiceDepotTransfer(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('trimite la depozit') && !norm.includes('transfer la depozit')) return false;
+  const product = findProduct(text.split(' '));
+  if (!product) return false;
+  const qty = parseQuantity(norm) || 1;
+  const depotMatch = text.match(/depozit\s+([A-Za-zÀ-ÿ\s]+?)(?:\s*$|\s+\d)/i);
+  const targetDepot = depotMatch ? depotMatch[1].trim() : null;
+  if (!targetDepot) { speak('Specificati depozitul destinatie.'); return true; }
+  product.qty = Math.max(0, product.qty - qty);
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog(text, 'TRANSFER OUT ' + qty + ' ' + product.unit + ' → ' + targetDepot, 'out');
+  speak('OK. ' + qty + ' ' + product.unit + ' ' + product.name + ' trimise la depozit ' + targetDepot + '.');
+  setFeedback('🚚 Transfer: ' + qty + ' ' + product.unit + ' ' + product.name + ' → ' + targetDepot, 'ok');
+  return true;
+}
+
+// 14. VOCE "CÂTE PRODUSE AM?"
+function handleVoiceCountProducts(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('cate produse am') && !norm.includes('câte produse am') && !norm.includes('cate produse sunt')) return false;
+  const total = stock.length;
+  const zero = stock.filter(p => p.qty===0).length;
+  const low = stock.filter(p => p.qty>0&&p.qty<=p.min).length;
+  const msg = 'Ai ' + total + ' produse in stoc. ' + zero + ' epuizate, ' + low + ' cu stoc scazut.';
+  speak(msg);
+  setFeedback('📦 ' + msg, 'ok');
+  return true;
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC C: CLIENȚI AVANSAȚI (15-21)
+// ══════════════════════════════════════════
+
+// 15. PROGRAM FIDELITATE CU NIVELE
+const LOYALTY_LEVELS = [
+  { name: 'Bronze', min: 0, color: '#cd7f32', discount: 0 },
+  { name: 'Silver', min: 500, color: '#c0c0c0', discount: 5 },
+  { name: 'Gold', min: 2000, color: '#ffd700', discount: 10 },
+  { name: 'Platinum', min: 5000, color: '#e5e4e2', discount: 15 }
+];
+
+function getLoyaltyLevel(clientName) {
+  const pts = getLoyaltyPoints(clientName).total || 0;
+  let level = LOYALTY_LEVELS[0];
+  for (const l of LOYALTY_LEVELS) { if (pts >= l.min) level = l; }
+  return level;
+}
+
+function showLoyaltyCard(clientName) {
+  const level = getLoyaltyLevel(clientName);
+  const pts = getLoyaltyPoints(clientName);
+  const nextLevel = LOYALTY_LEVELS.find(l => l.min > (pts.total||0));
+  const toNext = nextLevel ? nextLevel.min - (pts.total||0) : 0;
+  alert('💎 ' + clientName + '
+Nivel: ' + level.name + '
+Puncte: ' + (pts.points||0) + '
+Valoare totală: ' + (pts.total||0) + ' RON
+Discount: ' + level.discount + '%' + (toNext>0?'
+Până la ' + nextLevel.name + ': mai ' + toNext + ' RON':''));
+}
+
+// 16. COMANDĂ RECURENTĂ CLIENT
+let recurringClientOrders = JSON.parse(localStorage.getItem('sv_recurring_orders') || '[]');
+
+function addRecurringClientOrder(clientName, cartItems, intervalDays) {
+  recurringClientOrders.push({
+    id: Date.now(), clientName, cartItems, intervalDays,
+    lastRun: null, active: true, created: new Date().toISOString()
+  });
+  localStorage.setItem('sv_recurring_orders', JSON.stringify(recurringClientOrders));
+  setFeedback('✅ Comandă recurentă creată pentru ' + clientName + ' la fiecare ' + intervalDays + ' zile', 'ok');
+}
+
+function checkRecurringClientOrders() {
+  const today = new Date();
+  let processed = 0;
+  recurringClientOrders.filter(o => o.active).forEach(order => {
+    const lastRun = order.lastRun ? new Date(order.lastRun) : new Date(0);
+    if ((today - lastRun) / 86400000 >= order.intervalDays) {
+      order.cartItems.forEach(item => {
+        const p = stock.find(s => s.id === item.productId);
+        if (p && p.qty >= item.qty) {
+          p.qty -= item.qty;
+          addLog('Recurent: ' + order.clientName, 'OUT ' + item.qty + ' ' + item.unit + ' ' + item.name, 'out', order.clientName);
+        }
+      });
+      order.lastRun = today.toISOString();
+      processed++;
+    }
+  });
+  if (processed > 0) {
+    localStorage.setItem('sv_recurring_orders', JSON.stringify(recurringClientOrders));
+    saveStockToFirebase(); renderStock(); updateStats();
+    setFeedback(processed + ' comenzi recurente procesate!', 'ok');
+  }
+}
+setInterval(function(){ if(typeof checkRecurringClientOrders==='function') checkRecurringClientOrders(); }, 3600000);
+
+// 17. TEMPLATE SMS LIVRARE
+function generateSMSTemplate(clientName, items, deliveryDate) {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const itemsList = items.slice(0,3).map(i => i.qty + ' ' + i.unit + ' ' + i.name).join(', ');
+  const msg = 'Comanda dvs de la ' + depot + ': ' + itemsList + (items.length>3?'...':'') + '. Livrare: ' + (deliveryDate||'azi') + '. Multumim!';
+  navigator.clipboard.writeText(msg).then(() => {
+    setFeedback('📱 SMS copiat! (' + msg.length + ' caractere)', 'ok');
+  });
+  return msg;
+}
+
+// 18. GRUP CLIENȚI CU PREȚURI DIFERITE
+let clientGroups = JSON.parse(localStorage.getItem('sv_client_groups') || '{}');
+const CLIENT_GROUP_DISCOUNTS = { 'B2C': 0, 'B2B': 10, 'Angrosist': 20, 'VIP': 15 };
+
+function setClientGroup(clientName, group) {
+  clientGroups[normalizeText(clientName.toLowerCase())] = group;
+  localStorage.setItem('sv_client_groups', JSON.stringify(clientGroups));
+  setFeedback('✅ ' + clientName + ' → grup ' + group + ' (' + (CLIENT_GROUP_DISCOUNTS[group]||0) + '% discount)', 'ok');
+}
+
+function getClientGroup(clientName) {
+  return clientGroups[normalizeText(clientName.toLowerCase())] || 'B2C';
+}
+
+function getGroupPrice(product, clientName) {
+  const group = getClientGroup(clientName);
+  const discount = CLIENT_GROUP_DISCOUNTS[group] || 0;
+  return product.price_sell ? product.price_sell * (1 - discount/100) : 0;
+}
+
+// 19. LIMITĂ COMANDĂ LUNARĂ
+let monthlyOrderLimits = JSON.parse(localStorage.getItem('sv_monthly_limits') || '{}');
+
+function setMonthlyLimit(clientName, maxQty) {
+  monthlyOrderLimits[normalizeText(clientName.toLowerCase())] = maxQty;
+  localStorage.setItem('sv_monthly_limits', JSON.stringify(monthlyOrderLimits));
+  setFeedback('✅ Limită lunară setată: ' + clientName + ' max ' + maxQty + ' unități', 'ok');
+}
+
+function checkMonthlyLimit(clientName, qty) {
+  const key = normalizeText(clientName.toLowerCase());
+  const limit = monthlyOrderLimits[key];
+  if (!limit) return true;
+  const now = new Date();
+  const monthStr = now.toLocaleDateString('ro-RO', {month:'2-digit', year:'numeric'});
+  const thisMonthOrders = clients.filter(c =>
+    normalizeText((c.name||'').toLowerCase()) === key && c.time && c.time.includes(monthStr.slice(3))
+  ).reduce((s,c) => s + (parseInt(c.qty)||0), 0);
+  if (thisMonthOrders + qty > limit) {
+    setFeedback('❌ ' + clientName + ' a atins limita lunară! (' + thisMonthOrders + '/' + limit + ')', 'err');
+    speak('Atentie! ' + clientName + ' a atins limita lunara de comenzi.');
+    return false;
+  }
+  return true;
+}
+
+// 20. STATISTICI CLIENȚI PE ORAȘE
+function getClientsByCity() {
+  const cities = {};
+  const addrs = typeof clientAddresses !== 'undefined' ? clientAddresses : {};
+  Object.entries(addrs).forEach(([key, addr]) => {
+    const city = addr.city || 'Necunoscut';
+    if (!cities[city]) cities[city] = 0;
+    cities[city]++;
+  });
+  return Object.entries(cities).sort((a,b) => b[1]-a[1]);
+}
+
+// 21. FELICITARE AUTOMATĂ ZI NAȘTERE
+let clientBirthdays = JSON.parse(localStorage.getItem('sv_birthdays') || '{}');
+
+function setClientBirthday(clientName, dateMMDD) {
+  clientBirthdays[normalizeText(clientName.toLowerCase())] = { name: clientName, date: dateMMDD };
+  localStorage.setItem('sv_birthdays', JSON.stringify(clientBirthdays));
+  setFeedback('🎂 Ziua de naștere salvată pentru ' + clientName, 'ok');
+}
+
+function checkBirthdaysToday() {
+  const today = new Date();
+  const todayMMDD = String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  Object.values(clientBirthdays).forEach(b => {
+    if (b.date === todayMMDD) {
+      const msg = 'La multi ani, ' + b.name + '! Multa sanatate si comenzi fericite!';
+      triggerAlert('🎂 Ziua de naștere: ' + b.name + '!', 'ok');
+      if (userProfile && userProfile.telegram_id) {
+        sendTelegramAlert('🎂 <b>LA MULȚI ANI!</b>
+' + b.name + ' are astăzi ziua de naștere! Nu uita să-l feliciți!', userProfile.telegram_id);
+      }
+    }
+  });
+}
+setInterval(function(){ if(typeof checkBirthdaysToday==='function') checkBirthdaysToday(); }, 3600000);
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC D: RAPOARTE NOI (22-29)
+// ══════════════════════════════════════════
+
+// 22. RAPORT ABC
+function showABCAnalysis() {
+  const products = stock.filter(p => p.price_sell && p.qty > 0)
+    .map(p => ({ ...p, value: p.price_sell * p.qty }))
+    .sort((a,b) => b.value - a.value);
+  const totalValue = products.reduce((s,p) => s + p.value, 0);
+  let cumulative = 0;
+  const withABC = products.map(p => {
+    cumulative += p.value;
+    const pct = totalValue > 0 ? cumulative / totalValue * 100 : 0;
+    const cat = pct <= 80 ? 'A' : pct <= 95 ? 'B' : 'C';
+    return { ...p, abcCat: cat, pct: pct.toFixed(1) };
+  });
+
+  const el = document.getElementById('abc-content');
+  if (!el) return;
+  const grouped = { A: withABC.filter(p=>p.abcCat==='A'), B: withABC.filter(p=>p.abcCat==='B'), C: withABC.filter(p=>p.abcCat==='C') };
+
+  el.innerHTML = ['A','B','C'].map(cat => {
+    const items = grouped[cat];
+    const val = items.reduce((s,p) => s+p.value, 0);
+    const color = cat==='A'?'#00e5a0':cat==='B'?'#ffa502':'#6b7a8d';
+    return '<div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:10px;border-left:4px solid ' + color + '">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:8px">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:' + color + '">CLASA ' + cat + '</div>' +
+      '<div style="text-align:right"><div style="color:#e8ecf0;font-weight:700">' + items.length + ' produse</div>' +
+      '<div style="font-size:12px;color:#6b7a8d">' + val.toFixed(0) + ' RON (' + (totalValue>0?(val/totalValue*100).toFixed(0):0) + '%)</div></div>' +
+      '</div>' +
+      items.slice(0,5).map(p => '<div style="font-size:12px;color:#99a8b8;padding:3px 0;border-bottom:1px solid #1e2530">' +
+        p.name + ' — <b style="color:' + color + '">' + p.value.toFixed(0) + ' RON</b></div>').join('') +
+      (items.length>5?'<div style="font-size:11px;color:#6b7a8d;margin-top:4px">+' + (items.length-5) + ' mai multe...</div>':'') +
+      '</div>';
+  }).join('');
+  document.getElementById('abc-modal').style.display = 'flex';
+}
+
+// 23. RAPORT ROI PE PRODUS
+function showROIReport() {
+  const products = stock.filter(p => p.price_buy && p.price_sell)
+    .map(p => {
+      const roi = ((p.price_sell - p.price_buy) / p.price_buy * 100).toFixed(1);
+      const margin = ((p.price_sell - p.price_buy) / p.price_sell * 100).toFixed(1);
+      return { ...p, roi: parseFloat(roi), margin: parseFloat(margin) };
+    }).sort((a,b) => b.roi - a.roi);
+
+  const el = document.getElementById('roi-content');
+  if (!el) return;
+  el.innerHTML = products.slice(0,20).map(p =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + p.name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + p.price_buy + ' → ' + p.price_sell + ' RON</div></div>' +
+    '<div style="text-align:right">' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:' + (p.roi>=30?'#00e5a0':p.roi>=15?'#ffa502':'#ff4757') + '">' + p.roi + '%</div>' +
+    '<div style="font-size:10px;color:#6b7a8d">ROI</div>' +
+    '</div></div>').join('');
+  document.getElementById('roi-modal').style.display = 'flex';
+}
+
+// 24. RAPORT INACTIVITATE OPERATORI
+function showOperatorInactivity() {
+  const today = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const activeToday = new Set(log.filter(e => e.time && e.time.startsWith(today)).map(e => e.user));
+  const allOperators = new Set(log.map(e => e.user).filter(Boolean));
+  const inactive = [...allOperators].filter(op => !activeToday.has(op));
+
+  const el = document.getElementById('operator-inactivity-content');
+  if (!el) return;
+  el.innerHTML = inactive.length === 0
+    ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toți operatorii au lucrat azi!</div>'
+    : inactive.map(op => '<div style="display:flex;justify-content:space-between;padding:12px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+        '<span style="color:#e8ecf0">' + op + '</span><span style="color:#ff4757;font-size:12px">⚠️ Inactiv azi</span></div>').join('');
+  document.getElementById('operator-inactivity-modal').style.display = 'flex';
+}
+
+// 25. GRAFIC CASHFLOW 12 LUNI
+function showCashflowChart() {
+  const now = new Date();
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const label = d.toLocaleDateString('ro-RO', {month:'short'});
+    const monthLog = log.filter(e => e.ts && new Date(e.ts).getMonth()===d.getMonth() && new Date(e.ts).getFullYear()===d.getFullYear());
+    let inVal = 0, outVal = 0;
+    monthLog.forEach(e => {
+      const m = e.result && e.result.match(/(\d+).(\d+)/);
+      if (!m) return;
+      const qty = Math.abs(parseInt(m[1]) - parseInt(m[2]));
+      const p = stock.find(s => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(s.name.toLowerCase())));
+      if (!p) return;
+      if (e.type === 'in') inVal += qty * (p.price_buy||0);
+      else if (e.type === 'out') outVal += qty * (p.price_sell||0);
+    });
+    months.push({ label, inVal: inVal.toFixed(0), outVal: outVal.toFixed(0), profit: (outVal-inVal).toFixed(0) });
+  }
+
+  const el = document.getElementById('cashflow-content');
+  if (!el) return;
+  const maxVal = Math.max(...months.map(m => Math.max(parseFloat(m.inVal),parseFloat(m.outVal))), 1);
+
+  el.innerHTML = '<div style="display:flex;gap:4px;align-items:flex-end;height:120px;margin-bottom:8px">' +
+    months.map(m => '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end">' +
+      '<div style="width:100%;background:rgba(0,229,160,0.7);border-radius:2px 2px 0 0;height:' + Math.round(parseFloat(m.inVal)/maxVal*100) + 'px" title="IN: ' + m.inVal + ' RON"></div>' +
+      '<div style="width:100%;background:rgba(255,71,87,0.7);border-radius:0;height:' + Math.round(parseFloat(m.outVal)/maxVal*100) + 'px" title="OUT: ' + m.outVal + ' RON"></div>' +
+      '</div>').join('') + '</div>' +
+    '<div style="display:flex;gap:4px;justify-content:space-between;margin-bottom:12px">' +
+    months.map(m => '<div style="flex:1;text-align:center;font-size:9px;color:#6b7a8d">' + m.label + '</div>').join('') + '</div>' +
+    '<div style="display:flex;gap:12px;justify-content:center">' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#00e5a0;border-radius:2px"></div><span style="font-size:11px;color:#6b7a8d">Cumpărări</span></div>' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#ff4757;border-radius:2px"></div><span style="font-size:11px;color:#6b7a8d">Vânzări</span></div></div>';
+
+  document.getElementById('cashflow-modal').style.display = 'flex';
+}
+
+// 26. RAPORT PRODUSE FĂRĂ FURNIZOR
+function showProductsWithoutSupplier() {
+  const noSupplier = stock.filter(p => !p.supplier || p.supplier.trim() === '');
+  const el = document.getElementById('no-supplier-content');
+  if (!el) return;
+  el.innerHTML = noSupplier.length === 0
+    ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate produsele au furnizor!</div>'
+    : noSupplier.map(p => '<div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+        '<div><div style="font-weight:700;color:#e8ecf0">' + p.name + '</div>' +
+        '<div style="font-size:11px;color:#6b7a8d">' + (p.cat||'—') + ' · ' + p.qty + ' ' + p.unit + '</div></div>' +
+        '<button onclick="openEditModal(' + p.id + ');document.getElementById('no-supplier-modal').style.display='none'" style="background:#ffa502;border:none;border-radius:6px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:11px;padding:5px 10px;cursor:pointer">EDITEAZĂ</button>' +
+        '</div>').join('');
+  document.getElementById('no-supplier-modal').style.display = 'flex';
+}
+
+// 27. TOP 10 CLIENȚI DUPĂ VALOARE
+function showTopClientsByValue() {
+  const clientValues = {};
+  clients.forEach(c => {
+    if (!c.name) return;
+    const key = normalizeText(c.name.toLowerCase());
+    if (!clientValues[key]) clientValues[key] = { name: c.name, value: 0, orders: 0 };
+    const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText((c.product||'').toLowerCase())));
+    clientValues[key].value += (parseInt(c.qty)||0) * (p?p.price_sell||0:0);
+    clientValues[key].orders++;
+  });
+  const sorted = Object.values(clientValues).sort((a,b) => b.value-a.value).slice(0,10);
+
+  const el = document.getElementById('top-clients-value-content');
+  if (!el) return;
+  el.innerHTML = sorted.map((c,i) =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ' + (i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'#1e2530') + '">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + (i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'') + c.name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + c.orders + ' comenzi</div></div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#00e5a0">' + c.value.toFixed(0) + ' RON</div>' +
+    '</div>').join('');
+  document.getElementById('top-clients-value-modal').style.display = 'flex';
+}
+
+// 28. RAPORT PIERDERI EXPIRARE
+function showExpirationLosses() {
+  const today = new Date();
+  const expired = stock.filter(p => p.expiry && new Date(p.expiry) < today && p.qty > 0);
+  const totalLoss = expired.reduce((s,p) => s + p.qty*(p.price_buy||0), 0);
+
+  const el = document.getElementById('expiration-losses-content');
+  if (!el) return;
+  el.innerHTML = expired.length === 0
+    ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Niciun produs expirat în stoc!</div>'
+    : '<div style="background:#ff4757;border-radius:8px;padding:12px;text-align:center;margin-bottom:12px">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#fff">' + totalLoss.toFixed(0) + ' RON</div>' +
+      '<div style="font-size:12px;color:rgba(255,255,255,0.8)">Valoare totală pierderi</div></div>' +
+      expired.map(p => '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #ff4757">' +
+        '<div style="font-weight:700;color:#e8ecf0">' + p.name + '</div>' +
+        '<div style="font-size:11px;color:#6b7a8d">Exp: ' + p.expiry + ' · ' + p.qty + ' ' + p.unit + ' · Pierdere: ' + (p.qty*(p.price_buy||0)).toFixed(0) + ' RON</div>' +
+        '</div>').join('');
+  document.getElementById('expiration-losses-modal').style.display = 'flex';
+}
+
+// 29. DASHBOARD MOBIL SIMPLIFICAT
+function showMobileDashboard() {
+  const val = typeof calculateStockValue==='function' ? calculateStockValue() : {totalBuy:0};
+  const zero = stock.filter(p=>p.qty===0).length;
+  const low = stock.filter(p=>p.qty>0&&p.qty<=p.min).length;
+  const todayStr = new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'});
+  const todayOps = log.filter(e=>e.time&&e.time.startsWith(todayStr)).length;
+
+  const el = document.getElementById('mobile-dash-content');
+  if (!el) return;
+  el.innerHTML = [
+    ['💰', parseFloat(val.totalBuy||0).toFixed(0)+' RON', 'Valoare Stoc', '#00e5a0'],
+    ['📦', stock.length, 'Total Produse', '#a78bfa'],
+    ['🔴', zero+low, 'Produse Critice', zero+low>0?'#ff4757':'#00e5a0'],
+    ['📊', todayOps, 'Operații Azi', '#ffa502']
+  ].map(([icon,val,label,color]) =>
+    '<div style="background:#181d24;border-radius:16px;padding:24px;text-align:center;border-top:3px solid '+color+'">' +
+    '<div style="font-size:32px;margin-bottom:8px">'+icon+'</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:36px;font-weight:900;color:'+color+'">'+val+'</div>' +
+    '<div style="font-size:12px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-top:4px">'+label+'</div>' +
+    '</div>').join('');
+  document.getElementById('mobile-dash-modal').style.display = 'flex';
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC E: AI NOU (30-36)
+// ══════════════════════════════════════════
+
+// 30. AI CLASIFICARE LA IMPORT EXCEL
+async function aiClassifyImportedProducts(products) {
+  if (!products || !products.length) return products;
+  const cats = [...new Set(stock.map(p=>p.cat||'General'))].slice(0,10).join(', ');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 400,
+        messages: [{ role: 'user', content: 'Categorizeaza aceste produse de depozit in categoriile existente: ' + cats + '. Produse: ' + products.map(p=>p.name).join(', ') + '. Raspunde STRICT cu JSON: [{"name":"...","cat":"..."}]' }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+    const classified = JSON.parse(raw);
+    return products.map(p => {
+      const found = classified.find(c => normalizeText(c.name.toLowerCase()) === normalizeText(p.name.toLowerCase()));
+      return found ? { ...p, cat: found.cat } : p;
+    });
+  } catch(e) { return products; }
+}
+
+// 31. AI DETECTARE ANOMALIE PREȚ
+async function aiDetectPriceAnomaly(product, newPrice) {
+  if (!newPrice) return;
+  const avgPrice = stock.filter(p => (p.cat||'')===product.cat && p.price_buy && p.id!==product.id)
+    .reduce((s,p,_,arr) => s + p.price_buy/arr.length, 0);
+  if (avgPrice === 0) return;
+  const deviation = Math.abs(newPrice - avgPrice) / avgPrice * 100;
+  if (deviation > 50) {
+    triggerAlert('⚠️ Anomalie preț: ' + product.name + ' — ' + newPrice + ' RON vs medie ' + avgPrice.toFixed(2) + ' RON (diferență ' + deviation.toFixed(0) + '%)', 'warn');
+    speak('Atentie! Pret neobisnuit pentru ' + product.name + '.');
+  }
+}
+
+// 32. AI SUGESTIE REDENUMIRE
+async 
+
+// 33. AI FORECAST PE CATEGORIE
+async function aiForecastByCategory() {
+  const el = document.getElementById('ai-cat-forecast-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:20px">⏳ AI calculează...</div>';
+  document.getElementById('ai-cat-forecast-modal').style.display = 'flex';
+
+  const cats = [...new Set(stock.map(p=>p.cat||'General'))];
+  const catData = cats.map(cat => {
+    const products = stock.filter(p=>(p.cat||'General')===cat);
+    const totalQty = products.reduce((s,p)=>s+p.qty, 0);
+    const totalValue = products.reduce((s,p)=>s+p.qty*(p.price_buy||0), 0);
+    const lowCount = products.filter(p=>p.qty<=p.min).length;
+    return { cat, products: products.length, totalQty, totalValue: totalValue.toFixed(0), lowCount };
+  });
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 400,
+        messages: [{ role: 'user', content: 'Analizeaza aceste categorii de depozit si genereaza forecast pentru urmatoarele 30 zile: ' + JSON.stringify(catData) + '. Raspunde in romana cu bullets, o linie per categorie.' }]
+      })
+    });
+    const data = await resp.json();
+    el.innerHTML = '<div style="font-size:13px;color:#e8ecf0;line-height:1.8;white-space:pre-wrap">' + data.content[0].text + '</div>';
+  } catch(e) { el.innerHTML = '<div style="color:#ff4757">Eroare AI.</div>'; }
+}
+
+// 34. AI DRAFT RĂSPUNS EMAIL FURNIZOR
+async function aiDraftSupplierResponse(offerText) {
+  const el = document.getElementById('supplier-email-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:20px">⏳ AI redactează...</div>';
+  document.getElementById('supplier-email-modal').style.display = 'flex';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 300,
+        messages: [{ role: 'user', content: 'Scrie un email profesional de raspuns la aceasta oferta de furnizor, in romana. Oferta: ' + offerText + '. Depozit: ' + (userProfile?userProfile.depot:'') + '. Email scurt, politicos, cu confirmare partala sau cerere de clarificari.' }]
+      })
+    });
+    const data = await resp.json();
+    el.innerHTML = '<div style="background:#181d24;border-radius:8px;padding:16px">' +
+      '<pre style="color:#e8ecf0;font-size:13px;white-space:pre-wrap;font-family:inherit">' + data.content[0].text + '</pre>' +
+      '<button onclick="navigator.clipboard.writeText(this.previousElementSibling.textContent).then(()=>setFeedback('Copiat!','ok'))" style="margin-top:10px;background:#ffa502;border:none;border-radius:6px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:12px;padding:6px 14px;cursor:pointer">📋 COPIAZĂ</button>' +
+      '</div>';
+  } catch(e) { el.innerHTML = '<div style="color:#ff4757">Eroare AI.</div>'; }
+}
+
+// 35. AI OPTIMIZARE SPAȚIU DEPOZIT
+async function aiOptimizeWarehouseSpace() {
+  setFeedback('⏳ AI optimizează...', 'ok');
+  const locData = {};
+  stock.forEach(p => {
+    const loc = p.loc || 'Nedefinit';
+    if (!locData[loc]) locData[loc] = { products: 0, totalQty: 0, fastMover: 0 };
+    locData[loc].products++;
+    locData[loc].totalQty += p.qty;
+    const moves = log.filter(e => e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))).length;
+    if (moves > 5) locData[loc].fastMover++;
+  });
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 350,
+        messages: [{ role: 'user', content: 'Esti expert in organizare depozit. Analizeaza locatiile si sugereaza optimizare: ' + JSON.stringify(locData) + '. Principiu: produse des mutate (fast movers) aproape de iesire. Raspunde in romana, 5 sugestii concrete.' }]
+      })
+    });
+    const data = await resp.json();
+    alert('🗺️ Optimizare spațiu depozit:
+
+' + data.content[0].text);
+    setFeedback('✅ Recomandări AI generate!', 'ok');
+  } catch(e) { setFeedback('❌ Eroare AI optimizare.', 'err'); }
+}
+
+// 36. AI ANALIZĂ SENTIMENT NOTE PRODUSE
+async function aiAnalyzeProductNotes() {
+  const productsWithNotes = stock.filter(p => p.notes && p.notes.length > 0);
+  if (!productsWithNotes.length) { setFeedback('Niciun produs cu note.', 'warn'); return; }
+
+  const notesData = productsWithNotes.slice(0,10).map(p => ({
+    product: p.name,
+    notes: (p.notes||[]).map(n => n.text||n).join('; ')
+  }));
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 300,
+        messages: [{ role: 'user', content: 'Analizeaza sentimentul si problemele din notele de depozit: ' + JSON.stringify(notesData) + '. Identifica probleme recurente, produse cu probleme. Raspunde in romana, concis.' }]
+      })
+    });
+    const data = await resp.json();
+    alert('📝 Analiză note produse:
+
+' + data.content[0].text);
+  } catch(e) { setFeedback('❌ Eroare AI.', 'err'); }
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 1 BLOC F: SISTEM, MOBILE, INTEGRĂRI (37-50)
+// ══════════════════════════════════════════
+
+// 37. MULTI-UTILIZATOR CU ROLURI
+const USER_ROLES = {
+  admin: { label: 'Admin', canEdit: true, canDelete: true, canViewReports: true, canManageUsers: true },
+  operator: { label: 'Operator', canEdit: true, canDelete: false, canViewReports: true, canManageUsers: false },
+  viewer: { label: 'Viewer', canEdit: false, canDelete: false, canViewReports: true, canManageUsers: false },
+  contabil: { label: 'Contabil', canEdit: false, canDelete: false, canViewReports: true, canManageUsers: false }
+};
+
+function getCurrentUserRole() {
+  if (!userProfile) return USER_ROLES.viewer;
+  const role = userProfile.role || 'operator';
+  return USER_ROLES[role] || USER_ROLES.operator;
+}
+
+
+
+// 38. LOG MODIFICĂRI PRODUS
+let productChangelog = JSON.parse(localStorage.getItem('sv_changelog') || '{}');
+
+function logProductChange(productId, field, oldVal, newVal) {
+  const key = String(productId);
+  if (!productChangelog[key]) productChangelog[key] = [];
+  productChangelog[key].push({
+    ts: new Date().toISOString(),
+    time: new Date().toLocaleString('ro-RO'),
+    field, oldVal: String(oldVal||''), newVal: String(newVal||''),
+    user: userProfile ? userProfile.name : '—'
+  });
+  if (productChangelog[key].length > 50) productChangelog[key] = productChangelog[key].slice(-50);
+  localStorage.setItem('sv_changelog', JSON.stringify(productChangelog));
+}
+
+function getProductChangelog(productId) {
+  return (productChangelog[String(productId)] || []).reverse();
+}
+
+// 39. BACKUP AUTOMAT MIEZUL NOPȚII
+function checkMidnightBackup() {
+  const now = new Date();
+  if (now.getHours() !== 0 || now.getMinutes() !== 0) return;
+  const today = now.toISOString().slice(0,10);
+  if (localStorage.getItem('sv_midnight_backup_' + today)) return;
+  localStorage.setItem('sv_midnight_backup_' + today, '1');
+  if (!window.fbReady || !currentUser) return;
+  const bkData = { stock, clients, log: log.slice(0,200), ts: now.toISOString(), depot: userProfile?userProfile.depot:'' };
+  db.ref('auto_backups/' + getDepotKey() + '/' + today).set(bkData)
+    .then(() => console.log('Auto backup OK'))
+    .catch(e => console.error('Auto backup error:', e));
+}
+setInterval(function(){ if(typeof checkMidnightBackup==='function') checkMidnightBackup(); }, 60000);
+
+// 40. NOTIFICĂRI BADGE TAB BROWSER
+function updateBrowserBadge() {
+  const criticalCount = stock.filter(p => p.qty === 0 || p.qty <= p.min).length;
+  const overdue = typeof getOverduePayments === 'function' ? getOverduePayments().length : 0;
+  const total = criticalCount + overdue;
+
+  if ('setAppBadge' in navigator) {
+    if (total > 0) navigator.setAppBadge(total).catch(()=>{});
+    else navigator.clearAppBadge().catch(()=>{});
+  }
+
+  // Update tab title
+  const baseTitle = 'StocVoce';
+  document.title = total > 0 ? '(' + total + ') ' + baseTitle : baseTitle;
+}
+setInterval(function(){ if(typeof updateBrowserBadge==='function') updateBrowserBadge(); }, 30000);
+
+// 41. SHORTCUT-URI TASTATURĂ
+document.addEventListener('keydown', function(e) {
+  if (document.activeElement && ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  if (e.ctrlKey || e.metaKey) {
+    switch(e.key.toLowerCase()) {
+      case 'n': e.preventDefault(); if(typeof openAddModal==='function') openAddModal(); break;
+      case 'f': e.preventDefault(); const si = document.getElementById('stock-search'); if(si){si.focus();si.select();} break;
+      case 'z': e.preventDefault(); if(typeof undoLastOperation==='function') undoLastOperation(); break;
+      case 'b': e.preventDefault(); if(typeof doManualBackup==='function') doManualBackup(); break;
+      case 'k': e.preventDefault(); if(typeof openKioskMode==='function') openKioskMode(); break;
+      case 'r': e.preventDefault(); if(typeof generatePDF==='function') generatePDF(); break;
+    }
+  }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('[style*="display: flex"][id$="-modal"]').forEach(m => { m.style.display='none'; });
+    document.querySelectorAll('[style*="display:flex"][id$="-modal"]').forEach(m => { m.style.display='none'; });
+  }
+});
+
+// 42. MOD NOAPTE AUTOMAT
+function checkNightMode() {
+  const h = new Date().getHours();
+  const isNight = h >= 22 || h < 7;
+  const wasNight = localStorage.getItem('sv_night_mode') === 'true';
+  if (isNight !== wasNight) {
+    localStorage.setItem('sv_night_mode', String(isNight));
+    if (typeof applyThemeFull === 'function') {
+      applyThemeFull(isNight ? 'dark' : (appSettings.theme || 'dark'));
+    }
+    document.documentElement.style.filter = isNight ? 'brightness(0.85)' : '';
+  }
+}
+setInterval(function(){ if(typeof checkNightMode==='function') checkNightMode(); }, 60000);
+
+// 43. UNDO MULTIPLU (10 PAȘI)
+let undoStack = [];
+const MAX_UNDO = 10;
+
+function pushUndoState(product, opType, qty) {
+  undoStack.push({ productId: product.id, name: product.name, qty: product.qty, opType, opQty: qty, ts: Date.now() });
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+}
+
+function undoMultiple(steps) {
+  steps = Math.min(steps || 1, undoStack.length);
+  for (let i = 0; i < steps; i++) {
+    const state = undoStack.pop();
+    if (!state) break;
+    const p = stock.find(s => s.id === state.productId);
+    if (p) {
+      p.qty = state.qty;
+      addLog('Undo: ' + state.name, 'UNDO ' + state.opType + ' ' + state.opQty, 'ok');
+    }
+  }
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('↩️ ' + steps + ' operații anulate!', 'ok');
+  speak(steps + ' operatii anulate.');
+}
+
+// 44. SWIPE PE CARD MOBIL
+function initSwipeGestures() {
+  let startX = 0, startY = 0;
+  document.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > 40) return;
+
+    const card = e.target.closest('.stock-card');
+    if (!card) return;
+    const productId = parseInt(card.id.replace('card-',''));
+    const p = stock.find(s => s.id === productId);
+    if (!p) return;
+
+    if (dx < -60) {
+      if (p.qty > 0) { p.qty--; addLog('Swipe OUT: ' + p.name, 'OUT 1 ' + p.unit, 'out'); card.style.transform='translateX(-10px)'; setTimeout(()=>card.style.transform='',300); }
+    } else if (dx > 60) {
+      p.qty++; addLog('Swipe IN: ' + p.name, 'IN 1 ' + p.unit, 'in'); card.style.transform='translateX(10px)'; setTimeout(()=>card.style.transform='',300);
+    }
+    saveStockToFirebase(); renderStock(); updateStats();
+    setFeedback((dx<0?'➖ -1 ':' ➕ +1 ') + p.name + ': ' + p.qty + ' ' + p.unit, 'ok');
+  }, { passive: true });
+}
+document.addEventListener('DOMContentLoaded', function(){ if(typeof initSwipeGestures==='function') initSwipeGestures(); });
+
+// 45. SCAN COD DE BARE EAN
+function openBarcodeScanModal() {
+  document.getElementById('barcode-scan-modal').style.display = 'flex';
+}
+
+function handleBarcodeScanned(barcode) {
+  const p = stock.find(s => s.sku === barcode || s.barcode === barcode);
+  if (p) {
+    document.getElementById('barcode-result').innerHTML =
+      '<div style="background:#181d24;border-radius:10px;padding:16px;text-align:center">' +
+      '<div style="font-weight:700;color:#00e5a0;font-size:16px">' + p.name + '</div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;color:#e8ecf0;margin:8px 0">' + p.qty + ' ' + p.unit + '</div>' +
+      '<div style="display:flex;gap:8px;justify-content:center;margin-top:12px">' +
+      '<button onclick="quickOp(' + p.id + ','out')" style="background:#ff4757;border:none;border-radius:8px;color:#fff;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:18px;padding:10px 20px;cursor:pointer">−1</button>' +
+      '<button onclick="quickOp(' + p.id + ','in')" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:900;font-size:18px;padding:10px 20px;cursor:pointer">+1</button>' +
+      '</div></div>';
+  } else {
+    document.getElementById('barcode-result').innerHTML = '<div style="color:#ff4757;text-align:center;padding:16px">Cod nerecunoscut: ' + barcode + '</div>';
+  }
+}
+
+// 46. SHARE STOC WHATSAPP
+function shareStockWhatsApp() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const zero = stock.filter(p=>p.qty===0);
+  const low = stock.filter(p=>p.qty>0&&p.qty<=p.min);
+  let msg = '📦 *SITUAȚIE STOC — ' + depot + '*
+_' + new Date().toLocaleDateString('ro-RO') + '_
+
+';
+  if (zero.length) msg += '🔴 *Epuizate (' + zero.length + '):*
+' + zero.slice(0,5).map(p=>'• '+p.name).join('
+') + '
+
+';
+  if (low.length) msg += '⚠️ *Stoc scăzut (' + low.length + '):*
+' + low.slice(0,5).map(p=>'• '+p.name+': '+p.qty+' '+p.unit).join('
+') + '
+
+';
+  msg += '✅ *Total: ' + stock.length + ' produse*';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// 47. WIDGET PWA STOC CRITIC
+function updatePWAWidget() {
+  const critical = stock.filter(p=>p.qty<=p.min).length;
+  if ('setAppBadge' in navigator && critical > 0) navigator.setAppBadge(critical).catch(()=>{});
+  localStorage.setItem('sv_widget_data', JSON.stringify({ critical, total: stock.length, ts: new Date().toISOString() }));
+}
+setInterval(function(){ if(typeof updatePWAWidget==='function') updatePWAWidget(); }, 60000);
+
+// 48. EXPORT GOOGLE SHEETS
+async 
+
+// 49. IMPORT COMENZI WOOCOMMERCE
+async function importWooCommerceOrders() {
+  const url = prompt('URL magazin WooCommerce:
+https://magazin.ro');
+  const key = prompt('Consumer Key:');
+  const secret = prompt('Consumer Secret:');
+  if (!url || !key || !secret) return;
+
+  try {
+    setFeedback('⏳ Se importă comenzile...', 'ok');
+    const auth = btoa(key + ':' + secret);
+    const resp = await fetch(url + '/wp-json/wc/v3/orders?status=processing&per_page=10', {
+      headers: { 'Authorization': 'Basic ' + auth }
+    });
+    if (!resp.ok) { setFeedback('❌ Eroare WooCommerce: ' + resp.status, 'err'); return; }
+    const orders = await resp.json();
+    let processed = 0;
+    orders.forEach(order => {
+      order.line_items.forEach(item => {
+        const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(item.name.toLowerCase())));
+        if (p && p.qty >= item.quantity) {
+          p.qty -= item.quantity;
+          addLog('WooCommerce #' + order.id, 'OUT ' + item.quantity + ' ' + (p.unit||'buc') + ' ' + p.name, 'out', order.billing.first_name + ' ' + order.billing.last_name);
+          processed++;
+        }
+      });
+    });
+    saveStockToFirebase(); renderStock(); updateStats();
+    setFeedback('✅ ' + orders.length + ' comenzi WooCommerce importate! ' + processed + ' produse scăzute.', 'ok');
+  } catch(e) { setFeedback('❌ Eroare import: ' + e.message, 'err'); }
+}
+
+// 50. API REST PUBLIC
+function getAPILink() {
+  const apiKey = localStorage.getItem('sv_api_key') || generateDepotAPIKey();
+  const baseUrl = window.location.origin;
+  const info = 'API StocVoce\n\nEndpoint: ' + baseUrl + '/api/stock\nMetodă: GET\nHeader: X-API-Key: ' + apiKey + '\n\nRăspuns JSON cu tot stocul depozitului.';
+  navigator.clipboard.writeText(apiKey).then(() => {
+    alert(info + '\n\nAPI Key copiat în clipboard!');
+  });
+  setFeedback('🔑 API Key copiat! Endpoint generat.', 'ok');
 }
 
 </script>
@@ -9512,7 +10805,6 @@ function calcAutoMarkup(product, markupPercent) {
 }
 
 // 24. NUMĂR SERIE TRACKING
-let serialNumbers = JSON.parse(localStorage.getItem('sv_serials') || '{}');
 
 function addSerial(productId, serialNo) {
   if (!serialNumbers[productId]) serialNumbers[productId] = [];
@@ -11287,6 +12579,166 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CART MODAL -->
+<div id="cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🛒 Coș Cumpărături <span id="cart-badge" style="background:#ff4757;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center">0</span></div>
+      <button onclick="document.getElementById('cart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cart-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="cart-client-name" placeholder="Nume client (opțional)" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <button onclick="processCart(document.getElementById('cart-client-name').value)" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">✅ PROCESEAZĂ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MASS MOVE MODAL -->
+<div id="mass-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📦 Mișcare Masivă</div>
+      <button onclick="document.getElementById('mass-move-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <input id="mass-move-loc" placeholder="Locație nouă (ex: B3)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div id="mass-move-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmMassMove()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">MUTĂ SELECȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHYSICAL INVENTORY MODAL -->
+<div id="physical-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚖️ Inventar Fizic vs Sistem</div>
+      <button onclick="document.getElementById('physical-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="physical-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="applyPhysicalInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ APLICĂ DIFERENȚELE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABC MODAL -->
+<div id="abc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Analiză ABC</div>
+      <button onclick="document.getElementById('abc-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="abc-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- ROI MODAL -->
+<div id="roi-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💹 ROI per Produs</div>
+      <button onclick="document.getElementById('roi-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="roi-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI CAT FORECAST MODAL -->
+<div id="ai-cat-forecast-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Forecast AI per Categorie</div>
+      <button onclick="document.getElementById('ai-cat-forecast-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-cat-forecast-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CASHFLOW MODAL -->
+<div id="cashflow-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💸 Cashflow 12 Luni</div>
+      <button onclick="document.getElementById('cashflow-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cashflow-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO SUPPLIER MODAL -->
+<div id="no-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">⚠️ Fără Furnizor</div>
+      <button onclick="document.getElementById('no-supplier-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-supplier-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS VALUE MODAL -->
+<div id="top-clients-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffd700;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffd700;text-transform:uppercase">🏆 Top Clienți Valoare</div>
+      <button onclick="document.getElementById('top-clients-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- EXPIRATION LOSSES MODAL -->
+<div id="expiration-losses-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">📅 Pierderi Expirare</div>
+      <button onclick="document.getElementById('expiration-losses-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="expiration-losses-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MOBILE DASH MODAL -->
+<div id="mobile-dash-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#e8ecf0">📱 Dashboard Șef</div>
+      <button onclick="document.getElementById('mobile-dash-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="mobile-dash-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+  </div>
+</div>
+
+<!-- OPERATOR INACTIVITY MODAL -->
+<div id="operator-inactivity-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">👤 Inactivitate Operatori</div>
+      <button onclick="document.getElementById('operator-inactivity-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-inactivity-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BARCODE SCAN MODAL -->
+<div id="barcode-scan-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📷 Scan Cod de Bare</div>
+      <button onclick="document.getElementById('barcode-scan-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <input id="barcode-input" placeholder="Scanează sau introdu codul EAN..." oninput="handleBarcodeScanned(this.value)" autofocus style="width:100%;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#e8ecf0;font-size:14px;padding:12px;outline:none;margin-bottom:12px;font-family:'JetBrains Mono',monospace">
+      <div id="barcode-result"></div>
+    </div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -12012,6 +13464,166 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CART MODAL -->
+<div id="cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🛒 Coș Cumpărături <span id="cart-badge" style="background:#ff4757;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center">0</span></div>
+      <button onclick="document.getElementById('cart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cart-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="cart-client-name" placeholder="Nume client (opțional)" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <button onclick="processCart(document.getElementById('cart-client-name').value)" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">✅ PROCESEAZĂ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MASS MOVE MODAL -->
+<div id="mass-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📦 Mișcare Masivă</div>
+      <button onclick="document.getElementById('mass-move-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <input id="mass-move-loc" placeholder="Locație nouă (ex: B3)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div id="mass-move-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmMassMove()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">MUTĂ SELECȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHYSICAL INVENTORY MODAL -->
+<div id="physical-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚖️ Inventar Fizic vs Sistem</div>
+      <button onclick="document.getElementById('physical-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="physical-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="applyPhysicalInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ APLICĂ DIFERENȚELE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABC MODAL -->
+<div id="abc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Analiză ABC</div>
+      <button onclick="document.getElementById('abc-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="abc-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- ROI MODAL -->
+<div id="roi-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💹 ROI per Produs</div>
+      <button onclick="document.getElementById('roi-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="roi-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI CAT FORECAST MODAL -->
+<div id="ai-cat-forecast-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Forecast AI per Categorie</div>
+      <button onclick="document.getElementById('ai-cat-forecast-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-cat-forecast-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CASHFLOW MODAL -->
+<div id="cashflow-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💸 Cashflow 12 Luni</div>
+      <button onclick="document.getElementById('cashflow-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cashflow-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO SUPPLIER MODAL -->
+<div id="no-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">⚠️ Fără Furnizor</div>
+      <button onclick="document.getElementById('no-supplier-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-supplier-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS VALUE MODAL -->
+<div id="top-clients-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffd700;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffd700;text-transform:uppercase">🏆 Top Clienți Valoare</div>
+      <button onclick="document.getElementById('top-clients-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- EXPIRATION LOSSES MODAL -->
+<div id="expiration-losses-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">📅 Pierderi Expirare</div>
+      <button onclick="document.getElementById('expiration-losses-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="expiration-losses-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MOBILE DASH MODAL -->
+<div id="mobile-dash-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#e8ecf0">📱 Dashboard Șef</div>
+      <button onclick="document.getElementById('mobile-dash-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="mobile-dash-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+  </div>
+</div>
+
+<!-- OPERATOR INACTIVITY MODAL -->
+<div id="operator-inactivity-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">👤 Inactivitate Operatori</div>
+      <button onclick="document.getElementById('operator-inactivity-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-inactivity-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BARCODE SCAN MODAL -->
+<div id="barcode-scan-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📷 Scan Cod de Bare</div>
+      <button onclick="document.getElementById('barcode-scan-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <input id="barcode-input" placeholder="Scanează sau introdu codul EAN..." oninput="handleBarcodeScanned(this.value)" autofocus style="width:100%;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#e8ecf0;font-size:14px;padding:12px;outline:none;margin-bottom:12px;font-family:'JetBrains Mono',monospace">
+      <div id="barcode-result"></div>
+    </div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -12312,6 +13924,9 @@ function showNoMovementReport() {
       <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
         <button class="add-btn" onclick="document.getElementById('payment-schedule-modal').style.display='flex';renderPaymentSchedule()" style="border-color:#00e5a0;color:#00e5a0">💳 Scadențar</button>
         <button class="add-btn" onclick="safeCall('aiGenerateSupplierEmail')" style="border-color:#ffa502;color:#ffa502">📧 Email Furnizor</button>
+        <button class="add-btn" onclick="safeCall('aiSuggestRename')" style="border-color:#a78bfa;color:#a78bfa">✍️ AI Redenumire</button>
+        <button class="add-btn" onclick="safeCall('aiOptimizeWarehouseSpace')" style="border-color:#a78bfa;color:#a78bfa">🗺️ AI Spațiu</button>
+        <button class="add-btn" onclick="safeCall('aiAnalyzeProductNotes')" style="border-color:#a78bfa;color:#a78bfa">📝 AI Note</button>
     </div>
     <div style="padding:14px 24px;flex-shrink:0">
       <input id="client-search-input" placeholder="Caută după nume..." oninput="renderClientSearch()" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:14px;padding:10px 14px;outline:none">
@@ -12513,6 +14128,166 @@ function showNoMovementReport() {
     <input id="pin-input" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="width:100%;background:#181d24;border:2px solid #00e5a0;border-radius:10px;color:#00e5a0;font-size:32px;font-weight:900;padding:14px;text-align:center;outline:none;margin-bottom:16px;letter-spacing:8px">
     <button onclick="verifyPIN(document.getElementById('pin-input').value)" style="width:100%;background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:14px;cursor:pointer">CONFIRMĂ →</button>
     <button onclick="document.getElementById('pin-modal').style.display='none'" style="width:100%;background:none;border:none;color:#6b7a8d;font-size:13px;padding:10px;cursor:pointer;margin-top:6px">Anulează</button>
+  </div>
+</div>
+
+
+<!-- CART MODAL -->
+<div id="cart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🛒 Coș Cumpărături <span id="cart-badge" style="background:#ff4757;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center">0</span></div>
+      <button onclick="document.getElementById('cart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cart-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="cart-client-name" placeholder="Nume client (opțional)" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <button onclick="processCart(document.getElementById('cart-client-name').value)" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer;white-space:nowrap">✅ PROCESEAZĂ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MASS MOVE MODAL -->
+<div id="mass-move-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📦 Mișcare Masivă</div>
+      <button onclick="document.getElementById('mass-move-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:12px 24px;flex-shrink:0;border-bottom:1px solid #1e2530">
+      <input id="mass-move-loc" placeholder="Locație nouă (ex: B3)" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+    </div>
+    <div id="mass-move-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="confirmMassMove()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">MUTĂ SELECȚIA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHYSICAL INVENTORY MODAL -->
+<div id="physical-inv-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚖️ Inventar Fizic vs Sistem</div>
+      <button onclick="document.getElementById('physical-inv-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="physical-inv-list" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="applyPhysicalInventory()" style="width:100%;background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">✅ APLICĂ DIFERENȚELE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABC MODAL -->
+<div id="abc-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">📊 Analiză ABC</div>
+      <button onclick="document.getElementById('abc-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="abc-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- ROI MODAL -->
+<div id="roi-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">💹 ROI per Produs</div>
+      <button onclick="document.getElementById('roi-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="roi-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- AI CAT FORECAST MODAL -->
+<div id="ai-cat-forecast-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:520px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🤖 Forecast AI per Categorie</div>
+      <button onclick="document.getElementById('ai-cat-forecast-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-cat-forecast-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CASHFLOW MODAL -->
+<div id="cashflow-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💸 Cashflow 12 Luni</div>
+      <button onclick="document.getElementById('cashflow-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="cashflow-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO SUPPLIER MODAL -->
+<div id="no-supplier-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">⚠️ Fără Furnizor</div>
+      <button onclick="document.getElementById('no-supplier-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-supplier-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- TOP CLIENTS VALUE MODAL -->
+<div id="top-clients-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffd700;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffd700;text-transform:uppercase">🏆 Top Clienți Valoare</div>
+      <button onclick="document.getElementById('top-clients-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="top-clients-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- EXPIRATION LOSSES MODAL -->
+<div id="expiration-losses-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">📅 Pierderi Expirare</div>
+      <button onclick="document.getElementById('expiration-losses-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="expiration-losses-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- MOBILE DASH MODAL -->
+<div id="mobile-dash-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#e8ecf0">📱 Dashboard Șef</div>
+      <button onclick="document.getElementById('mobile-dash-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="mobile-dash-content" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+  </div>
+</div>
+
+<!-- OPERATOR INACTIVITY MODAL -->
+<div id="operator-inactivity-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">👤 Inactivitate Operatori</div>
+      <button onclick="document.getElementById('operator-inactivity-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="operator-inactivity-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- BARCODE SCAN MODAL -->
+<div id="barcode-scan-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:400px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📷 Scan Cod de Bare</div>
+      <button onclick="document.getElementById('barcode-scan-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px 24px">
+      <input id="barcode-input" placeholder="Scanează sau introdu codul EAN..." oninput="handleBarcodeScanned(this.value)" autofocus style="width:100%;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#e8ecf0;font-size:14px;padding:12px;outline:none;margin-bottom:12px;font-family:'JetBrains Mono',monospace">
+      <div id="barcode-result"></div>
+    </div>
   </div>
 </div>
 
