@@ -1489,6 +1489,149 @@ function confirmImport() {
   </div>
 </div>
 
+
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>');
   pw.document.close();
 }
@@ -3282,6 +3425,12 @@ function showCategoryPieChart() {
         <button class="add-btn" onclick="safeCall('showMobileDashboard')" style="border-color:#a78bfa;color:#a78bfa">📱 Dash Șef</button>
         <button class="add-btn" onclick="safeCall('showOperatorInactivity')" style="border-color:#6b7a8d;color:#6b7a8d">👤 Inactivitate</button>
         <button class="add-btn" onclick="safeCall('aiForecastByCategory')" style="border-color:#a78bfa;color:#a78bfa">🤖 Forecast Cat.</button>
+        <button class="add-btn" onclick="safeCall('showOperatorEfficiency')" style="border-color:#00e5a0;color:#00e5a0">⚡ Ef. Operatori</button>
+        <button class="add-btn" onclick="safeCall('showSeasonalReport')" style="border-color:#a78bfa;color:#a78bfa">🌸 Sezonier</button>
+        <button class="add-btn" onclick="safeCall('showPredictiveChart')" style="border-color:#a78bfa;color:#a78bfa">📈 Predictiv</button>
+        <button class="add-btn" onclick="safeCall('showNoMovement90Days')" style="border-color:#ffa502;color:#ffa502">💤 Fără Mișcare</button>
+        <button class="add-btn" onclick="safeCall('showValuePerRack')" style="border-color:#00e5a0;color:#00e5a0">📍 Val. Raft</button>
+        <button class="add-btn" onclick="safeCall('exportReportWord')" style="border-color:#6b7a8d;color:#6b7a8d">📝 Export Word</button>
   const cats = {};
   stock.forEach(p => {
     const cat = p.cat || 'General';
@@ -3570,6 +3719,12 @@ function openWebhookSettings() {
         <button class="add-btn" onclick="document.getElementById('pin-modal').style.display='flex'" style="border-color:#ffa502;color:#ffa502">🔒 PIN Login</button>
         <button class="add-btn" onclick="safeCall('openWebhookSettings')" style="border-color:#6b7a8d;color:#6b7a8d">🔗 Webhook</button>
         <button class="add-btn" onclick="safeCall('aiDailySummaryVocal')" style="border-color:#a78bfa;color:#a78bfa">🎙️ Rezumat AI</button>
+        <button class="add-btn" onclick="safeCall('syncToDropbox')" style="border-color:#00e5a0;color:#00e5a0">☁️ Dropbox</button>
+        <button class="add-btn" onclick="safeCall('exportSAGAFormat')" style="border-color:#ffa502;color:#ffa502">📋 SAGA/NIR</button>
+        <button class="add-btn" onclick="safeCall('showSessionLog')" style="border-color:#6b7a8d;color:#6b7a8d">🔐 Log Sesiuni</button>
+        <button class="add-btn" onclick="safeCall('togglePresentationMode')" style="border-color:#a78bfa;color:#a78bfa">👁️ Prezentare</button>
+        <button class="add-btn" onclick="safeCall('openTVDashboard')" style="border-color:#00e5a0;color:#00e5a0">📺 TV Dashboard</button>
+        <button class="add-btn" onclick="safeCall('loadConsolidatedStock')" style="border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
         <button class="add-btn" onclick="safeCall('exportToGoogleSheets')" style="border-color:#00e5a0;color:#00e5a0">📊 G.Sheets</button>
         <button class="add-btn" onclick="safeCall('getAPILink')" style="border-color:#6b7a8d;color:#6b7a8d">🔗 API Link</button>
         <button class="add-btn" onclick="safeCall('importWooCommerceOrders')" style="border-color:#a78bfa;color:#a78bfa">🛒 WooCommerce</button>
@@ -4698,6 +4853,1604 @@ function getAPILink() {
     alert(info + '\n\nAPI Key copiat în clipboard!');
   });
   setFeedback('🔑 API Key copiat! Endpoint generat.', 'ok');
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC A: STOC & DEPOZIT (1-8)
+// ══════════════════════════════════════════
+
+// 1. STOC MINIM DINAMIC PER SEZON
+function getSeasonalMin(product) {
+  const month = new Date().getMonth();
+  if (!product.seasonal_mins) return product.min;
+  const season = month >= 5 && month <= 8 ? 'vara' : month >= 11 || month <= 1 ? 'iarna' : month >= 2 && month <= 4 ? 'primavara' : 'toamna';
+  return product.seasonal_mins[season] || product.min;
+}
+
+function setSeasonalMins(productId, vara, iarna, primavara, toamna) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.seasonal_mins = { vara: parseInt(vara)||p.min, iarna: parseInt(iarna)||p.min, primavara: parseInt(primavara)||p.min, toamna: parseInt(toamna)||p.min };
+  saveStockToFirebase(); renderStock();
+  setFeedback('✅ Minime sezoniere setate pentru ' + p.name, 'ok');
+}
+
+function updateSeasonalMins() {
+  stock.forEach(p => { if (p.seasonal_mins) p.min = getSeasonalMin(p); });
+}
+setInterval(function(){ if(typeof updateSeasonalMins==='function') updateSeasonalMins(); }, 86400000);
+
+// 2. PRODUS CU DATA FABRICAȚIE ȘI LOT
+let productLots = JSON.parse(localStorage.getItem('sv_lots') || '{}');
+
+function addProductLot(productId, lotNumber, manufactureDate, expiryDate, qty) {
+  const key = String(productId);
+  if (!productLots[key]) productLots[key] = [];
+  productLots[key].push({ lot: lotNumber, mfg: manufactureDate, exp: expiryDate, qty: parseInt(qty)||0, added: new Date().toISOString() });
+  localStorage.setItem('sv_lots', JSON.stringify(productLots));
+  const p = stock.find(s => s.id === productId);
+  setFeedback('✅ Lot ' + lotNumber + ' adăugat pentru ' + (p?p.name:'produs'), 'ok');
+}
+
+function getProductLots(productId) {
+  return productLots[String(productId)] || [];
+}
+
+function getEarliestExpiryLot(productId) {
+  const lots = getProductLots(productId).filter(l => l.exp && l.qty > 0);
+  return lots.sort((a,b) => a.exp.localeCompare(b.exp))[0] || null;
+}
+
+// 3. CROSS-DOCKING
+let crossDockQueue = JSON.parse(localStorage.getItem('sv_crossdock') || '[]');
+
+function addCrossDock(productName, qty, unit, fromSupplier, toClient, expectedDate) {
+  crossDockQueue.push({ id: Date.now(), productName, qty, unit, fromSupplier, toClient, expectedDate, status: 'pending', created: new Date().toISOString() });
+  localStorage.setItem('sv_crossdock', JSON.stringify(crossDockQueue));
+  setFeedback('🔄 Cross-dock: ' + productName + ' → ' + toClient, 'ok');
+}
+
+function processCrossDock(entryId) {
+  const entry = crossDockQueue.find(e => e.id === entryId);
+  if (!entry) return;
+  entry.status = 'completed';
+  entry.completedDate = new Date().toISOString();
+  localStorage.setItem('sv_crossdock', JSON.stringify(crossDockQueue));
+  addLog('Cross-dock: ' + entry.productName, 'OUT ' + entry.qty + ' ' + entry.unit + ' → ' + entry.toClient, 'out', entry.toClient);
+  setFeedback('✅ Cross-dock procesat: ' + entry.productName + ' → ' + entry.toClient, 'ok');
+  speak('Cross dock procesat: ' + entry.productName + ' catre ' + entry.toClient + '.');
+}
+
+// 4. STOC CONSIGNAȚIE
+let consignmentStock = JSON.parse(localStorage.getItem('sv_consignment') || '[]');
+
+function addConsignmentItem(ownerName, productName, qty, unit, pricePerUnit) {
+  consignmentStock.push({ id: Date.now(), ownerName, productName, qty: parseInt(qty)||0, unit, pricePerUnit: parseFloat(pricePerUnit)||0, soldQty: 0, added: new Date().toISOString() });
+  localStorage.setItem('sv_consignment', JSON.stringify(consignmentStock));
+  setFeedback('✅ Consignație adăugată: ' + productName + ' de la ' + ownerName, 'ok');
+}
+
+function sellConsignmentItem(itemId, qty) {
+  const item = consignmentStock.find(i => i.id === itemId);
+  if (!item || item.qty - item.soldQty < qty) { setFeedback('❌ Stoc insuficient consignație!', 'err'); return; }
+  item.soldQty += qty;
+  localStorage.setItem('sv_consignment', JSON.stringify(consignmentStock));
+  const earned = qty * item.pricePerUnit;
+  setFeedback('✅ Consignație vândută: ' + qty + ' ' + item.unit + ' ' + item.productName + ' · ' + earned.toFixed(2) + ' RON', 'ok');
+}
+
+function getConsignmentReport() {
+  return consignmentStock.map(i => ({ ...i, available: i.qty - i.soldQty, totalEarned: i.soldQty * i.pricePerUnit }));
+}
+
+// 5. COD INTERN PRODUS
+function setInternalCode(productId, code) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  p.internal_code = code;
+  saveStockToFirebase();
+  setFeedback('✅ Cod intern setat: ' + code + ' pentru ' + p.name, 'ok');
+}
+
+function findByInternalCode(code) {
+  return stock.find(p => p.internal_code === code);
+}
+
+// 6. PRODUS KIT AUTO-DEZASAMBLAT
+function disassembleKit(kitProductId, qty) {
+  const kit = compositeProducts ? compositeProducts.find(k => k.productId === kitProductId) : null;
+  if (!kit) { setFeedback('❌ Produsul nu are o rețetă de dezasamblare!', 'err'); return; }
+  const p = stock.find(s => s.id === kitProductId);
+  if (!p || p.qty < qty) { setFeedback('❌ Stoc insuficient kit!', 'err'); return; }
+  p.qty -= qty;
+  kit.components.forEach(comp => {
+    const compProduct = stock.find(s => s.id === comp.productId);
+    if (compProduct) { compProduct.qty += comp.qty * qty; addLog('Dezasamblare kit: ' + p.name, 'IN ' + comp.qty*qty + ' ' + compProduct.unit + ' ' + compProduct.name, 'in'); }
+  });
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('✅ Kit dezasamblat: ' + qty + 'x ' + p.name, 'ok');
+  speak('Kit dezasamblat: ' + qty + ' seturi din ' + p.name + '.');
+}
+
+// 7. IMAGINE MULTIPLĂ PRODUS
+function openProductGallery(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  const photos = p.photos || (p.photo_url ? [p.photo_url] : []);
+  const el = document.getElementById('product-gallery-content');
+  if (!el) return;
+  el.innerHTML = photos.length === 0
+    ? '<div style="color:#6b7a8d;text-align:center;padding:30px">Nicio imagine adăugată.</div>'
+    : '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">' +
+      photos.map((url,i) => '<div style="position:relative"><img src="'+url+'" style="width:100%;height:120px;object-fit:cover;border-radius:8px;border:1px solid #1e2530">' +
+        '<button onclick="removeProductPhoto('+productId+','+i+')" style="position:absolute;top:4px;right:4px;background:rgba(255,71,87,0.9);border:none;border-radius:4px;color:#fff;font-size:12px;padding:2px 6px;cursor:pointer">✕</button>' +
+        '</div>').join('') + '</div>';
+  el.innerHTML += '<input type="file" accept="image/*" onchange="addProductPhoto('+productId+',this.files[0])" style="margin-top:12px;width:100%">';
+  document.getElementById('product-gallery-modal').style.display = 'flex';
+}
+
+async function addProductPhoto(productId, file) {
+  const p = stock.find(s => s.id === productId);
+  if (!p || !file) return;
+  if (!p.photos) p.photos = [];
+  if (window.firebase && firebase.storage) {
+    const ref = firebase.storage().ref('products/' + getDepotKey() + '/' + productId + '_' + Date.now());
+    const snap = await ref.put(file);
+    const url = await snap.ref.getDownloadURL();
+    p.photos.push(url);
+    if (!p.photo_url) p.photo_url = url;
+  } else {
+    const reader = new FileReader();
+    reader.onload = e => { p.photos.push(e.target.result); if(!p.photo_url) p.photo_url=e.target.result; saveStockToFirebase(); renderStock(); openProductGallery(productId); };
+    reader.readAsDataURL(file); return;
+  }
+  saveStockToFirebase(); renderStock(); openProductGallery(productId);
+  setFeedback('✅ Imagine adăugată!', 'ok');
+}
+
+function removeProductPhoto(productId, index) {
+  const p = stock.find(s => s.id === productId);
+  if (!p || !p.photos) return;
+  p.photos.splice(index, 1);
+  p.photo_url = p.photos[0] || null;
+  saveStockToFirebase(); renderStock(); openProductGallery(productId);
+}
+
+// 8. DASHBOARD TV AUTO-REFRESH
+function openTVDashboard() {
+  window.open('', '_blank').document.write('<html><head><title>StocVoce TV</title><meta http-equiv="refresh" content="30"><style>body{background:#0a0c0f;color:#e8ecf0;font-family:Barlow Condensed,sans-serif;margin:0;padding:20px}h1{color:#00e5a0;font-size:48px;font-weight:900}h2{color:#6b7a8d;font-size:24px}.stat{background:#111418;border-radius:16px;padding:20px;text-align:center;display:inline-block;margin:10px;min-width:180px}.stat-val{font-size:64px;font-weight:900}.stat-label{font-size:14px;color:#6b7a8d;letter-spacing:2px;text-transform:uppercase}.critical{color:#ff4757}.ok{color:#00e5a0}.warn{color:#ffa502}</style></head><body>' +
+    '<h1>STOCVOCE</h1>' +
+    '<h2>' + (userProfile?userProfile.depot:'Depozit') + ' · ' + new Date().toLocaleString('ro-RO') + '</h2>' +
+    '<div class="stat"><div class="stat-val ok">' + stock.length + '</div><div class="stat-label">TOTAL PRODUSE</div></div>' +
+    '<div class="stat"><div class="stat-val critical">' + stock.filter(p=>p.qty===0).length + '</div><div class="stat-label">EPUIZATE</div></div>' +
+    '<div class="stat"><div class="stat-val warn">' + stock.filter(p=>p.qty>0&&p.qty<=p.min).length + '</div><div class="stat-label">STOC SCĂZUT</div></div>' +
+    '<div class="stat"><div class="stat-val ok">' + log.filter(e=>e.time&&e.time.startsWith(new Date().toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}))).length + '</div><div class="stat-label">OPERAȚII AZI</div></div>' +
+    '
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+</body></html>');
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC B: VOCE ULTRA (9-14)
+// ══════════════════════════════════════════
+
+// 9. COMANDĂ VOCALĂ ÎN LANȚ (fără "și")
+function handleChainCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const inKW = ['adauga','adaugă','pune','baga'];
+  const outKW = ['scoate','scade','ia','minus'];
+  const hasIn = inKW.some(k => norm.includes(normalizeText(k)));
+  const hasOut = outKW.some(k => norm.includes(normalizeText(k)));
+  if (!hasIn && !hasOut) return false;
+
+  // Match patterns like "10 M6 20 M8 30 M10"
+  const parts = [];
+  const matches = [...text.matchAll(/(\d+)\s+([A-Za-zÀ-ÿ0-9\s]+?)(?=\d|\.|$)/gi)];
+  if (matches.length < 2) return false;
+
+  matches.forEach(m => {
+    const qty = parseInt(m[1]);
+    const productText = m[2].trim();
+    if (!qty || !productText) return;
+    const product = findProduct(productText.split(/\s+/));
+    if (product) parts.push({ qty, product });
+  });
+
+  if (parts.length < 2) return false;
+
+  const opType = hasOut ? 'out' : 'in';
+  parts.forEach(({ qty, product }) => {
+    if (opType === 'in') product.qty += qty;
+    else product.qty = Math.max(0, product.qty - qty);
+    addLog(text, opType.toUpperCase() + ' ' + qty + ' ' + product.unit + ' ' + product.name, opType);
+  });
+
+  saveStockToFirebase(); renderStock(); updateStats();
+  const names = parts.map(p => p.qty + ' ' + p.product.unit + ' ' + p.product.name).join(', ');
+  speak('OK. ' + parts.length + ' produse actualizate: ' + names + '.');
+  setFeedback('✅ ' + parts.length + ' produse: ' + names, 'ok');
+  return true;
+}
+
+// 10. CONFIRMARE VOCALĂ CU ECOU
+let pendingEchoCommand = null;
+let echoConfirmMode = false;
+
+function processCommandWithEcho(text) {
+  if (!appSettings.voice_echo) return false;
+  const norm = normalizeText(text.toLowerCase());
+
+  if (echoConfirmMode) {
+    echoConfirmMode = false;
+    if (norm.includes('da') || norm.includes('confirma') || norm.includes('yes')) {
+      if (pendingEchoCommand) {
+        const saved = pendingEchoCommand;
+        pendingEchoCommand = null;
+        processCommand(saved.text);
+      }
+    } else {
+      pendingEchoCommand = null;
+      speak('Comandă anulată.');
+      setFeedback('❌ Comandă anulată.', 'warn');
+    }
+    return true;
+  }
+  return false;
+}
+
+// 11. "CE AM VÂNDUT AZI?"
+function handleWhatSoldToday(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('ce am vandut') && !norm.includes('ce am vândut') && !norm.includes('ce a iesit') && !norm.includes('ce a ieșit')) return false;
+
+  const todayStr = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+  const outToday = log.filter(e => e.type==='out' && e.time && e.time.startsWith(todayStr));
+
+  if (!outToday.length) {
+    speak('Nu ai vândut nimic astăzi.');
+    setFeedback('📋 Nicio ieșire azi.', 'ok');
+    return true;
+  }
+
+  const summary = outToday.slice(0,5).map(e => e.cmd).join(', ');
+  const msg = 'Azi ai vândut: ' + outToday.length + ' operații de ieșire. Ultimele: ' + summary + '.';
+  speak(msg);
+  setFeedback('📋 ' + msg, 'ok');
+  return true;
+}
+
+// 12. VOCE CORECTARE NUMĂR
+let lastVoiceQty = 0;
+let lastVoiceProduct = null;
+let lastVoiceOpType = null;
+
+function handleVoiceCorrection(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('nu ') || !lastVoiceProduct) return false;
+
+  const newQty = parseQuantity(norm);
+  if (!newQty || newQty <= 0) return false;
+
+  const diff = newQty - lastVoiceQty;
+  if (lastVoiceOpType === 'in') {
+    lastVoiceProduct.qty += diff;
+  } else {
+    lastVoiceProduct.qty = Math.max(0, lastVoiceProduct.qty - diff + lastVoiceQty);
+  }
+
+  saveStockToFirebase(); renderStock(); updateStats();
+  speak('Corectat. ' + lastVoiceProduct.name + ': acum ' + lastVoiceProduct.qty + ' ' + lastVoiceProduct.unit + '.');
+  setFeedback('✅ Corectat: ' + lastVoiceProduct.name + ' → ' + lastVoiceProduct.qty + ' ' + lastVoiceProduct.unit, 'ok');
+  lastVoiceProduct = null;
+  return true;
+}
+
+// 13. COMANDĂ VOCALĂ GRAFIC
+function handleVoiceChart(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('grafic') && !norm.includes('chart') && !norm.includes('evolutie') && !norm.includes('evoluție')) return false;
+  if (norm.includes('7 zile') || norm.includes('saptamana') || norm.includes('săptămână')) {
+    if (typeof showTrendsAnalysis === 'function') showTrendsAnalysis();
+  } else if (norm.includes('luna') || norm.includes('luni')) {
+    if (typeof showMonthlyComparison === 'function') showMonthlyComparison();
+  } else if (norm.includes('categori')) {
+    if (typeof showCategoryPieChart === 'function') showCategoryPieChart();
+  } else {
+    if (typeof showTrendsAnalysis === 'function') showTrendsAnalysis();
+  }
+  speak('Grafic deschis.');
+  return true;
+}
+
+// 14. OFFLINE VOICE PROCESSING (local keywords)
+function processVoiceOffline(text) {
+  if (navigator.onLine) return false;
+  const norm = normalizeText(text.toLowerCase());
+  const inKW = ['adauga','adaugă','pune'];
+  const outKW = ['scoate','scade','ia'];
+  const isIn = inKW.some(k => norm.includes(normalizeText(k)));
+  const isOut = outKW.some(k => norm.includes(normalizeText(k)));
+  if (!isIn && !isOut) return false;
+
+  const qty = parseQuantity(norm) || 1;
+  const product = findProduct(text.split(/\s+/));
+  if (!product) { speak('Produs negasit.'); return true; }
+
+  const opType = isOut ? 'out' : 'in';
+  if (opType === 'in') product.qty += qty;
+  else product.qty = Math.max(0, product.qty - qty);
+
+  // Save locally only
+  localStorage.setItem('sv_stock_offline', JSON.stringify(stock));
+  saveOfflineOp('stock', stock);
+  renderStock(); updateStats();
+  speak('Salvat local. Vei sincroniza la reconectare.');
+  setFeedback('📵 Offline: ' + product.name + ' actualizat local.', 'warn');
+  return true;
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC C: CLIENȚI PRO (15-21)
+// ══════════════════════════════════════════
+
+// 15. CRM MINIMAL
+let crmData = JSON.parse(localStorage.getItem('sv_crm') || '{}');
+
+function setCRMData(clientName, data) {
+  const key = normalizeText(clientName.toLowerCase());
+  crmData[key] = { name: clientName, ...data, updated: new Date().toISOString() };
+  localStorage.setItem('sv_crm', JSON.stringify(crmData));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/crm/' + key).set(crmData[key]);
+  setFeedback('✅ CRM actualizat pentru ' + clientName, 'ok');
+}
+
+function getCRMData(clientName) {
+  return crmData[normalizeText(clientName.toLowerCase())] || null;
+}
+
+function openCRMModal(clientName) {
+  const data = getCRMData(clientName) || { name: clientName };
+  const el = document.getElementById('crm-content');
+  if (!el) return;
+  document.getElementById('crm-client-name').textContent = clientName;
+  document.getElementById('crm-contact').value = data.contact || '';
+  document.getElementById('crm-phone').value = data.phone || '';
+  document.getElementById('crm-email').value = data.email || '';
+  document.getElementById('crm-stage').value = data.stage || 'prospect';
+  document.getElementById('crm-notes').value = data.notes || '';
+  document.getElementById('crm-modal').style.display = 'flex';
+}
+
+function saveCRMData() {
+  const name = document.getElementById('crm-client-name').textContent;
+  setCRMData(name, {
+    contact: document.getElementById('crm-contact').value,
+    phone: document.getElementById('crm-phone').value,
+    email: document.getElementById('crm-email').value,
+    stage: document.getElementById('crm-stage').value,
+    notes: document.getElementById('crm-notes').value
+  });
+  document.getElementById('crm-modal').style.display = 'none';
+}
+
+// 16. OFERTĂ PERSONALIZATĂ PDF
+async function generatePersonalizedOffer(clientName, items) {
+  const crm = getCRMData(clientName) || {};
+  const level = typeof getLoyaltyLevel === 'function' ? getLoyaltyLevel(clientName) : { name: 'Standard', discount: 0 };
+  const group = typeof getClientGroup === 'function' ? getClientGroup(clientName) : 'B2C';
+  const groupDiscount = (typeof CLIENT_GROUP_DISCOUNTS !== 'undefined' ? CLIENT_GROUP_DISCOUNTS[group] : 0) || 0;
+  const totalDiscount = Math.max(level.discount || 0, groupDiscount);
+
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const offerNo = 'OFR-' + Date.now().toString().slice(-6);
+  const now = new Date();
+
+  doc.setFillColor(10,12,15); doc.rect(0,0,210,42,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(232,236,240);
+  doc.text('OFERTĂ PERSONALIZATĂ', 14, 22);
+  doc.setFontSize(10); doc.setTextColor(0,229,160);
+  doc.text(offerNo + '  ·  ' + now.toLocaleDateString('ro-RO'), 14, 32);
+  doc.setTextColor(153,168,184); doc.text(depot, 14, 39);
+
+  doc.setFontSize(12); doc.setTextColor(232,236,240);
+  doc.text('Client: ' + clientName, 14, 54);
+  doc.setFontSize(10); doc.setTextColor(107,122,141);
+  if (crm.contact) doc.text('Contact: ' + crm.contact, 14, 62);
+  doc.text('Nivel: ' + level.name + '  ·  Discount: ' + totalDiscount + '%  ·  Grup: ' + group, 14, 70);
+
+  const itemsWithPrice = items.map(item => {
+    const basePrice = item.price_sell || 0;
+    const discountedPrice = basePrice * (1 - totalDiscount/100);
+    return { ...item, basePrice, discountedPrice, total: discountedPrice * item.qty };
+  });
+  const total = itemsWithPrice.reduce((s,i) => s+i.total, 0);
+
+  doc.autoTable({
+    startY: 78,
+    head: [['Produs','Cant.','UM','Preț Std.','Discount','Preț Final','Total']],
+    body: itemsWithPrice.map(i => [i.name, i.qty, i.unit||'buc', i.basePrice.toFixed(2)+' RON', totalDiscount+'%', i.discountedPrice.toFixed(2)+' RON', i.total.toFixed(2)+' RON']),
+    styles:{fontSize:9,textColor:[153,168,184],fillColor:[17,20,24]},
+    headStyles:{fillColor:[10,12,15],textColor:[0,229,160],fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[24,29,36]}, margin:{left:14,right:14}
+  });
+
+  const fy = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(0,229,160);
+  doc.text('TOTAL OFERTĂ: ' + total.toFixed(2) + ' RON (cu discount ' + totalDiscount + '%)', 14, fy);
+
+  doc.save(offerNo + '_' + clientName.replace(/\s+/g,'_') + '.pdf');
+  setFeedback('✅ Ofertă ' + offerNo + ' generată pentru ' + clientName, 'ok');
+}
+
+// 17. COȘ SALVAT PE CLIENT
+let clientCarts = JSON.parse(localStorage.getItem('sv_client_carts') || '{}');
+
+function saveClientCart(clientName, cartItems) {
+  clientCarts[normalizeText(clientName.toLowerCase())] = { clientName, items: cartItems, saved: new Date().toISOString() };
+  localStorage.setItem('sv_client_carts', JSON.stringify(clientCarts));
+  setFeedback('✅ Coș salvat pentru ' + clientName, 'ok');
+}
+
+function loadClientCart(clientName) {
+  const cart = clientCarts[normalizeText(clientName.toLowerCase())];
+  if (!cart) { setFeedback('⚠️ Niciun coș salvat pentru ' + clientName, 'warn'); return null; }
+  savedCart = cart.items;
+  localStorage.setItem('sv_cart', JSON.stringify(savedCart));
+  updateCartBadge();
+  setFeedback('✅ Coș restaurat pentru ' + clientName + ' (' + cart.items.length + ' produse)', 'ok');
+  return cart;
+}
+
+// 18. STATISTICI PER PRODUS PER CLIENT
+function getClientProductStats(clientName) {
+  const key = normalizeText(clientName.toLowerCase());
+  const clientOrders = clients.filter(c => normalizeText((c.name||'').toLowerCase()) === key);
+  const productStats = {};
+  clientOrders.forEach(o => {
+    const pk = normalizeText((o.product||'').toLowerCase());
+    if (!productStats[pk]) productStats[pk] = { product: o.product, qty: 0, orders: 0 };
+    productStats[pk].qty += parseInt(o.qty) || 0;
+    productStats[pk].orders++;
+  });
+  return Object.values(productStats).sort((a,b) => b.qty-a.qty);
+}
+
+// 19. EXPORT CRM EXCEL
+function exportCRMExcel() {
+  const rows = [['Nume','Contact','Telefon','Email','Stadiu','Grup','Nivel','Note','Actualizat']];
+  Object.values(crmData).forEach(c => {
+    const level = typeof getLoyaltyLevel==='function' ? getLoyaltyLevel(c.name).name : '—';
+    const group = typeof getClientGroup==='function' ? getClientGroup(c.name) : '—';
+    rows.push([c.name,c.contact||'',c.phone||'',c.email||'',c.stage||'',group,level,c.notes||'',(c.updated||'').slice(0,10)]);
+  });
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:20},{wch:16},{wch:14},{wch:22},{wch:12},{wch:10},{wch:10},{wch:30},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, ws, 'CRM');
+  XLSX.writeFile(wb, 'CRM_StocVoce_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  setFeedback('✅ CRM exportat Excel!', 'ok');
+}
+
+// 20. COMANDĂ CU TERMEN DE LIVRARE
+let deliveryOrders = JSON.parse(localStorage.getItem('sv_delivery_orders') || '[]');
+
+function addDeliveryOrder(clientName, items, deliveryDate, notes) {
+  const order = { id: Date.now(), clientName, items, deliveryDate, notes: notes||'', status: 'pending', created: new Date().toISOString() };
+  deliveryOrders.push(order);
+  localStorage.setItem('sv_delivery_orders', JSON.stringify(deliveryOrders));
+  if (window.fbReady) db.ref('depozite/' + getDepotKey() + '/delivery_orders').push(order);
+  setFeedback('✅ Comandă cu livrare ' + deliveryDate + ' creată pentru ' + clientName, 'ok');
+}
+
+function checkDeliveryOrdersDue() {
+  const today = new Date().toISOString().slice(0,10);
+  const tomorrow = new Date(Date.now()+86400000).toISOString().slice(0,10);
+  deliveryOrders.filter(o => o.status==='pending' && (o.deliveryDate===today || o.deliveryDate===tomorrow)).forEach(o => {
+    const msg = o.deliveryDate===today ? 'LIVRARE AZI' : 'LIVRARE MÂINE';
+    triggerAlert('🚚 ' + msg + ': ' + o.clientName + ' · ' + o.items.length + ' produse', 'warn');
+    if (userProfile && userProfile.telegram_id) {
+      sendTelegramAlert('🚚 ' + msg + ': ' + o.clientName, userProfile.telegram_id);
+    }
+  });
+}
+setInterval(function(){ if(typeof checkDeliveryOrdersDue==='function') checkDeliveryOrdersDue(); }, 3600000);
+
+// 21. ALERTĂ CLIENT VIP NECONTACTAT
+function checkVIPInactivity() {
+  const cutoffDays = appSettings.vip_inactivity_days || 30;
+  const cutoff = new Date(Date.now() - cutoffDays*86400000);
+  const seen = new Set();
+  const vips = typeof segmentClients==='function' ? segmentClients().filter(c=>c.visits>=10) : [];
+  vips.forEach(vip => {
+    if (seen.has(vip.name)) return;
+    seen.add(vip.name);
+    const lastOrder = clients.filter(c=>normalizeText((c.name||'').toLowerCase())===normalizeText(vip.name.toLowerCase())).slice(-1)[0];
+    if (lastOrder && lastOrder.time) {
+      const parts = lastOrder.time.split(' ')[0].split('.');
+      if (parts.length>=2) {
+        const lastDate = new Date(new Date().getFullYear(), parseInt(parts[1])-1, parseInt(parts[0]));
+        if (lastDate < cutoff) {
+          triggerAlert('💤 VIP INACTIV: ' + vip.name + ' — ' + cutoffDays + '+ zile!', 'warn');
+        }
+      }
+    }
+  });
+}
+setInterval(function(){ if(typeof checkVIPInactivity==='function') checkVIPInactivity(); }, 86400000);
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC D: RAPOARTE PRO (22-29)
+// ══════════════════════════════════════════
+
+// 22. RAPORT EFICIENȚĂ OPERATORI
+function showOperatorEfficiency() {
+  const opStats = {};
+  log.forEach(e => {
+    const u = e.user || 'Unknown';
+    if (!opStats[u]) opStats[u] = { ops: 0, errors: 0, in: 0, out: 0, firstTs: e.ts, lastTs: e.ts };
+    opStats[u].ops++;
+    if (e.type==='err') opStats[u].errors++;
+    if (e.type==='in') opStats[u].in++;
+    if (e.type==='out') opStats[u].out++;
+    if (e.ts && e.ts < opStats[u].firstTs) opStats[u].firstTs = e.ts;
+    if (e.ts && e.ts > opStats[u].lastTs) opStats[u].lastTs = e.ts;
+  });
+
+  const el = document.getElementById('op-efficiency-content');
+  if (!el) return;
+  const sorted = Object.entries(opStats).sort((a,b) => b[1].ops-a[1].ops);
+  el.innerHTML = sorted.map(([name, s]) => {
+    const hours = s.firstTs && s.lastTs ? Math.max(1, (new Date(s.lastTs)-new Date(s.firstTs))/3600000) : 1;
+    const rate = (s.ops/hours).toFixed(1);
+    const errRate = s.ops>0 ? (s.errors/s.ops*100).toFixed(1) : 0;
+    return '<div style="background:#181d24;border-radius:10px;padding:14px;margin-bottom:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<div style="font-weight:700;color:#e8ecf0">' + name + '</div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#00e5a0">' + rate + ' ops/h</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px;color:#6b7a8d">' +
+      '<div>Total: <b style="color:#e8ecf0">' + s.ops + '</b></div>' +
+      '<div>IN: <b style="color:#00e5a0">' + s.in + '</b></div>' +
+      '<div>OUT: <b style="color:#ff4757">' + s.out + '</b></div>' +
+      '<div>Erori: <b style="color:#ffa502">' + errRate + '%</b></div>' +
+      '</div></div>';
+  }).join('');
+  document.getElementById('op-efficiency-modal').style.display = 'flex';
+}
+
+// 23. RAPORT SEZONIER (AN VS AN)
+function showSeasonalReport() {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const lastYear = currentYear - 1;
+
+  const thisYearLog = log.filter(e => e.ts && new Date(e.ts).getMonth()===currentMonth && new Date(e.ts).getFullYear()===currentYear);
+  const lastYearLog = log.filter(e => e.ts && new Date(e.ts).getMonth()===currentMonth && new Date(e.ts).getFullYear()===lastYear);
+
+  const monthName = now.toLocaleDateString('ro-RO', {month:'long'});
+  const el = document.getElementById('seasonal-content');
+  if (!el) return;
+
+  const diff = lastYearLog.length>0 ? ((thisYearLog.length-lastYearLog.length)/lastYearLog.length*100).toFixed(0) : 'N/A';
+  el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">' +
+    [
+      [monthName + ' ' + currentYear, thisYearLog.length, '#00e5a0'],
+      [monthName + ' ' + lastYear, lastYearLog.length, '#6b7a8d']
+    ].map(([label,count,color]) =>
+      '<div style="background:#181d24;border-radius:10px;padding:16px;text-align:center;border-top:2px solid '+color+'">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:36px;font-weight:900;color:'+color+'">' + count + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">' + label + '</div>' +
+      '</div>').join('') + '</div>' +
+    '<div style="background:#181d24;border-radius:10px;padding:14px;text-align:center">' +
+    '<div style="font-size:12px;color:#6b7a8d;margin-bottom:4px">Față de ' + monthName + ' ' + lastYear + '</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;color:' + (parseFloat(diff)>=0?'#00e5a0':'#ff4757') + '">' + (parseFloat(diff)>=0?'+':'') + diff + '%</div>' +
+    '</div>';
+  document.getElementById('seasonal-modal').style.display = 'flex';
+}
+
+// 24. GRAFIC PREDICTIV 30 ZILE
+function showPredictiveChart() {
+  const el = document.getElementById('predictive-chart-content');
+  if (!el) return;
+
+  const now = new Date();
+  const points = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now - i*86400000);
+    const dateStr = d.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
+    const ops = log.filter(e => e.time && e.time.startsWith(dateStr)).length;
+    points.push({ date: dateStr, ops, predicted: false });
+  }
+
+  // Simple linear prediction for next 7 days
+  const avg = points.reduce((s,p) => s+p.ops, 0) / points.length;
+  const trend = (points.slice(-7).reduce((s,p)=>s+p.ops,0)/7) - (points.slice(-14,-7).reduce((s,p)=>s+p.ops,0)/7);
+  for (let i = 1; i <= 7; i++) {
+    const d = new Date(now.getTime() + i*86400000);
+    points.push({ date: d.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'}), ops: Math.max(0, Math.round(avg + trend*i)), predicted: true });
+  }
+
+  const maxOps = Math.max(...points.map(p=>p.ops), 1);
+  el.innerHTML = '<div style="display:flex;gap:1px;align-items:flex-end;height:100px;margin-bottom:8px">' +
+    points.map(p => '<div style="flex:1;background:' + (p.predicted?'rgba(167,139,250,0.5)':'rgba(0,229,160,0.7)') + ';border-radius:2px 2px 0 0;min-height:2px;height:'+Math.max(2,Math.round(p.ops/maxOps*90))+'px;' + (p.predicted?'border:1px dashed #a78bfa;border-bottom:none':'') + '" title="'+p.date+': '+p.ops+(p.predicted?' (predicție)':'')+'"></div>').join('') +
+    '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7a8d">' +
+    '<span>' + points[0].date + '</span>' +
+    '<span style="color:#a78bfa">← Predicție 7 zile →</span>' +
+    '<span style="color:#a78bfa">' + points[points.length-1].date + '</span>' +
+    '</div>' +
+    '<div style="display:flex;gap:12px;margin-top:10px;justify-content:center">' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#00e5a0;border-radius:2px"></div><span style="font-size:11px;color:#6b7a8d">Real</span></div>' +
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#a78bfa;border-radius:2px;border:1px dashed #a78bfa"></div><span style="font-size:11px;color:#6b7a8d">Predicție</span></div>' +
+    '</div>';
+  document.getElementById('predictive-chart-modal').style.display = 'flex';
+}
+
+// 25. PRODUSE FĂRĂ MIȘCARE 90 ZILE
+function showNoMovement90Days() {
+  const cutoff = new Date(Date.now() - 90*86400000);
+  const noMove = stock.filter(p => {
+    if (p.qty === 0) return false;
+    const lastMove = log.find(e => e.ts && new Date(e.ts) >= cutoff && e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase())));
+    return !lastMove;
+  });
+
+  const totalValue = noMove.reduce((s,p) => s + p.qty*(p.price_buy||0), 0);
+  const el = document.getElementById('no-movement-content');
+  if (!el) return;
+  el.innerHTML = noMove.length===0
+    ? '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate produsele au mișcare!</div>'
+    : '<div style="background:#ffa502;border-radius:8px;padding:10px;text-align:center;margin-bottom:12px;color:#000;font-weight:700">⚠️ ' + noMove.length + ' produse fără mișcare — ' + totalValue.toFixed(0) + ' RON blocat</div>' +
+      noMove.map(p => '<div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #ffa502">' +
+        '<div><div style="font-weight:700;color:#e8ecf0">' + p.name + '</div>' +
+        '<div style="font-size:11px;color:#6b7a8d">' + p.qty + ' ' + p.unit + (p.price_buy?' · '+(p.qty*p.price_buy).toFixed(0)+' RON blocați':'') + '</div></div>' +
+        '<button onclick="openEditModal('+p.id+')" style="background:#ffa502;border:none;border-radius:6px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:11px;padding:5px 10px;cursor:pointer">EDITEAZĂ</button>' +
+        '</div>').join('');
+  document.getElementById('no-movement-modal').style.display = 'flex';
+}
+
+// 26. RAPORT VALOARE PER RAFT
+function showValuePerRack() {
+  const racks = {};
+  stock.forEach(p => {
+    const loc = p.loc || 'Nedefinit';
+    if (!racks[loc]) racks[loc] = { products: 0, totalValue: 0, totalQty: 0 };
+    racks[loc].products++;
+    racks[loc].totalValue += p.qty * (p.price_buy||0);
+    racks[loc].totalQty += p.qty;
+  });
+  const sorted = Object.entries(racks).sort((a,b) => b[1].totalValue-a[1].totalValue);
+
+  const el = document.getElementById('rack-value-content');
+  if (!el) return;
+  const maxVal = Math.max(...sorted.map(([,r]) => r.totalValue), 1);
+  el.innerHTML = sorted.map(([loc, r]) =>
+    '<div style="margin-bottom:10px">' +
+    '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+    '<span style="font-weight:700;color:#e8ecf0">' + loc + '</span>' +
+    '<span style="color:#00e5a0;font-weight:700">' + r.totalValue.toFixed(0) + ' RON</span>' +
+    '</div>' +
+    '<div style="height:8px;background:#1e2530;border-radius:4px">' +
+    '<div style="height:100%;width:'+Math.round(r.totalValue/maxVal*100)+'%;background:linear-gradient(90deg,#00e5a0,#a78bfa);border-radius:4px"></div>' +
+    '</div>' +
+    '<div style="font-size:10px;color:#6b7a8d;margin-top:2px">' + r.products + ' produse · ' + r.totalQty + ' buc total</div>' +
+    '</div>').join('');
+  document.getElementById('rack-value-modal').style.display = 'flex';
+}
+
+// 27. ALERTĂ CONCENTRARE STOC
+function checkStockConcentration() {
+  const total = stock.reduce((s,p) => s+p.qty*(p.price_buy||0), 0);
+  if (total === 0) return;
+  const sorted = [...stock].sort((a,b) => b.qty*(b.price_buy||0)-a.qty*(a.price_buy||0));
+  const top5Value = sorted.slice(0,5).reduce((s,p) => s+p.qty*(p.price_buy||0), 0);
+  const pct = top5Value/total*100;
+  if (pct > 80) {
+    triggerAlert('⚠️ RISC CONCENTRARE: ' + pct.toFixed(0) + '% din valoare în top 5 produse! ' + sorted.slice(0,3).map(p=>p.name).join(', '), 'warn');
+  }
+}
+
+// 28. EXPORT RAPORT WORD
+async function exportReportWord() {
+  // Generate HTML that looks like Word doc
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  const val = typeof calculateStockValue==='function' ? calculateStockValue() : {totalBuy:0};
+  const zero = stock.filter(p=>p.qty===0);
+  const low = stock.filter(p=>p.qty>0&&p.qty<=p.min);
+
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' +
+    'body{font-family:Calibri,Arial;font-size:11pt;margin:2cm}' +
+    'h1{color:#00b87a;font-size:18pt;border-bottom:2px solid #00b87a;padding-bottom:6pt}' +
+    'h2{color:#333;font-size:13pt;margin-top:12pt}' +
+    'table{width:100%;border-collapse:collapse;font-size:10pt}' +
+    'th{background:#00b87a;color:white;padding:6pt;text-align:left}' +
+    'td{padding:5pt;border-bottom:1px solid #ddd}' +
+    'tr:nth-child(even){background:#f5f5f5}' +
+    '.stat{display:inline-block;background:#f0f0f0;border-radius:4pt;padding:8pt 16pt;margin:4pt;text-align:center}' +
+    '.stat-val{font-size:18pt;font-weight:bold;color:#00b87a}' +
+    '</style></head><body>' +
+    '<h1>Raport Stoc — ' + depot + '</h1>' +
+    '<p style="color:#666">' + now + ' · Generat de StocVoce</p>' +
+    '<div>' +
+    '<div class="stat"><div class="stat-val">' + stock.length + '</div><div>Total Produse</div></div>' +
+    '<div class="stat"><div class="stat-val" style="color:#cc0000">' + zero.length + '</div><div>Epuizate</div></div>' +
+    '<div class="stat"><div class="stat-val" style="color:#ff8800">' + low.length + '</div><div>Stoc Scăzut</div></div>' +
+    '<div class="stat"><div class="stat-val">' + parseFloat(val.totalBuy||0).toFixed(0) + ' RON</div><div>Valoare Stoc</div></div>' +
+    '</div>' +
+    '<h2>Produse Critice</h2>' +
+    (zero.length?'<table><tr><th>Produs</th><th>Categorie</th><th>UM</th><th>Furnizor</th></tr>' + zero.slice(0,20).map(p=>'<tr><td>'+p.name+'</td><td>'+(p.cat||'')+'</td><td>'+p.unit+'</td><td>'+(p.supplier||'')+'</td></tr>').join('') + '</table>':'<p>Niciun produs epuizat.</p>') +
+    '<h2>Stoc Complet</h2>' +
+    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Locație</th><th>Min</th></tr>' +
+    stock.slice(0,50).map(p=>'<tr><td>'+p.name+'</td><td>'+(p.cat||'')+'</td><td>'+p.qty+'</td><td>'+p.unit+'</td><td>'+(p.loc||'')+'</td><td>'+p.min+'</td></tr>').join('') +
+    '</table>
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+</body></html>';
+
+  const blob = new Blob([html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='Raport_StocVoce_' + depot.replace(/\s+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.doc'; a.click();
+  URL.revokeObjectURL(url);
+  setFeedback('✅ Raport Word exportat!', 'ok');
+}
+
+// 29. MOD PREZENTARE (ascunde date sensibile)
+let presentationMode = false;
+function togglePresentationMode() {
+  presentationMode = !presentationMode;
+  const sensitiveEls = document.querySelectorAll('.price-display, [data-sensitive]');
+  sensitiveEls.forEach(el => { el.style.filter = presentationMode ? 'blur(4px)' : ''; });
+  document.querySelectorAll('.card-price').forEach(el => { el.style.visibility = presentationMode ? 'hidden' : ''; });
+  if (presentationMode) {
+    document.querySelectorAll('[class*="price"], [class*="cost"]').forEach(el => { el.style.filter='blur(4px)'; el.dataset.pm='1'; });
+  } else {
+    document.querySelectorAll('[data-pm]').forEach(el => { el.style.filter=''; delete el.dataset.pm; });
+  }
+  setFeedback((presentationMode?'👁️ Mod prezentare ACTIV — date sensibile ascunse':'✅ Mod prezentare dezactivat'), 'ok');
+  speak(presentationMode ? 'Mod prezentare activ.' : 'Mod prezentare dezactivat.');
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC E: AI PRO (30-37)
+// ══════════════════════════════════════════
+
+// 30. AI COMPLETARE FURNIZOR
+async function aiFindSupplier(productName) {
+  setFeedback('🤖 AI caută furnizori pentru ' + productName + '...', 'ok');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 200,
+        messages: [{ role: 'user', content: 'Sugereaza 3 furnizori tipici din Romania pentru produsul: "' + productName + '". Include tip furnizor (producator/distribuitor), termen livrare estimat. Raspunde cu JSON: [{"name":"...","type":"...","leadTime":"...","notes":"..."}]' }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+    const suppliers = JSON.parse(raw);
+    const msg = suppliers.map(s => s.name + ' (' + s.type + ')').join(', ');
+    setFeedback('💡 Furnizori sugerați: ' + msg, 'ok');
+    return suppliers;
+  } catch(e) { setFeedback('❌ Eroare AI furnizori.', 'err'); return []; }
+}
+
+// 31. AI DETECTARE SEZONALITATE AUTOMATĂ
+async function aiDetectSeasonality() {
+  setFeedback('⏳ AI detectează produsele sezoniere...', 'ok');
+  const productActivity = stock.map(p => {
+    const monthlyOps = Array(12).fill(0);
+    log.filter(e => e.ts && e.cmd && normalizeText(e.cmd.toLowerCase()).includes(normalizeText(p.name.toLowerCase()))).forEach(e => {
+      monthlyOps[new Date(e.ts).getMonth()]++;
+    });
+    const maxMonth = monthlyOps.indexOf(Math.max(...monthlyOps));
+    const minMonth = monthlyOps.indexOf(Math.min(...monthlyOps));
+    const variance = monthlyOps.reduce((s,v,_,arr) => s + Math.pow(v - arr.reduce((a,b)=>a+b,0)/12, 2), 0) / 12;
+    return { name: p.name, maxMonth, minMonth, variance: variance.toFixed(1), monthlyOps };
+  }).filter(p => parseFloat(p.variance) > 2).slice(0,10);
+
+  if (!productActivity.length) { setFeedback('✅ Nicio sezonalitate detectată.', 'ok'); return; }
+
+  try {
+    const months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 300,
+        messages: [{ role: 'user', content: 'Analizeaza sezonalitatea acestor produse de depozit: ' + JSON.stringify(productActivity.map(p=>({name:p.name,lunaActiva:months[p.maxMonth],lunaSlaba:months[p.minMonth]}))) + '. Confirma sezonalitatea si sugereaza ajustari stoc minim per sezon. Raspunde in romana, concis.' }]
+      })
+    });
+    const data = await resp.json();
+    alert('🌸 Sezonalitate detectată:
+
+' + data.content[0].text);
+    setFeedback('✅ Analiza sezonalitate completă!', 'ok');
+  } catch(e) { setFeedback('❌ Eroare AI sezonalitate.', 'err'); }
+}
+
+// 32. AI SETARE PREȚ OPTIM
+async function aiOptimalPrice(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p || !p.price_buy) { setFeedback('Adăugați prețul de achiziție!', 'warn'); return; }
+  const catProducts = stock.filter(s => s.cat===p.cat && s.price_sell && s.id!==p.id);
+  const avgSell = catProducts.length ? catProducts.reduce((s,x)=>s+x.price_sell,0)/catProducts.length : 0;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 150,
+        messages: [{ role: 'user', content: 'Sugereaza pretul optim de vanzare pentru: "' + p.name + '". Cost achizitie: ' + p.price_buy + ' RON. Pret mediu categorie ' + (p.cat||'') + ': ' + avgSell.toFixed(2) + ' RON. Raspunde cu JSON: {"suggestedPrice":0,"margin":0,"reasoning":"..."}' }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    const confirmed = confirm('💡 Preț optim AI: ' + result.suggestedPrice + ' RON (marjă ' + result.margin + '%)
+
+Motiv: ' + result.reasoning + '
+
+Setezi acest preț?');
+    if (confirmed) { p.price_sell = result.suggestedPrice; saveStockToFirebase(); renderStock(); setFeedback('✅ Preț actualizat: ' + result.suggestedPrice + ' RON', 'ok'); }
+  } catch(e) { setFeedback('❌ Eroare AI preț.', 'err'); }
+}
+
+// 33. AI GRUPARE PRODUSE SIMILARE
+async function aiGroupSimilarProducts() {
+  setFeedback('⏳ AI analizează similarități...', 'ok');
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 400,
+        messages: [{ role: 'user', content: 'Analizeaza aceste produse si identifica duplicate sau produse care ar putea fi fuzionate: ' + stock.slice(0,30).map(p=>p.name).join(', ') + '. Raspunde cu JSON: [{"group":"...","products":["..."],"action":"merge/review/ok"}]' }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content[0].text.replace(/```json|```/g,'').trim();
+    const groups = JSON.parse(raw);
+    const needsReview = groups.filter(g => g.action!=='ok');
+    if (!needsReview.length) { setFeedback('✅ Niciun duplicat găsit!', 'ok'); return; }
+    const msg = needsReview.map(g => g.action.toUpperCase() + ': ' + g.products.join(' + ')).join('
+');
+    alert('🔍 Produse similare detectate:
+
+' + msg);
+    setFeedback('⚠️ ' + needsReview.length + ' grupuri necesită atenție!', 'warn');
+  } catch(e) { setFeedback('❌ Eroare AI grupare.', 'err'); }
+}
+
+// 34. AI PREDICȚIE CLIENT INACTIV
+async function aiPredictChurnRisk() {
+  setFeedback('⏳ AI analizează riscul de abandon...', 'ok');
+  const clientActivity = typeof segmentClients==='function' ? segmentClients() : [];
+  if (!clientActivity.length) { setFeedback('Niciun client în bază!', 'warn'); return; }
+
+  const atRisk = clientActivity.filter(c => {
+    const daysSinceLast = c.lastVisit ? Math.floor((Date.now()-new Date(c.lastVisit))/86400000) : 999;
+    return daysSinceLast > 20 && c.visits >= 3;
+  }).slice(0,10);
+
+  if (!atRisk.length) { setFeedback('✅ Niciun client cu risc de abandon!', 'ok'); return; }
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 250,
+        messages: [{ role: 'user', content: 'Analizeaza acesti clienti cu risc de abandon si sugereaza actiuni de retentie: ' + JSON.stringify(atRisk.map(c=>({name:c.name,vizite:c.visits,zileDeAbsenta:Math.floor((Date.now()-new Date(c.lastVisit||Date.now()))/86400000)}))) + '. Raspunde in romana, cu actiuni concrete per client.' }]
+      })
+    });
+    const data = await resp.json();
+    alert('⚠️ Clienți cu risc de abandon:
+
+' + data.content[0].text);
+    setFeedback('⚠️ ' + atRisk.length + ' clienți cu risc de abandon!', 'warn');
+  } catch(e) { setFeedback('❌ Eroare AI.', 'err'); }
+}
+
+// 35. AI DESCRIERE PRODUS
+async function aiGenerateProductDescription(productId) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 150,
+        messages: [{ role: 'user', content: 'Scrie o descriere scurta (2 propozitii) pentru produsul de depozit: "' + p.name + '" din categoria "' + (p.cat||'General') + '". Text de marketing simplu, in romana.' }]
+      })
+    });
+    const data = await resp.json();
+    const desc = data.content[0].text.trim();
+    p.description = desc;
+    saveStockToFirebase();
+    setFeedback('✅ Descriere generată: ' + desc.slice(0,50) + '...', 'ok');
+  } catch(e) { setFeedback('❌ Eroare AI descriere.', 'err'); }
+}
+
+// 36. AI AUDIT COMPLET DEPOZIT
+async function aiFullDepotAudit() {
+  const el = document.getElementById('ai-audit-content');
+  if (el) el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">⏳ AI auditează depozitul complet...</div>';
+  document.getElementById('ai-audit-modal').style.display = 'flex';
+
+  const auditData = {
+    totalProducts: stock.length,
+    zeroStock: stock.filter(p=>p.qty===0).length,
+    lowStock: stock.filter(p=>p.qty>0&&p.qty<=p.min).length,
+    noSupplier: stock.filter(p=>!p.supplier).length,
+    noPrice: stock.filter(p=>!p.price_sell).length,
+    noLocation: stock.filter(p=>!p.loc).length,
+    expired: stock.filter(p=>p.expiry&&new Date(p.expiry)<new Date()).length,
+    totalValue: typeof calculateStockValue==='function' ? parseFloat((calculateStockValue().totalBuy)||0).toFixed(0) : 0,
+    recentOps: log.filter(e=>e.ts&&(Date.now()-new Date(e.ts).getTime())<7*86400000).length,
+    totalClients: new Set(clients.map(c=>c.name)).size
+  };
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 600,
+        messages: [{ role: 'user', content: 'Fa un audit complet al acestui depozit si identifica toate problemele, riscurile si oportunitatile de imbunatatire: ' + JSON.stringify(auditData) + '. Structureaza in: PROBLEME CRITICE, RISCURI, RECOMANDARI, PUNCTE FORTE. Raspunde in romana, detaliat.' }]
+      })
+    });
+    const data = await resp.json();
+    if (el) el.innerHTML = '<div style="font-size:13px;color:#e8ecf0;line-height:1.8;white-space:pre-wrap">' + data.content[0].text + '</div>';
+  } catch(e) { if (el) el.innerHTML = '<div style="color:#ff4757">Eroare AI audit.</div>'; }
+}
+
+// 37. CHAT AI CU MEMORIE ÎNTRE SESIUNI
+let persistentChatHistory = JSON.parse(localStorage.getItem('sv_chat_history') || '[]');
+
+async function askPersistentAI(question) {
+  if (!question.trim()) return;
+  persistentChatHistory.push({ role: 'user', content: question });
+  if (persistentChatHistory.length > 20) persistentChatHistory = persistentChatHistory.slice(-20);
+
+  const chatEl = document.getElementById('persistent-chat-messages');
+  if (chatEl) {
+    chatEl.innerHTML += '<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><div style="background:#1e2530;border-radius:12px 12px 4px 12px;padding:10px 14px;max-width:80%;color:#e8ecf0;font-size:13px">' + question + '</div></div>';
+    chatEl.innerHTML += '<div id="p-ai-typing" style="display:flex;margin-bottom:8px"><div style="background:#181d24;border-radius:4px 12px 12px 12px;padding:10px 14px;color:#6b7a8d;font-size:13px">⏳ AI gândește...</div></div>';
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 500,
+        system: 'Esti asistentul AI al depozitului ' + (userProfile?userProfile.depot:'') + '. Raspunzi in romana. Stoc: ' + stock.length + ' produse, ' + stock.filter(p=>p.qty===0).length + ' epuizate.',
+        messages: persistentChatHistory.slice(-10)
+      })
+    });
+    const data = await resp.json();
+    const answer = data.content[0].text;
+    persistentChatHistory.push({ role: 'assistant', content: answer });
+    localStorage.setItem('sv_chat_history', JSON.stringify(persistentChatHistory));
+
+    const typing = document.getElementById('p-ai-typing');
+    if (typing) typing.remove();
+    if (chatEl) {
+      chatEl.innerHTML += '<div style="display:flex;margin-bottom:8px"><div style="background:#181d24;border:1px solid #1e2530;border-radius:4px 12px 12px 12px;padding:10px 14px;max-width:85%;color:#e8ecf0;font-size:13px;line-height:1.6">' + answer.replace(/
+/g,'<br>') + '</div></div>';
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
+  } catch(e) {
+    const typing = document.getElementById('p-ai-typing');
+    if (typing) typing.innerHTML = '<div style="color:#ff4757;font-size:13px">❌ Eroare.</div>';
+  }
+  document.getElementById('persistent-chat-input').value = '';
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC F: SISTEM PRO (38-44)
+// ══════════════════════════════════════════
+
+// 38. MULTI-DEPOZIT TRANSFER CU VALIDARE
+async function transferBetweenDepots(productId, qty, targetDepotKey, targetDepotName) {
+  const p = stock.find(s => s.id === productId);
+  if (!p) return;
+  if (p.qty < qty) { setFeedback('❌ Stoc insuficient pentru transfer!', 'err'); return; }
+  if (!window.fbReady) { setFeedback('❌ Firebase necesar pentru transfer!', 'err'); return; }
+
+  try {
+    // Scade din depozitul curent
+    p.qty -= qty;
+    await saveStockToFirebase();
+
+    // Adaugă în depozitul destinație
+    const targetRef = db.ref('depozite/' + targetDepotKey + '/stock');
+    const snap = await targetRef.once('value');
+    let targetStock = [];
+    if (snap.val()) {
+      targetStock = Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val());
+    }
+    const existing = targetStock.find(s => normalizeText((s.name||'').toLowerCase()) === normalizeText(p.name.toLowerCase()));
+    if (existing) existing.qty += qty;
+    else targetStock.push({ id: Date.now(), name: p.name, qty, unit: p.unit, cat: p.cat||'General', min: p.min, maxQty: qty*3, notes: [], note_preview: '' });
+    await targetRef.set(targetStock);
+
+    addLog('Transfer → ' + targetDepotName, 'OUT ' + qty + ' ' + p.unit + ' ' + p.name, 'out');
+    renderStock(); updateStats();
+    setFeedback('✅ Transfer finalizat: ' + qty + ' ' + p.unit + ' ' + p.name + ' → ' + targetDepotName, 'ok');
+    speak('Transfer finalizat catre ' + targetDepotName + '.');
+  } catch(e) {
+    setFeedback('❌ Eroare transfer: ' + e.message, 'err');
+  }
+}
+
+// 39. SCHEDULER TASK-URI
+let scheduledTasks = JSON.parse(localStorage.getItem('sv_tasks') || '[]');
+
+function addScheduledTask(name, hour, minute, action) {
+  scheduledTasks.push({ id: Date.now(), name, hour: parseInt(hour), minute: parseInt(minute), action, active: true, lastRun: null });
+  localStorage.setItem('sv_tasks', JSON.stringify(scheduledTasks));
+  setFeedback('✅ Task programat: ' + name + ' la ' + String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0'), 'ok');
+}
+
+function checkScheduledTasks() {
+  const now = new Date();
+  scheduledTasks.filter(t => t.active).forEach(t => {
+    if (now.getHours()===t.hour && now.getMinutes()===t.minute) {
+      const today = now.toISOString().slice(0,10);
+      if (t.lastRun === today) return;
+      t.lastRun = today;
+      localStorage.setItem('sv_tasks', JSON.stringify(scheduledTasks));
+      try {
+        if (typeof window[t.action] === 'function') window[t.action]();
+        else eval(t.action);
+        setFeedback('✅ Task automat: ' + t.name, 'ok');
+      } catch(e) { console.error('Task error:', e); }
+    }
+  });
+}
+setInterval(function(){ if(typeof checkScheduledTasks==='function') checkScheduledTasks(); }, 60000);
+
+// 40. NOTIFICĂRI GRUPATE
+let notificationQueue = [];
+let notificationTimer = null;
+
+function queueNotification(msg, type) {
+  notificationQueue.push({ msg, type, ts: Date.now() });
+  clearTimeout(notificationTimer);
+  notificationTimer = setTimeout(function(){if(typeof flushNotifications==="function")flushNotifications();}, 3000);
+}
+
+function flushNotifications() {
+  if (!notificationQueue.length) return;
+  if (notificationQueue.length === 1) {
+    triggerAlert(notificationQueue[0].msg, notificationQueue[0].type);
+  } else {
+    const summary = notificationQueue.length + ' alerte: ' + notificationQueue.slice(0,3).map(n=>n.msg.slice(0,30)).join('; ') + '...';
+    triggerAlert(summary, 'warn');
+  }
+  notificationQueue = [];
+}
+
+// 41. LOG SESIUNI UTILIZATORI
+let sessionLog = JSON.parse(localStorage.getItem('sv_sessions') || '[]');
+
+function logUserSession(action) {
+  const entry = { ts: new Date().toISOString(), action, user: currentUser?currentUser.email:'', depot: userProfile?userProfile.depot:'', ua: navigator.userAgent.slice(0,80), lang: navigator.language };
+  sessionLog.push(entry);
+  localStorage.setItem('sv_sessions', JSON.stringify(sessionLog.slice(-50)));
+}
+
+function showSessionLog() {
+  const el = document.getElementById('session-log-content');
+  if (!el) return;
+  el.innerHTML = sessionLog.slice().reverse().slice(0,20).map(s =>
+    '<div style="padding:8px;background:#181d24;border-radius:6px;margin-bottom:4px;font-size:11px">' +
+    '<div style="color:#e8ecf0">' + (s.user||'—') + ' · ' + (s.action||'') + '</div>' +
+    '<div style="color:#6b7a8d">' + (s.ts||'').slice(0,19).replace('T',' ') + ' · ' + (s.depot||'') + '</div>' +
+    '</div>').join('');
+  document.getElementById('session-log-modal').style.display = 'flex';
+}
+
+// 42. RATE LIMITING OPERAȚII
+let opRateTracker = {};
+const MAX_OPS_PER_MINUTE = 30;
+
+function checkRateLimit(userId) {
+  const now = Date.now();
+  const key = userId || 'default';
+  if (!opRateTracker[key]) opRateTracker[key] = [];
+  opRateTracker[key] = opRateTracker[key].filter(ts => now - ts < 60000);
+  if (opRateTracker[key].length >= MAX_OPS_PER_MINUTE) {
+    setFeedback('⚠️ Prea multe operații! Așteptați 1 minut.', 'warn');
+    return false;
+  }
+  opRateTracker[key].push(now);
+  return true;
+}
+
+// 43. ALERTĂ PERSONALIZATĂ
+let customAlerts = JSON.parse(localStorage.getItem('sv_custom_alerts') || '[]');
+
+function addCustomAlert(name, condition, message, telegramEnabled) {
+  customAlerts.push({ id: Date.now(), name, condition, message, telegramEnabled: !!telegramEnabled, active: true, lastFired: null });
+  localStorage.setItem('sv_custom_alerts', JSON.stringify(customAlerts));
+  setFeedback('✅ Alertă personalizată creată: ' + name, 'ok');
+}
+
+function checkCustomAlerts() {
+  customAlerts.filter(a => a.active).forEach(alert => {
+    try {
+      const result = eval(alert.condition);
+      if (result) {
+        const today = new Date().toISOString().slice(0,10);
+        if (alert.lastFired === today) return;
+        alert.lastFired = today;
+        localStorage.setItem('sv_custom_alerts', JSON.stringify(customAlerts));
+        triggerAlert('🔔 ' + alert.name + ': ' + alert.message, 'warn');
+        if (alert.telegramEnabled && userProfile && userProfile.telegram_id) {
+          sendTelegramAlert('🔔 ' + alert.name + ': ' + alert.message, userProfile.telegram_id);
+        }
+      }
+    } catch(e) {}
+  });
+}
+setInterval(function(){ if(typeof checkCustomAlerts==='function') checkCustomAlerts(); }, 300000);
+
+// 44. MULTI-DEPOZIT AVANSAT - STOC CONSOLIDAT
+async function loadConsolidatedStock() {
+  if (!window.fbReady || !currentUser) return;
+  const el = document.getElementById('consolidated-content');
+  if (!el) return;
+  el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:20px">⏳ Se încarcă stocul global...</div>';
+  document.getElementById('consolidated-modal').style.display = 'flex';
+
+  try {
+    const snap = await db.ref('depozite').once('value');
+    const allDepots = snap.val() || {};
+    const consolidated = {};
+    Object.entries(allDepots).forEach(([depotKey, depotData]) => {
+      const depotStock = Array.isArray(depotData.stock) ? depotData.stock : Object.values(depotData.stock || {});
+      depotStock.forEach(p => {
+        const key = normalizeText(p.name.toLowerCase());
+        if (!consolidated[key]) consolidated[key] = { name: p.name, depots: {}, totalQty: 0, unit: p.unit };
+        consolidated[key].depots[depotKey] = p.qty;
+        consolidated[key].totalQty += p.qty;
+      });
+    });
+    const sorted = Object.values(consolidated).sort((a,b) => b.totalQty-a.totalQty);
+    el.innerHTML = sorted.slice(0,30).map(p =>
+      '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+      '<span style="font-weight:700;color:#e8ecf0">' + p.name + '</span>' +
+      '<span style="color:#00e5a0;font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900">' + p.totalQty + ' ' + p.unit + '</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
+      Object.entries(p.depots).map(([k,q]) => '<span style="background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:4px;padding:2px 6px;font-size:10px;color:#00e5a0">' + k.replace('depozit_','') + ':' + q + '</span>').join('') +
+      '</div></div>').join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:#ff4757;text-align:center;padding:20px">Eroare la încărcarea stocului global.</div>';
+  }
+}
+
+
+// ══════════════════════════════════════════
+// RUNDA 2 BLOC G: MOBILE PRO + INTEGRĂRI (45-50)
+// ══════════════════════════════════════════
+
+// 45. MOD PORTRET/LANDSCAPE ADAPTIV
+function handleOrientationChange() {
+  const isLandscape = window.innerWidth > window.innerHeight;
+  const grid = document.getElementById('stock-grid');
+  if (!grid) return;
+  if (isLandscape) {
+    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+  } else {
+    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(160px, 1fr))';
+  }
+}
+window.addEventListener('orientationchange', function(){ setTimeout(function(){if(typeof handleOrientationChange==="function")handleOrientationChange();}, 300); });
+window.addEventListener('resize', handleOrientationChange);
+
+// 46. HAPTIC FEEDBACK
+function hapticSuccess() {
+  if (navigator.vibrate) navigator.vibrate([50]);
+}
+function hapticError() {
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+}
+function hapticWarning() {
+  if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+}
+
+// Hook haptic into executeOperation
+const _origExecHaptic = executeOperation;
+
+
+// 47. SYNC DROPBOX
+async function syncToDropbox() {
+  const token = appSettings.dropbox_token;
+  if (!token) {
+    const t = prompt('Token Dropbox (din Dropbox API):
+Vizitați developers.dropbox.com pentru token');
+    if (!t) return;
+    appSettings.dropbox_token = t; saveAppSettings();
+  }
+  const data = JSON.stringify({ stock, clients, log: log.slice(0,100), ts: new Date().toISOString() });
+  const filename = '/StocVoce_' + (userProfile?userProfile.depot:'depot').replace(/\s+/g,'_') + '_backup.json';
+  try {
+    const resp = await fetch('https://content.dropboxapi.com/2/files/upload', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/octet-stream', 'Dropbox-API-Arg': JSON.stringify({ path: filename, mode: 'overwrite' }) },
+      body: data
+    });
+    if (resp.ok) { setFeedback('✅ Backup Dropbox salvat: ' + filename, 'ok'); speak('Backup salvat in Dropbox.'); }
+    else { setFeedback('❌ Eroare Dropbox: ' + resp.status, 'err'); }
+  } catch(e) { setFeedback('❌ Eroare Dropbox: ' + e.message, 'err'); }
+}
+
+// 48. EXPORT FORMAT SMARTBILL/SAGA
+function exportSAGAFormat() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ro-RO');
+
+  // NIR format (Nota de Intrare-Receptie)
+  let nirContent = 'NOTA DE INTRARE-RECEPTIE
+';
+  nirContent += 'Furnizor: [Furnizor]
+Data: ' + dateStr + '
+Gestionar: ' + (userProfile?userProfile.name:'') + '
+
+';
+  nirContent += 'Nr. | Denumire | Cantitate | UM | Pret achizitie | Valoare
+';
+  nirContent += '-'.repeat(80) + '
+';
+  stock.forEach((p, i) => {
+    const val = p.qty * (p.price_buy||0);
+    nirContent += (i+1) + ' | ' + p.name + ' | ' + p.qty + ' | ' + p.unit + ' | ' + (p.price_buy||0).toFixed(2) + ' | ' + val.toFixed(2) + '
+';
+  });
+  const totalVal = stock.reduce((s,p) => s+p.qty*(p.price_buy||0), 0);
+  nirContent += '-'.repeat(80) + '
+TOTAL: ' + totalVal.toFixed(2) + ' RON';
+
+  const blob = new Blob([nirContent], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='NIR_StocVoce_' + now.toISOString().slice(0,10) + '.txt'; a.click();
+  URL.revokeObjectURL(url);
+  setFeedback('✅ Export format NIR/SAGA generat!', 'ok');
+}
+
+// 49. QR CODE PE FACTURĂ
+function addQRToInvoice(invoiceNo, data) {
+  if (typeof QRCode === 'undefined') { setFeedback('QRCode library necesară!', 'warn'); return; }
+  const container = document.createElement('div');
+  container.id = 'temp-qr-' + Date.now();
+  container.style.cssText = 'position:absolute;top:-9999px';
+  document.body.appendChild(container);
+  new QRCode(container, { text: JSON.stringify({ invoice: invoiceNo, depot: userProfile?userProfile.depot:'', ts: new Date().toISOString(), ...data }), width: 80, height: 80 });
+  setTimeout(() => { container.remove(); }, 5000);
+  setFeedback('✅ QR cod generat pentru factura ' + invoiceNo, 'ok');
+}
+
+// 50. SHORTCUT-URI VOCALE RAPIDE
+const VOICE_SHORTCUTS = {
+  'status': () => { if(typeof aiDailySummaryVocal==='function') aiDailySummaryVocal(); },
+  'raport': () => { if(typeof exportTelegramWithDetails==='function') exportTelegramWithDetails(); },
+  'audit': () => { if(typeof aiFullDepotAudit==='function') aiFullDepotAudit(); },
+  'backup': () => { if(typeof doManualBackup==='function') doManualBackup(); },
+  'bani': () => {
+    const val = typeof calculateStockValue==='function' ? calculateStockValue() : {totalBuy:0};
+    const msg = 'Valoare stoc: ' + parseFloat(val.totalBuy||0).toFixed(0) + ' lei.';
+    speak(msg); setFeedback('💰 ' + msg, 'ok');
+  },
+  'critic': () => {
+    const n = stock.filter(p=>p.qty<=p.min).length;
+    const msg = n + ' produse critice.';
+    speak(msg); setFeedback('⚠️ ' + msg, n>0?'warn':'ok');
+  }
+};
+
+function handleVoiceShortcut(text) {
+  const norm = normalizeText(text.toLowerCase().trim());
+  for (const [keyword, action] of Object.entries(VOICE_SHORTCUTS)) {
+    if (norm === normalizeText(keyword) || norm === 'stoc ' + normalizeText(keyword)) {
+      action();
+      return true;
+    }
+  }
+  return false;
 }
 
 </script>
@@ -12739,6 +14492,149 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -13624,6 +15520,149 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -13924,6 +15963,11 @@ function showNoMovementReport() {
       <button onclick="document.getElementById('client-search-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
         <button class="add-btn" onclick="document.getElementById('payment-schedule-modal').style.display='flex';renderPaymentSchedule()" style="border-color:#00e5a0;color:#00e5a0">💳 Scadențar</button>
         <button class="add-btn" onclick="safeCall('aiGenerateSupplierEmail')" style="border-color:#ffa502;color:#ffa502">📧 Email Furnizor</button>
+        <button class="add-btn" onclick="document.getElementById('persistent-chat-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🧠 AI Memorie</button>
+        <button class="add-btn" onclick="safeCall('aiFullDepotAudit')" style="border-color:#00e5a0;color:#00e5a0">🔍 Audit AI</button>
+        <button class="add-btn" onclick="safeCall('exportCRMExcel')" style="border-color:#ffa502;color:#ffa502">📊 Export CRM</button>
+        <button class="add-btn" onclick="safeCall('aiDetectSeasonality')" style="border-color:#a78bfa;color:#a78bfa">🌸 AI Sezon</button>
+        <button class="add-btn" onclick="safeCall('aiPredictChurnRisk')" style="border-color:#ff4757;color:#ff4757">⚠️ Risc Abandon</button>
         <button class="add-btn" onclick="safeCall('aiSuggestRename')" style="border-color:#a78bfa;color:#a78bfa">✍️ AI Redenumire</button>
         <button class="add-btn" onclick="safeCall('aiOptimizeWarehouseSpace')" style="border-color:#a78bfa;color:#a78bfa">🗺️ AI Spațiu</button>
         <button class="add-btn" onclick="safeCall('aiAnalyzeProductNotes')" style="border-color:#a78bfa;color:#a78bfa">📝 AI Note</button>
@@ -14288,6 +16332,149 @@ function showNoMovementReport() {
       <input id="barcode-input" placeholder="Scanează sau introdu codul EAN..." oninput="handleBarcodeScanned(this.value)" autofocus style="width:100%;background:#181d24;border:1px solid #00e5a0;border-radius:8px;color:#e8ecf0;font-size:14px;padding:12px;outline:none;margin-bottom:12px;font-family:'JetBrains Mono',monospace">
       <div id="barcode-result"></div>
     </div>
+  </div>
+</div>
+
+
+<!-- CRM MODAL -->
+<div id="crm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">👤 CRM Client</div>
+      <div id="crm-client-name" style="font-size:14px;color:#e8ecf0;font-weight:600;margin-top:2px"></div></div>
+      <button onclick="document.getElementById('crm-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px">
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Contact</label><input id="crm-contact" placeholder="Persoana de contact" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Telefon</label><input id="crm-phone" placeholder="0722 123 456" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Email</label><input id="crm-email" placeholder="email@firma.ro" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;margin-top:4px"></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Stadiu Relație</label>
+        <select id="crm-stage" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer;margin-top:4px">
+          <option value="prospect">Prospect</option><option value="activ">Client Activ</option><option value="vip">VIP</option><option value="inactiv">Inactiv</option><option value="risc">Risc Abandon</option>
+        </select></div>
+      <div><label style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px">Note</label><textarea id="crm-notes" placeholder="Note interne..." style="width:100%;height:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:9px;outline:none;resize:vertical;margin-top:4px"></textarea></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="saveCRMData()" style="width:100%;background:#a78bfa;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;text-transform:uppercase">SALVEAZĂ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI AUDIT MODAL -->
+<div id="ai-audit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🔍 Audit AI Complet</div>
+      <button onclick="document.getElementById('ai-audit-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="ai-audit-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PERSISTENT CHAT MODAL -->
+<div id="persistent-chat-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;color:#00e5a0;text-transform:uppercase">🧠 AI cu Memorie</div>
+      <div style="font-size:11px;color:#6b7a8d">Ține minte conversațiile anterioare</div></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="persistentChatHistory=[];localStorage.removeItem('sv_chat_history');document.getElementById('persistent-chat-messages').innerHTML=''" style="background:none;border:1px solid #1e2530;border-radius:6px;color:#6b7a8d;font-size:11px;padding:4px 8px;cursor:pointer">🗑️</button>
+        <button onclick="document.getElementById('persistent-chat-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:32px;height:32px;cursor:pointer">✕</button>
+      </div>
+    </div>
+    <div id="persistent-chat-messages" style="flex:1;overflow-y:auto;padding:16px 20px;min-height:200px"></div>
+    <div style="padding:12px 20px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="persistent-chat-input" placeholder="Întreabă orice..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:10px;color:#e8ecf0;font-size:13px;padding:10px 14px;outline:none" onkeydown="if(event.key==='Enter'){event.preventDefault();askPersistentAI(this.value)}">
+      <button onclick="askPersistentAI(document.getElementById('persistent-chat-input').value)" style="background:#00e5a0;border:none;border-radius:10px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- OP EFFICIENCY MODAL -->
+<div id="op-efficiency-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">⚡ Eficiență Operatori</div>
+      <button onclick="document.getElementById('op-efficiency-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="op-efficiency-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SEASONAL MODAL -->
+<div id="seasonal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📅 Raport Sezonier</div>
+      <button onclick="document.getElementById('seasonal-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="seasonal-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- PREDICTIVE CHART MODAL -->
+<div id="predictive-chart-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:500px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">📈 Grafic Predictiv 30 Zile</div>
+      <button onclick="document.getElementById('predictive-chart-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="predictive-chart-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+
+<!-- NO MOVEMENT 90 MODAL -->
+<div id="no-movement-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">💤 Fără Mișcare 90 Zile</div>
+      <button onclick="document.getElementById('no-movement-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="no-movement-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- RACK VALUE MODAL -->
+<div id="rack-value-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">📍 Valoare per Raft</div>
+      <button onclick="document.getElementById('rack-value-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="rack-value-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SESSION LOG MODAL -->
+<div id="session-log-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #6b7a8d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#6b7a8d;text-transform:uppercase">🔐 Log Sesiuni</div>
+      <button onclick="document.getElementById('session-log-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="session-log-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- PRODUCT GALLERY MODAL -->
+<div id="product-gallery-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #a78bfa;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#a78bfa;text-transform:uppercase">🖼️ Galerie Imagini</div>
+      <button onclick="document.getElementById('product-gallery-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="product-gallery-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- CONSOLIDATED MODAL -->
+<div id="consolidated-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #00e5a0;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#00e5a0;text-transform:uppercase">🌐 Stoc Consolidat Global</div>
+      <button onclick="document.getElementById('consolidated-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
 
