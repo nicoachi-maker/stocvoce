@@ -397,6 +397,83 @@ function confirmImport() {
   importedProducts = [];
 }
 
+
+// ── VOICE HANDLERS (restored) ──
+
+function handleHalfCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('jumatate') && !norm.includes('jumătate') && 
+      !norm.includes('half') && !norm.includes('sfert')) return false;
+  const product = findProduct(text.split(/\s+/));
+  if (!product || product.qty === 0) return false;
+  const outKW = ['scoate','scade','scad','ia','minus','consum'];
+  const opType = outKW.some(k => norm.includes(normalizeText(k))) ? 'out' : 'in';
+  const qty = norm.includes('sfert') ? Math.ceil(product.qty/4) : Math.ceil(product.qty/2);
+  const old = product.qty;
+  if (opType === 'out') product.qty = Math.max(0, product.qty - qty);
+  else product.qty += qty;
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog(text, opType.toUpperCase()+' '+qty+' '+product.unit+' '+old+'→'+product.qty, opType);
+  speak('OK. '+(opType==='out'?'Scos':'Adaugat')+' '+qty+' '+product.unit+' din '+product.name+'.');
+  setFeedback('✅ '+product.name+': '+(opType==='out'?'-':'+')+qty+' '+product.unit, 'ok');
+  return true;
+}
+
+function handleRepeatedCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  const repeatMatch = norm.match(/(\d+)\s*(?:ori|times|mal)/);
+  if (!repeatMatch) return false;
+  const times = parseInt(repeatMatch[1]);
+  if (times < 2 || times > 100) return false;
+  const cleanText = text.replace(new RegExp(repeatMatch[0], 'i'), '').trim();
+  const qty = parseQuantity(normalizeText(cleanText.toLowerCase())) || 1;
+  const product = findProduct(cleanText.split(/\s+/));
+  if (!product) return false;
+  const inKW = ['adauga','adaugă','pune','baga'];
+  const opType = inKW.some(k => norm.includes(normalizeText(k))) ? 'in' : 'out';
+  const totalQty = qty * times;
+  const old = product.qty;
+  if (opType === 'in') product.qty += totalQty;
+  else product.qty = Math.max(0, product.qty - totalQty);
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog(text, opType.toUpperCase()+' '+totalQty+' ('+qty+'x'+times+') '+product.unit+' '+old+'→'+product.qty, opType);
+  speak('OK. '+(opType==='in'?'Adaugat':'Scos')+' '+totalQty+' '+product.unit+' de '+product.name+' de '+times+' ori.');
+  setFeedback('✅ '+product.name+': '+(opType==='in'?'+':'-')+totalQty+' '+product.unit+' ('+qty+'x'+times+')', 'ok');
+  return true;
+}
+
+function handleLocationCommand(text) {
+  const norm = normalizeText(text.toLowerCase());
+  if (!norm.includes('muta') && !norm.includes('mută') && 
+      !norm.includes('schimba') && !norm.includes('schimbă') &&
+      !norm.includes('pune in') && !norm.includes('pune în')) return false;
+  const fromMatch = text.match(/din\s+([A-Z][0-9A-Za-z\-]+)/i);
+  const toMatch = text.match(/(?:in|în|la)\s+([A-Z][0-9A-Za-z\-]+)/i);
+  if (!toMatch) return false;
+  const toLoc = toMatch[1];
+  const product = findProduct(text.split(/\s+/));
+  if (!product) {
+    if (fromMatch) {
+      const fromLoc = fromMatch[1];
+      const moved = stock.filter(p => normalizeText((p.loc||'').toLowerCase()) === normalizeText(fromLoc.toLowerCase()));
+      if (!moved.length) { setFeedback('❌ Niciun produs în locația '+fromLoc, 'err'); return true; }
+      moved.forEach(p => { p.loc = toLoc; });
+      saveStockToFirebase(); renderStock();
+      speak(moved.length+' produse mutate in '+toLoc+'.');
+      setFeedback('✅ '+moved.length+' produse mutate → '+toLoc, 'ok');
+      return true;
+    }
+    return false;
+  }
+  const oldLoc = product.loc || 'Nedefinit';
+  product.loc = toLoc;
+  saveStockToFirebase(); renderStock();
+  addLog(text, 'TRANSFER '+oldLoc+'→'+toLoc, 'in');
+  speak(product.name+' mutat in '+toLoc+'.');
+  setFeedback('✅ '+product.name+' mutat: '+oldLoc+' → '+toLoc, 'ok');
+  return true;
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -6794,13 +6871,13 @@ function handleCommand(transcript){
     }
   }, 3000);
   
-  // Clear "Procesez comanda" after 4s if nothing else set feedback
+  // Clear "Procesez comanda" after 3s
   setTimeout(()=>{
-    const fb = document.getElementById('feedback-msg');
+    const fb = document.getElementById('feedback-display');
     if(fb && fb.textContent.includes('Procesez')) {
       setFeedback('', '');
     }
-  }, 4000);
+  }, 3000);
   
   // Process command immediately
   processCommand(transcript.trim());
