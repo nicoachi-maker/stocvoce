@@ -674,7 +674,7 @@ function confirmImport() {
         <button class="add-btn" onclick="if(typeof showTransitModal==='function'){showTransitModal()}else{console.warn('showTransitModal not ready');}" style="border-color:#ffa502;color:#ffa502">🚛 Tranzit</button>
         <button class="add-btn" onclick="if(typeof openInventarAdjust==='function'){openInventarAdjust()}else{console.warn('openInventarAdjust not ready');}" style="border-color:#a78bfa;color:#a78bfa">⚖️ Ajustare</button>
         <button class="add-btn" onclick="if(typeof updateAllSafetyStocks==='function'){updateAllSafetyStocks()}else{console.warn('updateAllSafetyStocks not ready');}" style="border-color:#00e5a0;color:#00e5a0">🛡️ Stoc Sig.</button>
-        <button class="add-btn" onclick="document.getElementById('sort-bar').style.display=document.getElementById('sort-bar').style.display==='none'?'flex':'none'" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
+        <button class="add-btn" onclick="const sb=document.getElementById('sort-bar');if(sb)sb.style.display=sb.style.display==='none'||!sb.style.display?'flex':'none'">↕️ Sortare</button>
         <button class="add-btn" onclick="if(typeof autoArchiveInactive==='function'){autoArchiveInactive()}else{console.warn('autoArchiveInactive not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
         <button class="add-btn" onclick="if(typeof printDashboard==='function'){printDashboard()}else{console.warn('printDashboard not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
       </div>
@@ -1630,6 +1630,127 @@ function confirmImport() {
     </div>
     <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
+</div>
+
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
 </div>
 
 </body></html>');
@@ -5169,6 +5290,127 @@ function openTVDashboard() {
   </div>
 </div>
 
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
+</div>
+
 </body></html>');
 }
 
@@ -5874,6 +6116,127 @@ async function exportReportWord() {
   </div>
 </div>
 
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
+</div>
+
 </body></html>';
 
   const blob = new Blob([html], {type:'application/msword'});
@@ -6461,13 +6824,14 @@ function handleVoiceShortcut(text) {
 window._fnQueue = [];
 window.safeCall = function(fnName, ...args) {
   if (typeof window[fnName] === 'function') {
-    window[fnName](...args);
+    try { window[fnName](...args); } catch(e) { console.error(fnName + ' error:', e); }
   } else {
-    console.warn('Function', fnName, 'not ready, retrying...');
+    // Retry after script loads
     setTimeout(() => {
-      if (typeof window[fnName] === 'function') window[fnName](...args);
-      else console.error('Function', fnName, 'still not defined!');
-    }, 500);
+      if (typeof window[fnName] === 'function') {
+        try { window[fnName](...args); } catch(e) { console.error(fnName + ' error:', e); }
+      }
+    }, 1000);
   }
 };
 
@@ -9832,7 +10196,26 @@ function applyTranslations() {
 }
 
 function openLangModal() {
-  document.getElementById('lang-modal').style.display = 'flex';
+  const el = document.getElementById('lang-modal');
+  if (!el) return;
+  const listEl = document.getElementById('lang-list');
+  if (listEl && typeof LANGUAGES !== 'undefined') {
+    listEl.innerHTML = '';
+    Object.entries(LANGUAGES).forEach(([code, lang]) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:' + (code===currentLang?'rgba(0,229,160,0.1)':'#181d24') + ';border-radius:8px;margin-bottom:6px;cursor:pointer;border:1px solid ' + (code===currentLang?'#00e5a0':'#1e2530');
+      div.innerHTML = '<span style="font-size:24px">' + lang.flag + '</span><div><div style="font-weight:700;color:#e8ecf0">' + lang.name + '</div><div style="font-size:11px;color:#6b7a8d">' + code.toUpperCase() + '</div></div>';
+      div.onclick = function() {
+        currentLang = code;
+        localStorage.setItem('sv_lang', code);
+        if (typeof applyTranslations === 'function') applyTranslations();
+        closeLangModal();
+        setFeedback('Limbă: ' + code.toUpperCase(), 'ok');
+      };
+      listEl.appendChild(div);
+    });
+  }
+  el.style.display = 'flex';
 }
 function closeLangModal() {
   document.getElementById('lang-modal').style.display = 'none';
@@ -14635,6 +15018,127 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -15663,6 +16167,127 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -16476,6 +17101,127 @@ function showNoMovementReport() {
     </div>
     <div id="consolidated-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
+</div>
+
+
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">⚙️ Setări</div>
+      <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px">
+      
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🌐 LIMBĂ</div>
+        <select id="settings-language" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none;cursor:pointer"></select>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📱 TELEGRAM</div>
+        <input id="settings-telegram" placeholder="Chat ID Telegram (ex: 123456789)" style="width:100%;background:#111418;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:9px;outline:none">
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🔔 ALERTE</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc scăzut</span>
+          <input type="checkbox" id="settings-alert-low" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Alertă stoc zero</span>
+          <input type="checkbox" id="settings-alert-zero" style="accent-color:#ff4757;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Notificări browser</span>
+          <input type="checkbox" id="settings-browser-notif" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📊 RAPORT AUTO</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Activat</span>
+          <input type="checkbox" id="settings-report-enabled" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:#e8ecf0">Ora</span>
+          <input type="number" id="settings-report-hour" min="0" max="23" value="8" style="width:70px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;padding:6px;outline:none;text-align:center">
+          <span style="font-size:13px;color:#6b7a8d">:00</span>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎙️ VOCE & SUNET</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Confirmare vocală</span>
+          <input type="checkbox" id="settings-voice-confirm" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Sunete alertă</span>
+          <input type="checkbox" id="settings-sound" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Rezumat zilnic vocal (18:00)</span>
+          <input type="checkbox" id="settings-daily-summary" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🎨 TEMĂ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="applyThemeFull('dark')" id="theme-dark" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🌑 DARK</button>
+          <button onclick="applyThemeFull('light')" id="theme-light" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">☀️ LIGHT</button>
+          <button onclick="applyThemeFull('blue')" id="theme-blue" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🔵 BLUE</button>
+          <button onclick="applyThemeFull('green')" id="theme-green" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;padding:8px;cursor:pointer;color:#6b7a8d;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px">🟢 GREEN</button>
+        </div>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚙️ ALTE OPȚIUNI</div>
+        <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Auto CSV</span>
+          <input type="checkbox" id="settings-auto-csv" style="accent-color:#00e5a0;width:18px;height:18px">
+        </label>
+        <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+          <span style="font-size:13px;color:#e8ecf0">Mod Demo</span>
+          <input type="checkbox" id="settings-demo-mode" style="accent-color:#a78bfa;width:18px;height:18px">
+        </label>
+      </div>
+
+      <div style="background:#181d24;border-radius:10px;padding:14px">
+        <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🗑️ DATE</div>
+        <button onclick="if(confirm('Ștergere cont și toate datele?'))deleteAccountGDPR()" style="width:100%;background:none;border:1px solid #ff4757;border-radius:8px;color:#ff4757;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:10px;cursor:pointer">🗑️ ȘTERGE CONT & DATE</button>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="if(typeof saveSettings==='function')saveSettings();document.getElementById('settings-modal').style.display='none'" style="width:100%;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;padding:13px;cursor:pointer;text-transform:uppercase">SALVEAZĂ SETĂRILE →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LANG MODAL -->
+<div id="lang-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #1e2530;border-radius:20px;max-width:360px;width:100%;max-height:80vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#e8ecf0;text-transform:uppercase">🌐 Limbă Interfață</div>
+      <button onclick="closeLangModal()" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer">✕</button>
+    </div>
+    <div id="lang-list" style="padding:12px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SORT BAR -->
+<div id="sort-bar" style="display:none;background:#111418;border:1px solid #1e2530;border-radius:10px;padding:8px 12px;margin-bottom:10px;gap:6px;flex-wrap:wrap;align-items:center">
+  <span style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-right:4px">SORTARE:</span>
+  <button onclick="sortStock('name')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">A-Z</button>
+  <button onclick="sortStock('qty-asc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↑</button>
+  <button onclick="sortStock('qty-desc')" style="background:#181d24;border:1px solid #1e2530;border-radius:6px;color:#99a8b8;font-size:12px;padding:4px 10px;cursor:pointer">Cant ↓</button>
+  <button onclick="sortStock('critical')" style="background:#181d24;border:1px solid #ff4757;border-radius:6px;color:#ff4757;font-size:12px;padding:4px 10px;cursor:pointer">Critice</button>
+  <button onclick="sortStock('value')" style="background:#181d24;border:1px solid #ffa502;border-radius:6px;color:#ffa502;font-size:12px;padding:4px 10px;cursor:pointer">Valoare</button>
+  <button onclick="sortStock('cat')" style="background:#181d24;border:1px solid #a78bfa;border-radius:6px;color:#a78bfa;font-size:12px;padding:4px 10px;cursor:pointer">Categorie</button>
+  <button onclick="sortStock('loc')" style="background:#181d24;border:1px solid #6b7a8d;border-radius:6px;color:#6b7a8d;font-size:12px;padding:4px 10px;cursor:pointer">Locație</button>
 </div>
 
 </body>
