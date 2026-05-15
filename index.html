@@ -6885,15 +6885,47 @@ function findProduct(words, clientName){
   // 5. Category match
   return stock.find(p => s.includes(normalizeText(p.cat.toLowerCase()))) || null;
 }
-function parseQuantity(text){
-  const nw={'unu':1,'una':1,'doua':2,'două':2,'trei':3,'patru':4,'cinci':5,'sase':6,'sapte':7,'opt':8,'noua':9,'zece':10,'unsprezece':11,'doisprezece':12,'treisprezece':13,'paisprezece':14,'cincisprezece':15,'saisprezece':16,'saptesprezece':17,'optsprezece':18,'nouasprezece':19,'douazeci':20,'treizeci':30,'patruzeci':40,'cincizeci':50,'saizeci':60,'saptezeci':70,'optzeci':80,'nouazeci':90,'o suta':100,'o sută':100,'doua sute':200,'două sute':200,'trei sute':300};
-  // Match "30 de" or just "30"
-  const m=text.match(/\b(\d+)\s*(?:de\s+)?/);
-  if(m)return parseInt(m[1]);
-  const normText = normalizeText(text);
-  for(const[w,v]of Object.entries(nw))if(normText.includes(normalizeText(w)))return v;
+function parseQuantity(text) {
+  const nw = {
+    'zero':0,'unu':1,'una':1,'un':1,'o ':1,
+    'doi':2,'doua':2,'două':2,'two':2,
+    'trei':3,'three':3,'patru':4,'four':4,
+    'cinci':5,'five':5,'sase':6,'șase':6,'six':6,
+    'sapte':7,'șapte':7,'seven':7,'opt':8,'eight':8,
+    'noua':9,'nouă':9,'nine':9,'zece':10,'ten':10,
+    'unsprezece':11,'doisprezece':12,'treisprezece':13,
+    'paisprezece':14,'cincisprezece':15,'saisprezece':16,
+    'saptesprezece':17,'optsprezece':18,'nouasprezece':19,
+    'douazeci':20,'douăzeci':20,'twenty':20,
+    'treizeci':30,'thirty':30,'patruzeci':40,'forty':40,
+    'cincizeci':50,'fifty':50,'saizeci':60,'sixty':60,
+    'saptezeci':70,'seventy':70,'optzeci':80,'eighty':80,
+    'nouazeci':90,'ninety':90,
+    'o suta':100,'o sută':100,'o sutã':100,
+    'doua sute':200,'două sute':200,'trei sute':300,
+    'jumatate':0.5,'jumătate':0.5,'sfert':0.25
+  };
+  
+  const normText = normalizeText(text.toLowerCase());
+  
+  // Check word numbers FIRST (before digit regex to avoid M6 false positives)
+  // Sort by word length descending to match longer words first
+  const sorted = Object.entries(nw).sort((a,b) => b[0].length - a[0].length);
+  for (const [word, val] of sorted) {
+    const normWord = normalizeText(word);
+    // Match as whole word
+    const regex = new RegExp('\\b' + normWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b');
+    if (regex.test(normText)) return val;
+  }
+  
+  // Then try digit match - but exclude numbers that are part of product names like M6, M8
+  // Only match standalone numbers or numbers followed by units
+  const digitMatch = normText.match(/(?<![a-z])\b(\d+)\b(?:\s*(?:de\s+)?(?:buc|kg|l|m|ml|g|saci|cutii|paleti|pachete|role|metri|litri|bucati|unitati)?)?/i);
+  if (digitMatch) return parseInt(digitMatch[1]);
+  
   return null;
 }
+
 function extractClientName(text, norm) {
   // Simple approach: split by "a luat", "a ridicat" etc and take left part as client name
   const actionPhrases = [
