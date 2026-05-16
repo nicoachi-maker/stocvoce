@@ -7970,7 +7970,7 @@ function findProduct(words, clientName){
   
   // Remove common words that are not product names
   const removeWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos',
-    'luat','ridicat','preluat','scoate','scot','adauga','adaugă','pune','bag',
+    'luat','ridicat','preluat','scoate','scot','scade','scad','adauga','adaugă','pune','bag',
     'stoc','stock','bucati','bucăți','cutii','litri',
     'intrare','iesire','ieșire','plus','minus','consum'];
   removeWords.forEach(w => {
@@ -8112,26 +8112,28 @@ function processCommand(text){
   }
   // Check handlers - log which one catches it
   // Check handlers - only SYNC boolean results count
-  const syncHandlers = [
-    handlePercentCommand, handleVoiceTransfer, handleVoiceReport,
-    handleVoiceNote, handleVoiceQuery, handleHalfCommand,
-    handleRepeatedCommand, handleLocationCommand, handleApproxQty,
-    handleFullStatusCommand, handleMoneyQuery, handleCriticalQuery,
-    handleVoiceUndo, handleOrdinalCommand, handleVoiceTelegramReport,
-    handleVoiceNoteOnProduct, handleVoiceHistoryToday,
-    handleVoiceDepotTransfer, handleVoiceCountProducts,
-    handleChainCommand, processCommandWithEcho, handleWhatSoldToday,
-    handleVoiceCorrection, handleVoiceChart, processVoiceOffline,
-    handleVoiceShortcut
+  // Voice handlers - safe window[] lookup prevents crashes if any fn missing
+  const _voiceHandlerNames = [
+    'handlePercentCommand','handleVoiceTransfer','handleVoiceReport',
+    'handleVoiceNote','handleVoiceQuery','handleHalfCommand',
+    'handleRepeatedCommand','handleLocationCommand','handleApproxQty',
+    'handleFullStatusCommand','handleMoneyQuery','handleCriticalQuery',
+    'handleVoiceUndo','handleOrdinalCommand','handleVoiceTelegramReport',
+    'handleVoiceNoteOnProduct','handleVoiceHistoryToday',
+    'handleVoiceDepotTransfer','handleVoiceCountProducts',
+    'handleChainCommand','processCommandWithEcho','handleWhatSoldToday',
+    'handleVoiceCorrection','handleVoiceChart','processVoiceOffline',
+    'handleVoiceShortcut'
   ];
-  for(const [name, fn] of syncHandlers){
-    if(fn){
-      const result = fn(text);
-      if(result === true){ return; }
-    }
+  for(const fnName of _voiceHandlerNames){
+    try{
+      const fn = window[fnName];
+      if(typeof fn==='function'){
+        const result = fn(text);
+        if(result===true) return;
+      }
+    }catch(e){ console.warn('Handler error ['+fnName+']:', e.message); }
   }
-  // Async handlers - don't block
-  if(typeof handleFullStatusCommand==='function'&&handleFullStatusCommand(text)===true)return;
   
   // Use multilingual keywords
   const cmds = getVoiceCommands();
@@ -11150,7 +11152,7 @@ function showStockValueDetails() {
 const VOICE_COMMANDS = {
   ro: {
     in:  ['adauga','adaugă','pune','bag','intra','intră','primire','receptie','intrare','plus'],
-    out: ['scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat'],
+    out: ['scade','scad','scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat','vinde','vandut','vândut','da jos','elimina'],
     list: ['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'],
     client_actions: ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos'],
     wake: ['stoc','stock']
