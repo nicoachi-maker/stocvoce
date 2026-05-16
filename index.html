@@ -480,6 +480,26 @@ function handleLocationCommand(text) {
   return true;
 }
 
+
+// Auto-correct common voice recognition mistakes
+function autocorrectVoice(text) {
+  const fixes = {
+    'adauga': ['adaugă','adauge','adaugă','add,ga','adauga','dăugă','aduaga','addauga'],
+    'scade': ['scăde','scalde','skade','cascade','scadea'],
+    'scoate': ['scoată','skwate','scoatei','scoată'],
+    'suruburi': ['șuruburi','suruburi','şuruburi','surub','surubul','șurup'],
+    'ciment': ['cimant','ciment','semant','cement'],
+    'adaug': ['adaog','addog','addaug'],
+  };
+  
+  let result = text.toLowerCase();
+  Object.entries(fixes).forEach(([correct, wrong]) => {
+    wrong.forEach(w => {
+      result = result.replace(new RegExp('\\b' + w + '\\b', 'gi'), correct);
+    });
+  });
+  return result;
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -7819,10 +7839,22 @@ function buildRecognition(){
   };
 
   recognition.onresult=(e)=>{
-    let interim='',final='';
+    let interim='', final='';
     for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal)final+=t;else interim+=t;
+      if(e.results[i].isFinal){
+        // Pick best alternative that contains action words
+        const actionWords = ['adauga','adaugă','scade','scoate','pune','ia','bag','plus','minus','cat','cate'];
+        let bestAlt = e.results[i][0].transcript;
+        let bestScore = 0;
+        for(let j=0;j<e.results[i].length;j++){
+          const alt = e.results[i][j].transcript.toLowerCase();
+          const score = actionWords.filter(w=>alt.includes(w)).length;
+          if(score>bestScore){bestScore=score;bestAlt=e.results[i][j].transcript;}
+        }
+        final+=bestAlt;
+      } else {
+        interim+=e.results[i][0].transcript;
+      }
     }
     const display=final||interim;
     if(display)document.getElementById('transcript-display').textContent=display.trim();
@@ -7932,7 +7964,12 @@ function handleCommand(transcript){
   }, 3000);
   
   // Process command immediately
-  processCommand(transcript.trim());
+  // Auto-correct common recognition mistakes
+  const corrected = typeof autocorrectVoice==='function' ? autocorrectVoice(transcript.trim()) : transcript.trim();
+  if(corrected !== transcript.trim().toLowerCase()){
+    document.getElementById('transcript-display').textContent = corrected + ' ✓';
+  }
+  processCommand(corrected);
   // Mic restarts automatically after speak() finishes via utt.onend
 }
 function setMicState(state){
@@ -7955,64 +7992,94 @@ function processManual(){
   document.getElementById('manual-input').value='';
   processCommand(val);
 }
-function normalizeText(text){
-  return text.replace(/[șş]/g,'s').replace(/[țţ]/g,'t').replace(/[ăâ]/g,'a').replace(/î/g,'i')
-    .replace(/[ȘŞ]/g,'S').replace(/[ȚŢ]/g,'T').replace(/[ĂÂ]/g,'A').replace(/Î/g,'I');
+function normalizeText(text) {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/[àáâãäå]/g, 'a')
+    .replace(/[ăâ]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/[ýÿ]/g, 'y')
+    .replace(/[șşṣ]/g, 's')
+    .replace(/[țţṭ]/g, 't')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[ç]/g, 'c')
+    .replace(/[ß]/g, 'ss')
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
-function findProduct(words, clientName){
-  // Build search text - remove client name, numbers, action words
-  let searchText = words.join(' ');
+function findProduct(words, clientName) {
+  if (!words || !stock.length) return null;
   
-  // Remove client name
-  if(clientName) {
-    searchText = searchText.replace(clientName, ' ');
-  }
-  
-  // Remove common words that are not product names
+  // Build search text - remove action words and numbers
   const removeWords = ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos',
-    'luat','ridicat','preluat','scoate','scot','scade','scad','adauga','adaugă','pune','bag',
-    'stoc','stock','bucati','bucăți','cutii','litri',
-    'intrare','iesire','ieșire','plus','minus','consum'];
+    'luat','ridicat','preluat','scoate','scot','scade','scad','adauga','adaugă','adaug',
+    'pune','pun','bag','stoc','stock','bucati','bucăți','cutii','litri',
+    'intrare','iesire','ieșire','plus','minus','consum','da','afara','afară',
+    'zero','unu','una','un','doi','doua','două','trei','patru','cinci',
+    'sase','șase','sapte','șapte','opt','noua','nouă','zece',
+    'unsprezece','doisprezece','treizeci','patruzeci','cincizeci',
+    'buc','kg','l','ml','g','litri','metri'];
+  
+  let searchText = (Array.isArray(words) ? words.join(' ') : String(words)).toLowerCase();
   removeWords.forEach(w => {
     searchText = searchText.replace(new RegExp('\\b' + normalizeText(w) + '\\b', 'gi'), ' ');
   });
+  // Remove standalone numbers but keep alphanumeric product codes like M6, M8
+  searchText = searchText.replace(/(?<![a-zA-Z])\b\d+\b(?![a-zA-Z])/g, ' ').trim();
+  searchText = searchText.replace(/\s+/g, ' ').trim();
   
-  // Remove numbers  
-  searchText = searchText.replace(/\b\d+\b/g, ' ').replace(/\s+/g, ' ').trim();
-  const s = normalizeText(searchText.toLowerCase());
+  if (!searchText || searchText.length < 2) return null;
+  const normSearch = normalizeText(searchText);
   
-  if(!s || s.length < 2) return null;
-
-  // 1. Exact match - product name fully in search
-  let f = stock.find(p => {
-    const n = normalizeText(p.name.toLowerCase());
-    return s.includes(n);
+  // Strategy 1: Exact match on normalized name
+  let found = stock.find(p => normalizeText(p.name.toLowerCase()) === normSearch);
+  if (found) return found;
+  
+  // Strategy 2: Full contains
+  found = stock.find(p => normalizeText(p.name.toLowerCase()).includes(normSearch));
+  if (found) return found;
+  
+  // Strategy 3: Search text contains product name
+  found = stock.find(p => normSearch.includes(normalizeText(p.name.toLowerCase())));
+  if (found) return found;
+  
+  // Strategy 4: Word by word matching - all words must match
+  const searchWords = normSearch.split(/\s+/).filter(w => w.length > 1);
+  if (searchWords.length > 0) {
+    found = stock.find(p => {
+      const pNorm = normalizeText(p.name.toLowerCase());
+      return searchWords.every(w => pNorm.includes(w));
+    });
+    if (found) return found;
+    
+    // Strategy 5: Most words match (>= 60%)
+    let bestMatch = null, bestScore = 0;
+    stock.forEach(p => {
+      const pNorm = normalizeText(p.name.toLowerCase());
+      const matchCount = searchWords.filter(w => pNorm.includes(w) || w.includes(pNorm.split(' ')[0])).length;
+      const score = matchCount / searchWords.length;
+      if (score >= 0.6 && score > bestScore) { bestScore = score; bestMatch = p; }
+    });
+    if (bestMatch) return bestMatch;
+  }
+  
+  // Strategy 6: Fuzzy - common characters
+  let fuzzyBest = null, fuzzyScore = 0;
+  stock.forEach(p => {
+    const pNorm = normalizeText(p.name.toLowerCase());
+    const minLen = Math.min(normSearch.length, pNorm.length);
+    if (minLen < 3) return;
+    let common = 0;
+    for (const ch of normSearch) { if (pNorm.includes(ch)) common++; }
+    const score = common / Math.max(normSearch.length, pNorm.length);
+    if (score > 0.7 && score > fuzzyScore) { fuzzyScore = score; fuzzyBest = p; }
   });
-  if(f) return f;
-
-  // 2. Search text in product name
-  f = stock.find(p => {
-    const n = normalizeText(p.name.toLowerCase());
-    return n.includes(s);
-  });
-  if(f) return f;
-
-  // 3. All significant words of product found in search
-  f = stock.find(p => {
-    const pWords = normalizeText(p.name.toLowerCase()).split(/\s+/).filter(w => w.length > 2);
-    return pWords.length > 0 && pWords.every(pw => s.includes(pw));
-  });
-  if(f) return f;
-
-  // 4. Any significant word of product found in search
-  f = stock.find(p => {
-    const pWords = normalizeText(p.name.toLowerCase()).split(/\s+/).filter(w => w.length > 3);
-    return pWords.some(pw => s.includes(pw));
-  });
-  if(f) return f;
-
-  // 5. Category match
-  return stock.find(p => s.includes(normalizeText(p.cat.toLowerCase()))) || null;
+  return fuzzyBest;
 }
 function parseQuantity(text) {
   const nw = {
@@ -8168,7 +8235,13 @@ function processCommand(text){
     else{const msg=`${stock.length} produse, ${stock.filter(p=>p.qty<=p.min).length} critic.`;setFeedback(`ℹ️ ${msg}`,'ok');speak(msg);}
     return;
   }
-  if(!opType){setFeedback('⚠️ Nerecunoscut. Ex: Adaugă 10 șuruburi M6','warn');speak('Comandă nerecunoscută.');addLog(text,'Nerecunoscut','err');return;}
+  if(!opType){
+    const hint = '💡 Spune: "adaugă 10 [produs]" sau "scade 5 [produs]"';
+    setFeedback('⚠️ Nu am înțeles comanda. ' + hint,'warn');
+    speak('Nu am inteles. Incearca: adauga sau scade urmat de cantitate si produs.');
+    addLog(text,'Nerecunoscut','err');
+    return;
+  }
   const qty=parseQuantity(text);
   const product=findProduct(text.split(/\s+/), clientName);
   if(!product){const dbg='⚠️ Produs negăsit: "'+text+'"';setFeedback(dbg,'warn');speak('Produsul nu a fost gasit in stoc.');addLog(text,'Produs negasit','err');console.warn('findProduct failed for:',text,'stock names:',stock.map(p=>p.name));return;}
@@ -11151,8 +11224,8 @@ function showStockValueDetails() {
 // ── COMENZI VOCALE MULTILINGVĂ ──
 const VOICE_COMMANDS = {
   ro: {
-    in:  ['adauga','adaugă','pune','bag','intra','intră','primire','receptie','intrare','plus'],
-    out: ['scade','scad','scoate','scot','ia','ies','iese','consum','livrat','livrare','expediat','retras','minus','iesire','ieșire','luat','ridicat','preluat','primit','achizitionat','vinde','vandut','vândut','da jos','elimina'],
+    in:  ['adauga','adaugă','adaug','pune','pun','bag','băgăm','băga','intra','intră','intru','primire','receptie','intrare','plus','mai pune','mai adauga','adaugat','primit','sosit','stochez'],
+    out: ['scade','scad','scadem','scoate','scot','scoatem','ia','iau','ies','iese','iesi','consum','consumat','consumam','livrat','livrare','livrez','livram','expediat','retras','minus','iesire','ieșire','luat','luam','ridicat','preluat','primit','achizitionat','vinde','vand','vândum','vandut','vândut','da jos','elimin','dau afara','dăm afară','folosit','folosesc','utilizat','iau','scad din'],
     list: ['cat','cât','cate','câte','arata','arată','verifica','verifică','situatie','lista'],
     client_actions: ['a luat','a ridicat','a preluat','a primit','a cumparat','a scos'],
     wake: ['stoc','stock']
