@@ -753,6 +753,110 @@ function printProductLabel(productId) {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>');
   win.document.close();
   setFeedback('✅ Etichetă generată pentru ' + p.name, 'ok');
@@ -1185,6 +1289,110 @@ function pickingListGenerate(orderItems) {
     <div id="territory-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
+
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
 
 </body></html>');
   win.document.close();
@@ -1888,6 +2096,110 @@ function packingSlipGenerate(orderId, items) {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>');
   win.document.close();
   setFeedback('✅ Bon ambalare generat!', 'ok');
@@ -2508,6 +2820,545 @@ function showAllProductScores() {
   if (el) { el.innerHTML = html; document.getElementById('product-scores-modal').style.display = 'flex'; }
 }
 
+
+// ══════════════════════════════════════════
+// SISTEM MULTI-INDUSTRIE
+// ══════════════════════════════════════════
+
+let currentIndustry = localStorage.getItem('sv_industry') || 'depozit';
+
+const INDUSTRY_CONFIG = {
+  depozit: {
+    name: 'Depozit / Logistică',
+    icon: '🏭',
+    color: '#00e5a0',
+    subtitle: 'Gestiune stoc & logistică',
+    productLabel: 'Produs',
+    qtyLabel: 'Cantitate',
+    locationLabel: 'Locație/Raft',
+    units: ['buc','kg','l','ml','g','m','m²','m³','saci','paleți','cutii','role'],
+    defaultCats: ['Materiale','Echipamente','Consumabile','Piese de schimb','Ambalaje','Chimice','Electrice'],
+    voiceKeywords: { in: ['adaugă','primire','recepție','intrare'], out: ['scoate','livrare','expediere','ieșire'] },
+    toolbarTabs: ['STOC','RAPOARTE','CLIENȚI','DEPOZIT','GLOBAL'],
+    accentColor: '#00e5a0',
+    features: { picking:true, transit:true, multiDepot:true, barcodes:true, expiry:true }
+  },
+  restaurant: {
+    name: 'Restaurant / HoReCa',
+    icon: '🍽️',
+    color: '#ff6b9d',
+    subtitle: 'Gestiune ingrediente & meniu',
+    productLabel: 'Ingredient / Produs',
+    qtyLabel: 'Cantitate',
+    locationLabel: 'Depozit/Frigider',
+    units: ['kg','g','l','ml','buc','portii','bucăți','pungi','sticle','doze'],
+    defaultCats: ['Carne','Legume','Fructe','Lactate','Băuturi','Condimente','Paste/Cereale','Uleiuri','Produse de curățenie','Ambalaje'],
+    voiceKeywords: { in: ['adaugă','aprovizionare','a sosit','recepție'], out: ['consumat','folosit','rupe','pregătit','gătit'] },
+    toolbarTabs: ['INGREDIENTE','MENIU','COMENZI','FURNIZORI','RAPOARTE'],
+    accentColor: '#ff6b9d',
+    features: { menu:true, recipes:true, allergens:true, expiry:true, portions:true, waste:true }
+  },
+  retail: {
+    name: 'Casă / Retail',
+    icon: '🏪',
+    color: '#ffa502',
+    subtitle: 'Gestiune magazin & vânzări',
+    productLabel: 'Produs / Articol',
+    qtyLabel: 'Bucăți',
+    locationLabel: 'Raft/Secțiune',
+    units: ['buc','perechi','set','pachet','cutie','roll','m','m²'],
+    defaultCats: ['Electronice','Îmbrăcăminte','Alimente','Cosmetice','Jucării','Sport','Casă&Grădină','Auto','Cărți','Diverse'],
+    voiceKeywords: { in: ['adaugă','marfă nouă','reaprovizionare','primit'], out: ['vândut','vânzare','client','ieșire'] },
+    toolbarTabs: ['PRODUSE','VÂNZĂRI','CLIENȚI','CASA','RAPOARTE'],
+    accentColor: '#ffa502',
+    features: { pos:true, discounts:true, loyalty:true, receipts:true, returns:true, promotions:true }
+  },
+  constructii: {
+    name: 'Șantier / Construcții',
+    icon: '🏗️',
+    color: '#fd9644',
+    subtitle: 'Gestiune materiale & șantier',
+    productLabel: 'Material / Echipament',
+    qtyLabel: 'Cantitate',
+    locationLabel: 'Șantier/Zonă',
+    units: ['buc','kg','t','m','m²','m³','saci','paleți','role','litri','seturi'],
+    defaultCats: ['Beton&Mortar','Cărămizi&Blocuri','Fier&Metal','Lemn','Izolații','Instalații','Finisaje','Echipamente','Unelte','Chimice'],
+    voiceKeywords: { in: ['adaugă','sosit','livrat','primit pe șantier'], out: ['consumat','folosit','montat','turnat','șantier'] },
+    toolbarTabs: ['MATERIALE','ȘANTIERE','UTILAJE','FURNIZORI','RAPOARTE'],
+    accentColor: '#fd9644',
+    features: { sites:true, equipment:true, workers:true, safety:true, progress:true, waste:true }
+  }
+};
+
+function selectIndustry(industry) {
+  currentIndustry = industry;
+  localStorage.setItem('sv_industry', industry);
+  
+  // Update UI buttons
+  document.querySelectorAll('.ind-btn').forEach(btn => {
+    btn.style.background = '#181d24';
+    btn.style.borderColor = '#1e2530';
+    btn.querySelectorAll('div').forEach(d => { if(d.style.fontFamily) d.style.color = '#e8ecf0'; });
+  });
+  
+  const cfg = INDUSTRY_CONFIG[industry];
+  const activeBtn = document.getElementById('ind-' + industry);
+  if (activeBtn) {
+    activeBtn.style.background = 'rgba(' + hexToRgb(cfg.color) + ',0.15)';
+    activeBtn.style.borderColor = cfg.color;
+    const nameEl = activeBtn.querySelectorAll('div')[1];
+    if (nameEl) nameEl.style.color = cfg.color;
+  }
+  
+  // Update subtitle
+  const sub = document.querySelector('.auth-sub');
+  if (sub) sub.textContent = cfg.subtitle;
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return r+','+g+','+b;
+}
+
+function applyIndustryTheme() {
+  const cfg = INDUSTRY_CONFIG[currentIndustry] || INDUSTRY_CONFIG.depozit;
+  
+  // Apply accent color
+  document.documentElement.style.setProperty('--accent', cfg.color);
+  document.documentElement.style.setProperty('--accent2', cfg.accentColor);
+  
+  // Update app title/logo
+  const logo = document.querySelector('.auth-logo');
+  if (logo) logo.innerHTML = 'Stoc<span>Voce</span> <small style="font-size:14px;opacity:0.7">' + cfg.icon + '</small>';
+  
+  // Update toolbar tabs labels
+  updateToolbarLabels(cfg);
+  
+  // Update voice commands
+  if (typeof VOICE_COMMANDS !== 'undefined' && VOICE_COMMANDS.ro) {
+    cfg.voiceKeywords.in.forEach(kw => { if (!VOICE_COMMANDS.ro.in.includes(kw)) VOICE_COMMANDS.ro.in.push(kw); });
+    cfg.voiceKeywords.out.forEach(kw => { if (!VOICE_COMMANDS.ro.out.includes(kw)) VOICE_COMMANDS.ro.out.push(kw); });
+  }
+  
+  // Show/hide industry-specific toolbar buttons
+  showIndustryButtons(cfg);
+  
+  // Update depot title
+  const depotTitle = document.getElementById('depot-title');
+  if (depotTitle) depotTitle.textContent = cfg.productLabel + 'e ' + cfg.icon;
+  
+  // Update add-modal labels
+  updateAddModalLabels(cfg);
+  
+  setFeedback(cfg.icon + ' Modul ' + cfg.name + ' activat!', 'ok');
+}
+
+function updateToolbarLabels(cfg) {
+  const tabMap = {
+    depozit: { 'tab-stoc': 'STOC', 'tab-rapoarte': 'RAPOARTE', 'tab-clienti': 'CLIENȚI', 'tab-depozit': 'DEPOZIT' },
+    restaurant: { 'tab-stoc': 'INGREDIENTE', 'tab-rapoarte': 'RAPOARTE', 'tab-clienti': 'COMENZI', 'tab-depozit': 'FURNIZORI' },
+    retail: { 'tab-stoc': 'PRODUSE', 'tab-rapoarte': 'RAPOARTE', 'tab-clienti': 'CLIENȚI', 'tab-depozit': 'CASĂ' },
+    constructii: { 'tab-stoc': 'MATERIALE', 'tab-rapoarte': 'RAPOARTE', 'tab-clienti': 'ȘANTIERE', 'tab-depozit': 'UTILAJE' }
+  };
+  const labels = tabMap[currentIndustry] || tabMap.depozit;
+  Object.entries(labels).forEach(([id, label]) => {
+    const el = document.querySelector('[onclick*="' + id.replace('tab-','') + '"]');
+    if (el && el.textContent !== label) el.textContent = label;
+  });
+}
+
+function updateAddModalLabels(cfg) {
+  const nameLabel = document.querySelector('label[for="new-name"], .form-label');
+  if (nameLabel && nameLabel.textContent.includes('Nume')) nameLabel.textContent = cfg.productLabel.toUpperCase();
+  const locLabel = Array.from(document.querySelectorAll('.form-label')).find(el => el.textContent.includes('LOCAȚIE') || el.textContent.includes('RAFT'));
+  if (locLabel) locLabel.textContent = cfg.locationLabel.toUpperCase();
+  const qtyLabel = Array.from(document.querySelectorAll('.form-label')).find(el => el.textContent.includes('CANTITATE'));
+  if (qtyLabel) qtyLabel.textContent = cfg.qtyLabel.toUpperCase();
+  
+  // Update unit dropdown
+  const unitSelect = document.getElementById('new-unit');
+  if (unitSelect && cfg.units.length) {
+    unitSelect.innerHTML = cfg.units.map(u => '<option value="'+u+'">'+u+'</option>').join('');
+  }
+  // Update category suggestions
+  const catInput = document.getElementById('new-cat');
+  if (catInput) catInput.setAttribute('list', 'cats-' + currentIndustry);
+}
+
+function showIndustryButtons(cfg) {
+  // Hide all industry-specific buttons
+  document.querySelectorAll('[data-industry]').forEach(el => { el.style.display = 'none'; });
+  // Show current industry buttons
+  document.querySelectorAll('[data-industry="' + currentIndustry + '"], [data-industry="all"]').forEach(el => { el.style.display = ''; });
+}
+
+// Apply on load
+document.addEventListener('DOMContentLoaded', () => {
+  selectIndustry(currentIndustry);
+  setTimeout(applyIndustryTheme, 1000);
+});
+
+
+// ══════════════════════════════════════════
+// FUNCȚII RESTAURANT / HORECA
+// ══════════════════════════════════════════
+
+let menuItems = JSON.parse(localStorage.getItem('sv_menu') || '[]');
+let recipes = JSON.parse(localStorage.getItem('sv_recipes') || '[]');
+let wasteLog = JSON.parse(localStorage.getItem('sv_waste') || '[]');
+let tableOrders = JSON.parse(localStorage.getItem('sv_table_orders') || '{}');
+
+// MENIU RESTAURANT
+function addMenuItem(name, price, category, allergens, available) {
+  menuItems.push({ id: Date.now(), name, price: parseFloat(price)||0, category: category||'Fel principal', allergens: allergens||[], available: available!==false, created: new Date().toISOString() });
+  localStorage.setItem('sv_menu', JSON.stringify(menuItems));
+  setFeedback('✅ Preparat adăugat în meniu: ' + name + ' — ' + price + ' RON', 'ok');
+}
+
+function renderMenu() {
+  const el = document.getElementById('menu-content');
+  if (!el) { alert('Meniu: ' + menuItems.length + ' preparate'); return; }
+  const cats = [...new Set(menuItems.map(m=>m.category))];
+  el.innerHTML = cats.map(cat =>
+    '<div style="margin-bottom:16px"><div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #1e2530">' + cat + '</div>' +
+    menuItems.filter(m=>m.category===cat).map(m =>
+      '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:' + (m.available?'#181d24':'#111418') + ';border-radius:8px;margin-bottom:4px;opacity:' + (m.available?1:0.5) + '">' +
+      '<div><div style="font-weight:700;color:#e8ecf0">' + m.name + '</div>' +
+      (m.allergens.length?'<div style="font-size:10px;color:#ffa502">⚠️ '+m.allergens.join(', ')+'</div>':'') + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#ff6b9d">' + m.price.toFixed(2) + ' RON</div>' +
+      '<button onclick="toggleMenuItemAvailability(' + m.id + ')" style="background:' + (m.available?'rgba(0,229,160,0.2)':'rgba(255,71,87,0.2)') + ';border:none;border-radius:6px;color:' + (m.available?'#00e5a0':'#ff4757') + ';font-size:12px;padding:4px 8px;cursor:pointer;touch-action:manipulation">' + (m.available?'✓ ACTIV':'✗ INACTIV') + '</button>' +
+      '</div></div>'
+    ).join('')
+  ).join('');
+  document.getElementById('menu-modal').style.display = 'flex';
+}
+
+function toggleMenuItemAvailability(id) {
+  const item = menuItems.find(m=>m.id===id);
+  if (item) { item.available = !item.available; localStorage.setItem('sv_menu', JSON.stringify(menuItems)); renderMenu(); }
+}
+
+// REȚETE - CONSUM AUTOMAT INGREDIENTE
+function addRecipe(dishName, ingredients) {
+  recipes.push({ id: Date.now(), dishName, ingredients, created: new Date().toISOString() });
+  localStorage.setItem('sv_recipes', JSON.stringify(recipes));
+  setFeedback('✅ Rețetă salvată: ' + dishName + ' (' + ingredients.length + ' ingrediente)', 'ok');
+}
+
+function cookDish(dishName, portions) {
+  const recipe = recipes.find(r => normalizeText(r.dishName.toLowerCase()).includes(normalizeText(dishName.toLowerCase())));
+  if (!recipe) { setFeedback('❌ Rețeta nu există! Adaugă rețeta mai întâi.', 'err'); return; }
+  const portions_ = portions || 1;
+  for (const ing of recipe.ingredients) {
+    const product = findProduct(ing.name.split(' '));
+    if (!product) { setFeedback('⚠️ Ingredient lipsă: ' + ing.name, 'warn'); continue; }
+    const needed = ing.qty * portions_;
+    if (product.qty < needed) { setFeedback('❌ Stoc insuficient: ' + product.name + ' (necesar: ' + needed + ', disponibil: ' + product.qty + ')', 'err'); return; }
+    product.qty -= needed;
+    addLog('Rețetă: ' + dishName, 'OUT ' + needed + ' ' + product.unit + ' ' + product.name, 'out');
+  }
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('✅ ' + portions_ + 'x ' + dishName + ' preparat! Ingrediente scăzute automat.', 'ok');
+  speak(portions_ + ' portii ' + dishName + ' preparate. Ingrediente actualizate.');
+}
+
+// COMANDĂ PE MASĂ
+function addTableOrder(tableNo, items, waiter) {
+  const order = { id: Date.now(), tableNo, items, waiter: waiter||'', status: 'activ', total: items.reduce((s,i)=>s+i.qty*(i.price||0),0), created: new Date().toLocaleString('ro-RO') };
+  if (!tableOrders[tableNo]) tableOrders[tableNo] = [];
+  tableOrders[tableNo].push(order);
+  localStorage.setItem('sv_table_orders', JSON.stringify(tableOrders));
+  setFeedback('✅ Comandă masă ' + tableNo + ' adăugată! Total: ' + order.total.toFixed(2) + ' RON', 'ok');
+  speak('Comanda la masa ' + tableNo + ' inregistrata. Total ' + order.total.toFixed(0) + ' lei.');
+}
+
+function closeTable(tableNo) {
+  const orders = tableOrders[tableNo] || [];
+  const total = orders.reduce((s,o)=>s+o.total,0);
+  delete tableOrders[tableNo];
+  localStorage.setItem('sv_table_orders', JSON.stringify(tableOrders));
+  setFeedback('✅ Masa ' + tableNo + ' închisă. Total încasat: ' + total.toFixed(2) + ' RON', 'ok');
+  speak('Masa ' + tableNo + ' inchisa. Total ' + total.toFixed(0) + ' lei incasat.');
+}
+
+function showTablesDashboard() {
+  const activeTables = Object.keys(tableOrders);
+  const el = document.getElementById('tables-content');
+  const html = activeTables.length ? activeTables.map(tNo => {
+    const orders = tableOrders[tNo];
+    const total = orders.reduce((s,o)=>s+o.total,0);
+    const duration = Math.round((Date.now()-new Date(orders[0].created).getTime())/60000);
+    return '<div style="background:#181d24;border-radius:12px;padding:16px;border-left:4px solid #ff6b9d">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:24px;font-weight:900;color:#ff6b9d">MASA ' + tNo + '</div>' +
+      '<button onclick="closeTable(' + tNo + ')" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;padding:8px 14px;cursor:pointer;touch-action:manipulation">ÎNCHIDE & PLATĂ</button>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#6b7a8d">' + orders.length + ' comenzi · ' + duration + ' min · Ospătar: ' + (orders[0].waiter||'—') + '</div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#ffa502;margin-top:6px">' + total.toFixed(2) + ' RON</div>' +
+      '</div>';
+  }).join('') : '<div style="color:#6b7a8d;text-align:center;padding:30px;font-size:16px">🍽️ Nu există mese active</div>';
+  if (el) { el.innerHTML = html; document.getElementById('tables-modal').style.display = 'flex'; }
+}
+
+// DEȘEURI ALIMENTARE
+function logFoodWaste(productName, qty, unit, reason) {
+  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(productName.toLowerCase())));
+  const val = p ? qty*(p.price_buy||0) : 0;
+  wasteLog.push({ product: productName, qty, unit, reason: reason||'Expirat', val, date: new Date().toLocaleDateString('ro-RO'), ts: new Date().toISOString() });
+  localStorage.setItem('sv_waste', JSON.stringify(wasteLog.slice(-200)));
+  if (p) { p.qty = Math.max(0, p.qty-qty); saveStockToFirebase(); renderStock(); }
+  setFeedback('♻️ Deșeu înregistrat: ' + qty + ' ' + unit + ' ' + productName + (val?' (pierdere: '+val.toFixed(2)+' RON)':''), 'warn');
+}
+
+function showWasteReport() {
+  const totalVal = wasteLog.reduce((s,w)=>s+w.val,0);
+  const byReason = {};
+  wasteLog.forEach(w => { byReason[w.reason]=(byReason[w.reason]||0)+w.val; });
+  alert('♻️ Raport Deșeuri:
+
+Total pierderi: ' + totalVal.toFixed(0) + ' RON
+
+Pe motive:
+' + Object.entries(byReason).map(([r,v])=>r+': '+v.toFixed(0)+' RON').join('
+'));
+}
+
+// ══════════════════════════════════════════
+// FUNCȚII RETAIL / CASĂ
+// ══════════════════════════════════════════
+
+let promotions = JSON.parse(localStorage.getItem('sv_promotions') || '[]');
+let cashRegister = JSON.parse(localStorage.getItem('sv_cash') || '{"total":0,"transactions":[]}');
+let posCart = [];
+
+// PROMOȚII
+function addPromotion(name, type, value, productIds, validUntil) {
+  promotions.push({ id: Date.now(), name, type: type||'pct', value: parseFloat(value)||0, productIds: productIds||[], validUntil, active: true, created: new Date().toISOString() });
+  localStorage.setItem('sv_promotions', JSON.stringify(promotions));
+  setFeedback('✅ Promoție activată: ' + name + ' (-' + value + (type==='pct'?'%':' RON') + ')', 'ok');
+}
+
+function getActivePromoPrice(productId, basePrice) {
+  const now = new Date().toISOString().slice(0,10);
+  const promo = promotions.find(p => p.active && (!p.validUntil || p.validUntil >= now) && (!p.productIds.length || p.productIds.includes(productId)));
+  if (!promo) return basePrice;
+  return promo.type==='pct' ? basePrice*(1-promo.value/100) : Math.max(0, basePrice-promo.value);
+}
+
+// CASĂ DE MARCAT (POS)
+function posAddItem(productId, qty) {
+  const p = stock.find(s=>s.id===productId);
+  if (!p) return;
+  const price = getActivePromoPrice(productId, p.price_sell||0);
+  const existing = posCart.find(i=>i.productId===productId);
+  if (existing) existing.qty += (qty||1);
+  else posCart.push({ productId, name:p.name, qty:qty||1, unit:p.unit, price, originalPrice:p.price_sell||0 });
+  renderPOSCart();
+}
+
+function renderPOSCart() {
+  const el = document.getElementById('pos-cart-items');
+  const totalEl = document.getElementById('pos-total');
+  if (!el) return;
+  const total = posCart.reduce((s,i)=>s+i.qty*i.price,0);
+  el.innerHTML = posCart.map((item,i) =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#181d24;border-radius:8px;margin-bottom:4px">' +
+    '<div><div style="font-weight:700;color:#e8ecf0;font-size:13px">' + item.name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + item.qty + ' x ' + item.price.toFixed(2) + ' RON' + (item.price<item.originalPrice?' 🏷️':'') + '</div></div>' +
+    '<div style="display:flex;align-items:center;gap:6px">' +
+    '<span style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;color:#ffa502">' + (item.qty*item.price).toFixed(2) + '</span>' +
+    '<button onclick="posCart.splice('+i+',1);renderPOSCart()" style="background:none;border:none;color:#ff4757;font-size:16px;cursor:pointer;touch-action:manipulation">✕</button>' +
+    '</div></div>'
+  ).join('') || '<div style="color:#6b7a8d;text-align:center;padding:16px">Coș gol</div>';
+  if (totalEl) totalEl.textContent = total.toFixed(2) + ' RON';
+}
+
+function posCheckout(paymentMethod) {
+  if (!posCart.length) { setFeedback('Coșul POS este gol!', 'warn'); return; }
+  const total = posCart.reduce((s,i)=>s+i.qty*i.price,0);
+  posCart.forEach(item => {
+    const p = stock.find(s=>s.id===item.productId);
+    if (p) { p.qty -= item.qty; addLog('Vânzare POS: '+item.name,'OUT '+item.qty+' '+item.unit+' '+item.name,'out'); }
+  });
+  cashRegister.total += total;
+  cashRegister.transactions.push({ total, method: paymentMethod||'numerar', items: posCart.length, ts: new Date().toISOString() });
+  localStorage.setItem('sv_cash', JSON.stringify(cashRegister));
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('✅ Vânzare finalizată! Total: ' + total.toFixed(2) + ' RON (' + (paymentMethod||'numerar') + ')', 'ok');
+  speak('Vanzare finalizata. Total ' + total.toFixed(0) + ' lei. ' + (paymentMethod||'numerar') + '.');
+  posCart = []; renderPOSCart();
+  document.getElementById('pos-modal').style.display = 'none';
+}
+
+function showCashReport() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayTx = cashRegister.transactions.filter(t=>t.ts.startsWith(today));
+  const todayTotal = todayTx.reduce((s,t)=>s+t.total,0);
+  setFeedback('💰 Casă azi: ' + todayTotal.toFixed(2) + ' RON (' + todayTx.length + ' tranzacții)', 'ok');
+  speak('Casa azi: ' + todayTotal.toFixed(0) + ' lei din ' + todayTx.length + ' tranzactii.');
+}
+
+// ══════════════════════════════════════════
+// FUNCȚII CONSTRUCȚII / ȘANTIER
+// ══════════════════════════════════════════
+
+let constructionSites = JSON.parse(localStorage.getItem('sv_sites') || '[]');
+let equipmentLog = JSON.parse(localStorage.getItem('sv_equipment') || '[]');
+let workerAllocation = JSON.parse(localStorage.getItem('sv_workers') || '{}');
+let safetyChecks = JSON.parse(localStorage.getItem('sv_safety') || '[]');
+
+// GESTIONARE ȘANTIERE
+function addConstructionSite(name, address, manager, budget, startDate, endDate) {
+  constructionSites.push({ id: Date.now(), name, address, manager, budget: parseFloat(budget)||0, spent:0, startDate, endDate, status:'activ', materials:[], created: new Date().toISOString() });
+  localStorage.setItem('sv_sites', JSON.stringify(constructionSites));
+  setFeedback('✅ Șantier adăugat: ' + name, 'ok');
+  speak('Santier ' + name + ' adaugat.');
+}
+
+function sendMaterialToSite(siteId, productId, qty) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  const p = stock.find(s=>s.id===productId);
+  if (!site || !p) { setFeedback('❌ Șantier sau produs negăsit!', 'err'); return; }
+  if (p.qty < qty) { setFeedback('❌ Stoc insuficient: ' + p.name, 'err'); return; }
+  p.qty -= qty;
+  site.spent += qty*(p.price_buy||0);
+  if (!site.materials) site.materials = [];
+  site.materials.push({ product: p.name, qty, unit:p.unit, date: new Date().toLocaleDateString('ro-RO'), value: qty*(p.price_buy||0) });
+  saveStockToFirebase(); renderStock(); updateStats();
+  localStorage.setItem('sv_sites', JSON.stringify(constructionSites));
+  addLog('Șantier: '+site.name, 'OUT '+qty+' '+p.unit+' '+p.name, 'out');
+  setFeedback('✅ ' + qty + ' ' + p.unit + ' ' + p.name + ' trimise la ' + site.name, 'ok');
+  speak(qty + ' ' + p.unit + ' ' + p.name + ' trimise la santier ' + site.name + '.');
+}
+
+function showSitesDashboard() {
+  const el = document.getElementById('sites-content');
+  const html = constructionSites.filter(s=>s.status==='activ').map(site => {
+    const budgetPct = site.budget>0 ? Math.min(100,Math.round(site.spent/site.budget*100)) : 0;
+    const matCount = (site.materials||[]).length;
+    return '<div style="background:#181d24;border-radius:12px;padding:16px;margin-bottom:10px;border-left:4px solid #fd9644">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">' +
+      '<div><div style="font-weight:700;color:#e8ecf0;font-size:15px">🏗️ ' + site.name + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + site.address + ' · Manager: ' + site.manager + '</div></div>' +
+      '<div style="text-align:right"><div style="font-size:11px;color:#6b7a8d">' + (site.startDate||'') + ' → ' + (site.endDate||'?') + '</div></div>' +
+      '</div>' +
+      '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#6b7a8d">Buget utilizat</span><span style="color:' + (budgetPct>90?'#ff4757':budgetPct>70?'#ffa502':'#00e5a0') + '">' + site.spent.toFixed(0) + ' / ' + site.budget.toFixed(0) + ' RON (' + budgetPct + '%)</span></div>' +
+      '<div style="height:6px;background:#1e2530;border-radius:3px"><div style="height:100%;width:'+budgetPct+'%;background:' + (budgetPct>90?'#ff4757':budgetPct>70?'#ffa502':'#00e5a0') + ';border-radius:3px;transition:width 0.5s"></div></div>' +
+      '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + matCount + ' livrări de materiale</div>' +
+      '</div>';
+  }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există șantiere active.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('sites-modal').style.display = 'flex'; }
+}
+
+// UTILAJE & ECHIPAMENTE
+function logEquipmentUsage(equipmentName, siteId, startHour, endHour, operator) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  const hours = parseFloat(endHour) - parseFloat(startHour);
+  equipmentLog.push({ equipment: equipmentName, site: site?site.name:'General', hours, operator: operator||'', date: new Date().toLocaleDateString('ro-RO'), ts: new Date().toISOString() });
+  localStorage.setItem('sv_equipment', JSON.stringify(equipmentLog.slice(-500)));
+  setFeedback('✅ Utilaj ' + equipmentName + ': ' + hours + 'h pe ' + (site?site.name:'șantier'), 'ok');
+}
+
+function getEquipmentHours(equipmentName) {
+  const entries = equipmentLog.filter(e => normalizeText(e.equipment.toLowerCase()).includes(normalizeText(equipmentName.toLowerCase())));
+  const total = entries.reduce((s,e)=>s+e.hours,0);
+  setFeedback('⚙️ ' + equipmentName + ': ' + total.toFixed(1) + ' ore total (' + entries.length + ' utilizări)', 'ok');
+  return total;
+}
+
+// ALOCĂRI MUNCITORI
+function allocateWorker(workerName, siteId, role, date) {
+  const key = date || new Date().toISOString().slice(0,10);
+  if (!workerAllocation[key]) workerAllocation[key] = [];
+  const site = constructionSites.find(s=>s.id===siteId);
+  workerAllocation[key].push({ worker:workerName, site:site?site.name:'General', siteId, role:role||'Muncitor', ts:new Date().toISOString() });
+  localStorage.setItem('sv_workers', JSON.stringify(workerAllocation));
+  setFeedback('✅ ' + workerName + ' alocat la ' + (site?site.name:'șantier') + ' ca ' + (role||'Muncitor'), 'ok');
+}
+
+function showWorkersDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayWorkers = workerAllocation[today] || [];
+  const el = document.getElementById('workers-content');
+  const html = todayWorkers.length ? todayWorkers.map(w =>
+    '<div style="display:flex;justify-content:space-between;padding:10px;background:#181d24;border-radius:8px;margin-bottom:5px">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + w.worker + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + w.role + '</div></div>' +
+    '<div style="text-align:right"><div style="font-size:12px;color:#fd9644;font-weight:700">' + w.site + '</div></div></div>'
+  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nicio alocare azi.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('workers-modal').style.display = 'flex'; }
+}
+
+// VERIFICARE SECURITATE ȘANTIER
+function logSafetyCheck(siteId, type, passed, notes, inspector) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  safetyChecks.push({ site:site?site.name:'General', type:type||'General', passed:!!passed, notes:notes||'', inspector:inspector||(userProfile?userProfile.name:''), date:new Date().toLocaleDateString('ro-RO'), ts:new Date().toISOString() });
+  localStorage.setItem('sv_safety', JSON.stringify(safetyChecks.slice(-200)));
+  if (!passed) {
+    triggerAlert('🦺 VERIFICARE SECURITATE EȘUATĂ: ' + (site?site.name:'Șantier') + ' — ' + type + ': ' + notes, 'err');
+    if (userProfile?.telegram_id) sendTelegramAlert('🦺 SECURITATE: ' + (site?site.name:'') + '
+' + type + ': EȘUAT
+' + notes, userProfile.telegram_id);
+  }
+  setFeedback((passed?'✅':'❌') + ' Verificare ' + type + ': ' + (passed?'TRECUT':'EȘUAT'), passed?'ok':'err');
+}
+
+function showSafetyReport() {
+  const recent = safetyChecks.slice().reverse().slice(0,15);
+  const failed = recent.filter(s=>!s.passed).length;
+  const el = document.getElementById('safety-content');
+  const html = (failed > 0 ? '<div style="background:rgba(255,71,87,0.1);border-radius:8px;padding:10px;margin-bottom:12px;color:#ff4757;font-size:13px">⚠️ ' + failed + ' verificări eșuate recent!</div>' : '') +
+    recent.map(s =>
+      '<div style="padding:8px;background:#181d24;border-radius:8px;margin-bottom:4px;border-left:3px solid ' + (s.passed?'#00e5a0':'#ff4757') + '">' +
+      '<div style="display:flex;justify-content:space-between"><span style="font-weight:700;color:#e8ecf0">' + s.type + '</span><span style="color:' + (s.passed?'#00e5a0':'#ff4757') + ';font-weight:700">' + (s.passed?'✓ TRECUT':'✗ EȘUAT') + '</span></div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + s.site + ' · ' + s.inspector + ' · ' + s.date + (s.notes?' · '+s.notes:'') + '</div></div>'
+    ).join('') || '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Nu există probleme recente!</div>';
+  if (el) { el.innerHTML = html; document.getElementById('safety-modal').style.display = 'flex'; }
+  else alert('🦺 Securitate: ' + safetyChecks.filter(s=>!s.passed).length + ' eșuate din ' + safetyChecks.length + ' verificări.');
+}
+
+// RAPORT ȘANTIER COMPLET
+function generateSiteReport(siteId) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  if (!site) return;
+  const budgetPct = site.budget>0?Math.round(site.spent/site.budget*100):0;
+  const workers = Object.values(workerAllocation).flat().filter(w=>w.siteId===siteId);
+  const safety = safetyChecks.filter(s=>s.site===site.name);
+  const report = [
+    '═══ RAPORT ȘANTIER: ' + site.name + ' ═══',
+    'Adresă: ' + site.address,
+    'Manager: ' + site.manager,
+    'Perioadă: ' + (site.startDate||'?') + ' → ' + (site.endDate||'?'),
+    'Status: ' + site.status.toUpperCase(),
+    '',
+    '💰 FINANCIAR:',
+    'Buget total: ' + site.budget.toFixed(0) + ' RON',
+    'Cheltuit: ' + site.spent.toFixed(0) + ' RON (' + budgetPct + '%)',
+    'Rămas: ' + (site.budget-site.spent).toFixed(0) + ' RON',
+    '',
+    '📦 MATERIALE LIVRATE: ' + (site.materials||[]).length + ' livrări',
+    ...(site.materials||[]).slice(0,10).map(m=>'  • '+m.product+': '+m.qty+' '+m.unit+' ('+m.value.toFixed(0)+' RON) — '+m.date),
+    '',
+    '👷 ALOCĂRI MUNCITORI: ' + workers.length,
+    '',
+    '🦺 VERIFICĂRI SECURITATE: ' + safety.length + ' (' + safety.filter(s=>!s.passed).length + ' eșuate)',
+    '',
+    'Generat: ' + new Date().toLocaleString('ro-RO')
+  ].join('
+');
+  
+  const blob = new Blob([report], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='Raport_Santier_'+site.name.replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.txt'; a.click();
+  URL.revokeObjectURL(url);
+  setFeedback('✅ Raport șantier generat pentru ' + site.name, 'ok');
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -2520,7 +3371,34 @@ function showAllProductScores() {
 <div id="auth-screen">
   <div class="auth-box">
     <div class="auth-logo">Stoc<span>Voce</span></div>
-    <div class="auth-sub">Sistem de gestiune depozit cu voce</div>
+    <div class="auth-sub">Sistem de gestiune cu voce — adaptabil oricărei industrii</div>
+    
+    <!-- INDUSTRY SELECTOR -->
+    <div id="industry-selector" style="margin:18px 0 8px">
+      <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;text-align:center">Alege industria ta</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onclick="selectIndustry('depozit')" id="ind-depozit" class="ind-btn active-ind" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+          <div style="font-size:24px;margin-bottom:4px">🏭</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#00e5a0;text-transform:uppercase">Depozit</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Logistică & stoc</div>
+        </button>
+        <button onclick="selectIndustry('restaurant')" id="ind-restaurant" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+          <div style="font-size:24px;margin-bottom:4px">🍽️</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Restaurant</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">HoReCa & meniu</div>
+        </button>
+        <button onclick="selectIndustry('retail')" id="ind-retail" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+          <div style="font-size:24px;margin-bottom:4px">🏪</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Casă / Retail</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Magazin & vânzări</div>
+        </button>
+        <button onclick="selectIndustry('constructii')" id="ind-constructii" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+          <div style="font-size:24px;margin-bottom:4px">🏗️</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Construcții</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Șantier & materiale</div>
+        </button>
+      </div>
+    </div>
 
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="showTab('login')">INTRĂ</button>
@@ -4405,6 +5283,110 @@ function showAllProductScores() {
     <div id="territory-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
+
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
 
 </body></html>');
   pw.document.close();
@@ -8374,6 +9356,110 @@ function openTVDashboard() {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>');
 }
 
@@ -9491,6 +10577,110 @@ async function exportReportWord() {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>';
 
   const blob = new Blob([html], {type:'application/msword'});
@@ -10281,6 +11471,7 @@ auth.onAuthStateChanged(async (user) => {
     setTimeout(() => { if(typeof initStockValueLive === "function") initStockValueLive(); }, 2000);
     loadLogFromFirebase();
 
+    if(typeof applyIndustryTheme==="function") setTimeout(applyIndustryTheme, 500);
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
@@ -18164,6 +19355,110 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -18885,6 +20180,110 @@ function showNoMovementReport() {
   </div>
 </div>
 
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -19465,6 +20864,110 @@ function showNoMovementReport() {
     <div id="territory-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
   </div>
 </div>
+
+
+<!-- MENU MODAL (Restaurant) -->
+<div id="menu-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍽️ Meniu Restaurant</div>
+      <button onclick="document.getElementById('menu-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="menu-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
+      <input id="new-dish-name" placeholder="Nume preparat" style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-price" type="number" placeholder="Preț RON" style="width:80px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <input id="new-dish-cat" placeholder="Categorie" style="width:100px;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:12px;padding:8px;outline:none">
+      <button onclick="addMenuItem(document.getElementById('new-dish-name').value,document.getElementById('new-dish-price').value,document.getElementById('new-dish-cat').value);renderMenu()" style="background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:8px 14px;cursor:pointer;touch-action:manipulation">+</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES MODAL (Restaurant) -->
+<div id="tables-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:540px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🪑 Mese Active</div>
+      <button onclick="document.getElementById('tables-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="tables-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- POS MODAL (Retail) -->
+<div id="pos-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏪 Casă de Marcat</div>
+      <button onclick="document.getElementById('pos-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div style="padding:12px 24px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <input id="pos-search" placeholder="Caută produs de adăugat..." oninput="const q=this.value;const res=stock.filter(p=>normalizeText(p.name.toLowerCase()).includes(normalizeText(q.toLowerCase()))).slice(0,5);document.getElementById('pos-results').innerHTML=res.map(p=>'<div onclick=\'posAddItem('+p.id+')\'style=\'padding:8px;background:#181d24;border-radius:6px;margin-bottom:3px;cursor:pointer;color:#e8ecf0;font-size:13px\'>'+p.name+' — <span style=\'color:#ffa502\'>'+p.price_sell.toFixed(2)+' RON</span></div>').join('')" style="width:100%;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:10px;outline:none">
+      <div id="pos-results" style="margin-top:6px;max-height:120px;overflow-y:auto"></div>
+    </div>
+    <div id="pos-cart-items" style="padding:12px 24px;overflow-y:auto;flex:1;min-height:100px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-size:14px;color:#6b7a8d">TOTAL</span>
+        <span id="pos-total" style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#ffa502">0.00 RON</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="posCheckout('numerar')" style="flex:1;background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💵 NUMERAR</button>
+        <button onclick="posCheckout('card')" style="flex:1;background:#4d9fff;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;padding:12px;cursor:pointer;touch-action:manipulation">💳 CARD</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SITES MODAL (Constructii) -->
+<div id="sites-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:560px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏗️ Șantiere Active</div>
+      <button onclick="document.getElementById('sites-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="sites-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume șantier:');if(n){const a=prompt('Adresă:');const m=prompt('Manager:');const b=prompt('Buget RON:');addConstructionSite(n,a,m,b);showSitesDashboard()}" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ ȘANTIER NOU →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKERS MODAL (Constructii) -->
+<div id="workers-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">👷 Muncitori Azi</div>
+      <button onclick="document.getElementById('workers-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="workers-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+<!-- SAFETY MODAL (Constructii) -->
+<div id="safety-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🦺 Securitate Șantier</div>
+      <button onclick="document.getElementById('safety-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="safety-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+
+
+<datalist id="cats-depozit">
+  <option value="Materiale"><option value="Echipamente"><option value="Consumabile"><option value="Piese de schimb"><option value="Ambalaje"><option value="Chimice"><option value="Electrice">
+</datalist>
+<datalist id="cats-restaurant">
+  <option value="Carne"><option value="Legume"><option value="Fructe"><option value="Lactate"><option value="Băuturi"><option value="Condimente"><option value="Paste/Cereale"><option value="Uleiuri"><option value="Produse de curățenie"><option value="Ambalaje">
+</datalist>
+<datalist id="cats-retail">
+  <option value="Electronice"><option value="Îmbrăcăminte"><option value="Alimente"><option value="Cosmetice"><option value="Jucării"><option value="Sport"><option value="Casă&Grădină"><option value="Auto"><option value="Diverse">
+</datalist>
+<datalist id="cats-constructii">
+  <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
+</datalist>
 
 </body>
 </html><!-- SORT BAR -->
