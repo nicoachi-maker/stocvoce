@@ -857,6 +857,114 @@ function printProductLabel(productId) {
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
 
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
 </body></html>');
   win.document.close();
   setFeedback('✅ Etichetă generată pentru ' + p.name, 'ok');
@@ -1393,6 +1501,114 @@ function pickingListGenerate(orderItems) {
 <datalist id="cats-constructii">
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
+
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
 
 </body></html>');
   win.document.close();
@@ -2199,6 +2415,114 @@ function packingSlipGenerate(orderId, items) {
 <datalist id="cats-constructii">
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
+
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
 
 </body></html>');
   win.document.close();
@@ -3357,6 +3681,1010 @@ function generateSiteReport(siteId) {
   a.href=url; a.download='Raport_Santier_'+site.name.replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.txt'; a.click();
   URL.revokeObjectURL(url);
   setFeedback('✅ Raport șantier generat pentru ' + site.name, 'ok');
+}
+
+
+// ══════════════════════════════════════════
+// RESTAURANT - FUNCȚII COMPLETE
+// ══════════════════════════════════════════
+
+// REZERVARE MASĂ
+let tableReservations = JSON.parse(localStorage.getItem('sv_reservations_tables') || '[]');
+
+function addTableReservation(name, tableNo, persons, date, time, phone) {
+  tableReservations.push({ id: Date.now(), name, tableNo, persons: parseInt(persons)||2, date, time, phone: phone||'', status: 'confirmat', created: new Date().toISOString() });
+  localStorage.setItem('sv_reservations_tables', JSON.stringify(tableReservations));
+  setFeedback('✅ Rezervare: ' + name + ' masa ' + tableNo + ' pe ' + date + ' ora ' + time, 'ok');
+  speak('Rezervare confirmata pentru ' + name + ' la masa ' + tableNo + '.');
+}
+
+function showTableReservations() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayRes = tableReservations.filter(r => r.date === today || r.date >= today).sort((a,b)=>a.time.localeCompare(b.time));
+  const el = document.getElementById('table-reservations-content');
+  const html = todayRes.length ? todayRes.map(r =>
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#181d24;border-radius:8px;margin-bottom:5px;border-left:3px solid ' + (r.date===today?'#ff6b9d':'#6b7a8d') + '">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + r.name + ' — Masa ' + r.tableNo + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + r.date + ' · ' + r.time + ' · ' + r.persons + ' persoane' + (r.phone?' · '+r.phone:'') + '</div></div>' +
+    '<button onclick="tableReservations=tableReservations.filter(x=>x.id!=='+r.id+');localStorage.setItem('sv_reservations_tables',JSON.stringify(tableReservations));showTableReservations()" style="background:none;border:none;color:#ff4757;font-size:18px;cursor:pointer;touch-action:manipulation">✕</button>' +
+    '</div>'
+  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nicio rezervare.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('table-reservations-modal').style.display = 'flex'; }
+}
+
+// SPLIT BILL
+function splitBill(tableNo, numPersons) {
+  const orders = tableOrders[tableNo] || [];
+  if (!orders.length) { setFeedback('Masa ' + tableNo + ' nu are comenzi!', 'warn'); return; }
+  const total = orders.reduce((s,o)=>s+o.total,0);
+  const persons = parseInt(numPersons) || 2;
+  const perPerson = total / persons;
+  setFeedback('💳 Split bill masa ' + tableNo + ': ' + total.toFixed(2) + ' RON ÷ ' + persons + ' = ' + perPerson.toFixed(2) + ' RON/persoană', 'ok');
+  speak('Total ' + total.toFixed(0) + ' lei impartit la ' + persons + ' persoane: ' + perPerson.toFixed(0) + ' lei per persoana.');
+  alert('🧾 Split Bill — Masa ' + tableNo + '
+
+Total: ' + total.toFixed(2) + ' RON
+Persoane: ' + persons + '
+Per persoană: ' + perPerson.toFixed(2) + ' RON
+
+Tip 10%: ' + (perPerson*0.1).toFixed(2) + ' RON/persoană');
+}
+
+// BON FISCAL RESTAURANT
+function printRestaurantBon(tableNo, paymentMethod) {
+  const orders = tableOrders[tableNo] || [];
+  if (!orders.length) { setFeedback('Masa ' + tableNo + ' nu are comenzi!', 'warn'); return; }
+  const total = orders.reduce((s,o)=>s+o.total,0);
+  const tva = total * 0.09; // Restaurant TVA 9%
+  const now = new Date().toLocaleString('ro-RO');
+  const depot = userProfile ? userProfile.depot : 'Restaurant';
+  const bonNo = 'BON-' + Date.now().toString().slice(-6);
+  
+  const win = window.open('','_blank','width=320,height=500');
+  win.document.write('<html><head><title>Bon ' + bonNo + '</title><style>body{font-family:monospace;font-size:12px;margin:10px;width:280px}h3{text-align:center;font-size:14px}.center{text-align:center}.right{text-align:right}.line{border-top:1px dashed #000;margin:6px 0}@media print{button{display:none}}</style></head><body>');
+  win.document.write('<h3>' + depot + '</h3>');
+  win.document.write('<div class="center">' + now + '</div>');
+  win.document.write('<div class="center">Masa ' + tableNo + ' · ' + bonNo + '</div>');
+  win.document.write('<div class="line"></div>');
+  orders.forEach(o => {
+    o.items.forEach(i => {
+      win.document.write('<div style="display:flex;justify-content:space-between"><span>' + i.name + ' x' + i.qty + '</span><span>' + (i.qty*i.price).toFixed(2) + '</span></div>');
+    });
+  });
+  win.document.write('<div class="line"></div>');
+  win.document.write('<div style="display:flex;justify-content:space-between"><span>Subtotal</span><span>' + (total-tva).toFixed(2) + ' RON</span></div>');
+  win.document.write('<div style="display:flex;justify-content:space-between"><span>TVA 9%</span><span>' + tva.toFixed(2) + ' RON</span></div>');
+  win.document.write('<div class="line"></div>');
+  win.document.write('<div style="display:flex;justify-content:space-between;font-weight:bold;font-size:14px"><span>TOTAL</span><span>' + total.toFixed(2) + ' RON</span></div>');
+  win.document.write('<div class="center" style="margin-top:6px">Plată: ' + (paymentMethod||'numerar') + '</div>');
+  win.document.write('<div class="line"></div><div class="center">Vă mulțumim!</div>');
+  win.document.write('<br><button onclick="window.print()">🖨️ Printează</button>');
+  win.document.write('
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
+</body></html>'); win.document.close();
+  setFeedback('✅ Bon generat pentru masa ' + tableNo, 'ok');
+}
+
+// COST PORȚIE CALCULAT
+function calculatePortionCost(dishName) {
+  const recipe = recipes.find(r => normalizeText(r.dishName.toLowerCase()).includes(normalizeText(dishName.toLowerCase())));
+  if (!recipe) { setFeedback('Rețeta nu există!', 'warn'); return 0; }
+  const cost = recipe.ingredients.reduce((s, ing) => {
+    const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(ing.name.toLowerCase())));
+    return s + (p ? ing.qty * (p.price_buy||0) : 0);
+  }, 0);
+  const menuItem = menuItems.find(m => normalizeText(m.name.toLowerCase()).includes(normalizeText(dishName.toLowerCase())));
+  const price = menuItem ? menuItem.price : 0;
+  const margin = price > 0 ? ((price-cost)/price*100).toFixed(1) : 0;
+  setFeedback('💰 ' + dishName + ': cost ' + cost.toFixed(2) + ' RON/porție · preț ' + price.toFixed(2) + ' RON · marjă ' + margin + '%', 'ok');
+  speak('Cost portie ' + dishName + ': ' + cost.toFixed(0) + ' lei. Marja: ' + margin + ' la suta.');
+  return cost;
+}
+
+// ALERTĂ INGREDIENTE SUB PRAG
+function checkMenuIngredients() {
+  const alerts = [];
+  recipes.forEach(recipe => {
+    const menuItem = menuItems.find(m => normalizeText(m.name.toLowerCase()) === normalizeText(recipe.dishName.toLowerCase()));
+    if (!menuItem || !menuItem.available) return;
+    recipe.ingredients.forEach(ing => {
+      const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(ing.name.toLowerCase())));
+      if (p && p.qty < ing.qty * 5) { // Less than 5 portions available
+        alerts.push({ dish: recipe.dishName, ingredient: ing.name, available: p.qty, needed: ing.qty, portions: Math.floor(p.qty/ing.qty) });
+      }
+    });
+  });
+  if (alerts.length) {
+    const msg = alerts.slice(0,3).map(a => a.dish + ': ' + a.ingredient + ' (doar ' + a.portions + ' porții)').join('
+');
+    triggerAlert('🍽️ ATENȚIE: Ingrediente insuficiente pentru meniu:
+' + msg, 'warn');
+    if (userProfile?.telegram_id) sendTelegramAlert('🍽️ Ingrediente insuficiente:
+' + msg, userProfile.telegram_id);
+  }
+  return alerts;
+}
+setInterval(function(){ if(currentIndustry==='restaurant' && typeof checkMenuIngredients==='function') checkMenuIngredients(); }, 1800000);
+
+// RAPORT VÂNZĂRI PER PREPARAT
+function dishSalesReport() {
+  const dishSales = {};
+  Object.values(tableOrders).flat().forEach(order => {
+    (order.items||[]).forEach(item => {
+      if (!dishSales[item.name]) dishSales[item.name] = { count:0, revenue:0 };
+      dishSales[item.name].count += item.qty;
+      dishSales[item.name].revenue += item.qty * item.price;
+    });
+  });
+  const sorted = Object.entries(dishSales).sort((a,b)=>b[1].revenue-a[1].revenue);
+  const el = document.getElementById('dish-sales-content');
+  const html = sorted.length ? sorted.map(([name, data], i) =>
+    '<div style="display:flex;justify-content:space-between;padding:9px;background:#181d24;border-radius:8px;margin-bottom:4px;border-left:3px solid ' + (i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'#1e2530') + '">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">' + (i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':'') + name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + data.count + ' porții</div></div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;color:#ff6b9d">' + data.revenue.toFixed(0) + ' RON</div>' +
+    '</div>'
+  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există vânzări înregistrate.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('dish-sales-modal').style.display = 'flex'; }
+}
+
+// INVENTAR ZILNIC BUCĂTĂRIE
+function kitchenDailyInventory() {
+  const el = document.getElementById('kitchen-inventory-content');
+  if (!el) return;
+  const kitchenCats = ['Carne','Legume','Fructe','Lactate','Condimente','Paste/Cereale'];
+  const kitchenItems = stock.filter(p => kitchenCats.some(c => (p.cat||'').includes(c)));
+  el.innerHTML = kitchenItems.map(p => {
+    const status = p.expiry && (new Date(p.expiry)-new Date())<86400000*3 ? '⚠️' : p.qty<=p.min ? '🔴' : '✅';
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:#181d24;border-radius:8px;margin-bottom:4px">' +
+      '<div><div style="font-weight:700;color:#e8ecf0">' + status + ' ' + p.name + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + (p.cat||'') + (p.expiry?' · exp:'+p.expiry:'') + '</div></div>' +
+      '<div style="display:flex;align-items:center;gap:8px">' +
+      '<input type="number" value="'+p.qty+'" onchange="const p=stock.find(s=>s.id==='+p.id+');if(p){p.qty=parseInt(this.value)||0;saveStockToFirebase();renderStock();}" style="width:60px;background:#111418;border:1px solid #1e2530;border-radius:6px;color:#e8ecf0;font-size:14px;font-weight:700;padding:4px;text-align:center;outline:none">' +
+      '<span style="color:#6b7a8d;font-size:12px">' + p.unit + '</span>' +
+      '</div></div>';
+  }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există ingrediente de verificat.</div>';
+  document.getElementById('kitchen-inventory-modal').style.display = 'flex';
+}
+
+// MENIU DIGITAL QR
+function generateMenuQR() {
+  if (typeof QRCode === 'undefined') { setFeedback('QRCode library necesară!', 'warn'); return; }
+  const menuUrl = window.location.origin + '?menu=1&depot=' + encodeURIComponent(userProfile?userProfile.depot:'');
+  const div = document.createElement('div');
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px';
+  div.innerHTML = '<div style="background:#fff;padding:20px;border-radius:12px" id="qr-menu-container"></div>' +
+    '<div style="color:#fff;font-size:13px;text-align:center">Scanați pentru meniu digital</div>' +
+    '<button onclick="this.parentNode.remove()" style="background:#ff4757;border:none;border-radius:8px;color:#fff;padding:10px 20px;cursor:pointer;touch-action:manipulation">Închide</button>';
+  document.body.appendChild(div);
+  new QRCode(document.getElementById('qr-menu-container'), { text: menuUrl, width:200, height:200 });
+  setFeedback('✅ QR meniu generat!', 'ok');
+}
+
+// RAPORT FIFO ALIMENTE
+function foodFIFOReport() {
+  const expiringSoon = stock.filter(p => {
+    if (!p.expiry) return false;
+    const days = Math.ceil((new Date(p.expiry)-new Date())/86400000);
+    return days >= 0 && days <= 7;
+  }).sort((a,b) => a.expiry.localeCompare(b.expiry));
+  
+  setFeedback('📅 FIFO: ' + expiringSoon.length + ' produse expiră în 7 zile', expiringSoon.length>0?'warn':'ok');
+  if (expiringSoon.length) {
+    const msg = expiringSoon.slice(0,5).map(p => p.name + ': ' + p.qty + ' ' + p.unit + ' — ' + p.expiry).join('
+');
+    alert('📅 RAPORT FIFO — Folosiți mai întâi:
+
+' + msg + (expiringSoon.length>5?'
+...și '+(expiringSoon.length-5)+' mai multe':''));
+    if (userProfile?.telegram_id) sendTelegramAlert('📅 FIFO Alerte:
+' + msg, userProfile.telegram_id);
+  }
+}
+
+
+// ══════════════════════════════════════════
+// RETAIL - FUNCȚII COMPLETE
+// ══════════════════════════════════════════
+
+// CHITANȚĂ CLIENT
+function printRetailReceipt(items, total, paymentMethod, clientName) {
+  const now = new Date().toLocaleString('ro-RO');
+  const depot = userProfile ? userProfile.depot : 'Magazin';
+  const recNo = 'CH-' + Date.now().toString().slice(-6);
+  const tva = total * 0.19;
+  const win = window.open('','_blank','width=320,height=480');
+  win.document.write('<html><head><title>Chitanță ' + recNo + '</title><style>body{font-family:monospace;font-size:12px;margin:10px;width:280px}h3{text-align:center}div{margin:2px 0}.line{border-top:1px dashed #000;margin:5px 0}.bold{font-weight:bold;font-size:13px}@media print{button{display:none}}</style></head><body>');
+  win.document.write('<h3>' + depot + '</h3><div style="text-align:center">' + now + '</div><div style="text-align:center">' + recNo + '</div>');
+  if (clientName) win.document.write('<div style="text-align:center">Client: ' + clientName + '</div>');
+  win.document.write('<div class="line"></div>');
+  (items||posCart).forEach(i => win.document.write('<div style="display:flex;justify-content:space-between"><span>' + i.name + ' x' + i.qty + '</span><span>' + (i.qty*i.price).toFixed(2) + '</span></div>'));
+  win.document.write('<div class="line"></div>');
+  win.document.write('<div style="display:flex;justify-content:space-between"><span>Subtotal fără TVA</span><span>' + (total-tva).toFixed(2) + '</span></div>');
+  win.document.write('<div style="display:flex;justify-content:space-between"><span>TVA 19%</span><span>' + tva.toFixed(2) + '</span></div>');
+  win.document.write('<div class="line"></div><div style="display:flex;justify-content:space-between" class="bold"><span>TOTAL</span><span>' + total.toFixed(2) + ' RON</span></div>');
+  win.document.write('<div style="text-align:center;margin-top:5px">Plată: ' + (paymentMethod||'numerar') + '</div>');
+  win.document.write('<div class="line"></div><div style="text-align:center">Vă mulțumim pentru cumpărături!</div>');
+  win.document.write('<br><button onclick="window.print()">🖨️ Printează</button>
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
+</body></html>');
+  win.document.close();
+  setFeedback('✅ Chitanță ' + recNo + ' generată!', 'ok');
+}
+
+// RETUR CU BON
+function processRetailReturn(productId, qty, reason, originalReceiptNo) {
+  const p = stock.find(s=>s.id===productId);
+  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
+  p.qty += parseInt(qty)||0;
+  const refund = (parseInt(qty)||0) * (p.price_sell||0);
+  addLog('RETUR: ' + p.name + (originalReceiptNo?' (bon '+originalReceiptNo+')':''), 'IN ' + qty + ' ' + p.unit + ' — Motiv: ' + (reason||'Nerspecificat'), 'in');
+  saveStockToFirebase(); renderStock(); updateStats();
+  setFeedback('✅ Retur procesat: ' + qty + ' ' + p.unit + ' ' + p.name + ' · Ramburs: ' + refund.toFixed(2) + ' RON', 'ok');
+  speak('Retur procesat. Ramburs ' + refund.toFixed(0) + ' lei.');
+  if (typeof printRetailReceipt==='function') {
+    alert('↩️ RETUR PROCESAT
+
+Produs: ' + p.name + '
+Cantitate: ' + qty + ' ' + p.unit + '
+Motiv: ' + (reason||'—') + '
+Ramburs: ' + refund.toFixed(2) + ' RON');
+  }
+}
+
+// RAPORT VÂNZĂRI PE ORĂ
+function hourlySalesReport() {
+  const today = new Date().toISOString().slice(0,10);
+  const todayLog = log.filter(e=>e.type==='out'&&e.ts&&e.ts.startsWith(today));
+  const hourlyData = new Array(24).fill(0);
+  todayLog.forEach(e => { hourlyData[new Date(e.ts).getHours()]++; });
+  const peakHour = hourlyData.indexOf(Math.max(...hourlyData));
+  const el = document.getElementById('hourly-sales-content');
+  const maxVal = Math.max(...hourlyData,1);
+  const html = '<div style="font-size:13px;color:#e8ecf0;margin-bottom:10px">Ora de vârf: <span style="color:#ffa502;font-weight:700">' + String(peakHour).padStart(2,'0') + ':00</span></div>' +
+    '<div style="display:flex;gap:2px;align-items:flex-end;height:80px;margin-bottom:8px">' +
+    hourlyData.map((v,h) => '<div title="'+String(h).padStart(2,'0')+':00 — '+v+' vânzări" style="flex:1;background:rgba(255,165,2,'+(v/maxVal).toFixed(2)+');border-radius:2px 2px 0 0;min-height:2px;height:'+Math.max(2,Math.round(v/maxVal*70))+'px"></div>').join('') + '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7a8d"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>';
+  if (el) { el.innerHTML = html; document.getElementById('hourly-sales-modal').style.display = 'flex'; }
+  else alert('📊 Vânzări azi: ' + todayLog.length + ' tranzacții. Ora de vârf: ' + peakHour + ':00');
+}
+
+// GESTIUNE SCHIMB TURĂ CASĂ
+let cashShifts = JSON.parse(localStorage.getItem('sv_shifts') || '[]');
+
+function startCashShift(operatorName, initialCash) {
+  const shift = { id: Date.now(), operator: operatorName, startCash: parseFloat(initialCash)||0, startTime: new Date().toISOString(), sales:0, transactions:0, active:true };
+  cashShifts.push(shift);
+  localStorage.setItem('sv_shifts', JSON.stringify(cashShifts));
+  setFeedback('✅ Tură pornită pentru ' + operatorName + ' cu ' + initialCash + ' RON în casă', 'ok');
+  speak('Tura pornita pentru ' + operatorName + '.');
+}
+
+function endCashShift(countedCash) {
+  const active = cashShifts.find(s=>s.active);
+  if (!active) { setFeedback('Nu există tură activă!', 'warn'); return; }
+  active.active = false;
+  active.endTime = new Date().toISOString();
+  active.countedCash = parseFloat(countedCash)||0;
+  active.expectedCash = active.startCash + active.sales;
+  active.difference = active.countedCash - active.expectedCash;
+  localStorage.setItem('sv_shifts', JSON.stringify(cashShifts));
+  const diff = active.difference;
+  setFeedback((Math.abs(diff)<1?'✅':'⚠️') + ' Tură închisă: ' + active.operator + ' · Diferență: ' + diff.toFixed(2) + ' RON', diff<-1?'err':diff>1?'warn':'ok');
+  speak('Tura inchisa. ' + (Math.abs(diff)<1?'Fara diferente.':'Diferenta: ' + diff.toFixed(0) + ' lei.'));
+}
+
+// RAPORT PRODUSE CEL MAI VÂNDUTE (RETAIL)
+function topSellingProducts() {
+  const today = new Date().toISOString().slice(0,10);
+  const sales = {};
+  log.filter(e=>e.type==='out'&&e.ts&&e.ts.startsWith(today)).forEach(e => {
+    const match = (e.cmd||'').match(/OUT\s+(\d+)/);
+    const qty = match ? parseInt(match[1]) : 1;
+    const name = (e.cmd||'').replace(/OUT\s+\d+\s+\w+\s*/,'').trim();
+    if (name) { sales[name]=(sales[name]||0)+qty; }
+  });
+  const sorted = Object.entries(sales).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const el = document.getElementById('top-selling-content');
+  const html = sorted.length ? sorted.map(([name,qty],i) =>
+    '<div style="display:flex;justify-content:space-between;padding:8px;background:#181d24;border-radius:8px;margin-bottom:4px">' +
+    '<span style="color:#e8ecf0">' + (i===0?'🥇':i===1?'🥈':i===2?'🥉':'  ') + ' ' + name + '</span>' +
+    '<span style="color:#ffa502;font-weight:700">' + qty + ' buc</span></div>'
+  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există vânzări azi.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('top-selling-modal').style.display = 'flex'; }
+}
+
+// DISCOUNT MANUAL LA CASĂ
+function applyManualDiscount(discountPct) {
+  if (!posCart.length) { setFeedback('Coșul e gol!', 'warn'); return; }
+  const pct = parseFloat(discountPct)||0;
+  posCart.forEach(item => { item.price = item.price * (1-pct/100); });
+  renderPOSCart();
+  setFeedback('✅ Discount ' + pct + '% aplicat la toate produsele din coș!', 'ok');
+}
+
+// RAPORT MARFĂ LIPSĂ RAFT
+function shelfReplenishmentReport() {
+  const empty = stock.filter(p=>p.qty===0);
+  const low = stock.filter(p=>p.qty>0&&p.qty<=p.min);
+  const el = document.getElementById('shelf-report-content');
+  const html = '<div style="margin-bottom:14px"><div style="font-size:11px;color:#ff4757;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🔴 LIPSĂ DE PE RAFT (' + empty.length + ')</div>' +
+    empty.slice(0,10).map(p => '<div style="padding:7px;background:#181d24;border-radius:6px;margin-bottom:3px;display:flex;justify-content:space-between"><span style="color:#e8ecf0">' + p.name + '</span><span style="font-size:11px;color:#6b7a8d">' + (p.loc||'?') + '</span></div>').join('') +
+    '</div><div><div style="font-size:11px;color:#ffa502;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⚠️ STOC SCĂZUT (' + low.length + ')</div>' +
+    low.slice(0,10).map(p => '<div style="padding:7px;background:#181d24;border-radius:6px;margin-bottom:3px;display:flex;justify-content:space-between"><span style="color:#e8ecf0">' + p.name + '</span><span style="font-size:11px;color:#ffa502">' + p.qty + '/' + p.min + ' min</span></div>').join('') + '</div>';
+  if (el) { el.innerHTML = html; document.getElementById('shelf-report-modal').style.display = 'flex'; }
+}
+
+// PUNCTE FIDELITATE LA CASĂ
+function addLoyaltyPointsFromSale(clientName, saleTotal) {
+  const points = Math.floor(saleTotal / 10); // 1 punct per 10 RON
+  if (!points || !clientName) return;
+  const key = normalizeText(clientName.toLowerCase());
+  const existing = JSON.parse(localStorage.getItem('sv_loyalty_'+key)||'{"points":0,"total":0}');
+  existing.points += points;
+  existing.total += saleTotal;
+  localStorage.setItem('sv_loyalty_'+key, JSON.stringify(existing));
+  setFeedback('⭐ ' + clientName + ' a primit ' + points + ' puncte! Total: ' + existing.points + ' puncte', 'ok');
+}
+
+// EXPORT LISTA PREȚURI
+function exportPriceList() {
+  const cats = [...new Set(stock.map(p=>p.cat||'General'))].sort();
+  let html = '<html><head><title>Lista Prețuri</title><style>body{font-family:Arial;margin:20px}h1{color:#333}h2{color:#555;border-bottom:1px solid #ddd}table{width:100%;border-collapse:collapse}th{background:#333;color:#fff;padding:8px}td{padding:6px;border-bottom:1px solid #eee}@media print{button{display:none}}</style></head><body>';
+  html += '<h1>📋 Lista Prețuri — ' + (userProfile?userProfile.depot:'') + '</h1>';
+  html += '<p style="color:#888">Actualizat: ' + new Date().toLocaleDateString('ro-RO') + '</p>';
+  cats.forEach(cat => {
+    const items = stock.filter(p=>(p.cat||'General')===cat&&p.price_sell>0);
+    if (!items.length) return;
+    html += '<h2>' + cat + '</h2><table><tr><th>Produs</th><th>UM</th><th>Preț</th></tr>';
+    items.forEach(p => html += '<tr><td>' + p.name + '</td><td>' + p.unit + '</td><td>' + p.price_sell.toFixed(2) + ' RON</td></tr>');
+    html += '</table>';
+  });
+  html += '<br><button onclick="window.print()">🖨️ Printează</button>
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
+</body></html>';
+  const win = window.open('','_blank'); win.document.write(html); win.document.close();
+  setFeedback('✅ Listă prețuri generată!', 'ok');
+}
+
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - FUNCȚII COMPLETE
+// ══════════════════════════════════════════
+
+// DEVIZ LUCRARE PDF
+function generateDeviz(siteId, lucrari) {
+  if (!window.jspdf) { setFeedback('jsPDF indisponibil!', 'err'); return; }
+  const site = constructionSites.find(s=>s.id===siteId);
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const devizNo = 'DEV-' + Date.now().toString().slice(-6);
+  const now = new Date().toLocaleDateString('ro-RO');
+  
+  doc.setFillColor(17,20,24); doc.rect(0,0,210,42,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(232,236,240);
+  doc.text('DEVIZ LUCRARE', 14, 20);
+  doc.setFontSize(10); doc.setTextColor(253,150,68);
+  doc.text(devizNo + '  ·  ' + now, 14, 30);
+  doc.setTextColor(153,168,184);
+  doc.text('Șantier: ' + (site?site.name:'—') + '  ·  Manager: ' + (site?site.manager:'—'), 14, 37);
+
+  const total = (lucrari||[]).reduce((s,l)=>s+l.qty*(l.unitPrice||0),0);
+  doc.autoTable({
+    startY:48,
+    head:[['Nr.','Descriere lucrare','U.M.','Cant.','Preț unit. (RON)','Total (RON)']],
+    body:(lucrari||[]).map((l,i)=>[i+1,l.name,l.unit||'m²',l.qty,(l.unitPrice||0).toFixed(2),(l.qty*(l.unitPrice||0)).toFixed(2)]),
+    styles:{fontSize:9,textColor:[0,0,0],fillColor:[255,255,255]},
+    headStyles:{fillColor:[17,20,24],textColor:[253,150,68],fontStyle:'bold'},
+    alternateRowStyles:{fillColor:[245,245,245]},margin:{left:14,right:14}
+  });
+  const fy = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(253,150,68);
+  doc.text('TOTAL DEVIZ: ' + total.toFixed(2) + ' RON', 14, fy);
+  doc.text('TVA 19%: ' + (total*0.19).toFixed(2) + ' RON', 14, fy+8);
+  doc.text('TOTAL CU TVA: ' + (total*1.19).toFixed(2) + ' RON', 14, fy+16);
+  doc.save(devizNo + '_' + (site?site.name:'santier').replace(/\s+/g,'_') + '.pdf');
+  setFeedback('✅ Deviz ' + devizNo + ' generat!', 'ok');
+  speak('Deviz lucrare generat.');
+}
+
+// SITUAȚIE LUCRĂRI
+let workProgress = JSON.parse(localStorage.getItem('sv_progress') || '{}');
+
+function updateSiteProgress(siteId, phase, completedPct, notes) {
+  if (!workProgress[siteId]) workProgress[siteId] = [];
+  workProgress[siteId].push({ phase, pct: parseInt(completedPct)||0, notes: notes||'', date: new Date().toLocaleDateString('ro-RO'), ts: new Date().toISOString(), user: userProfile?userProfile.name:'' });
+  localStorage.setItem('sv_progress', JSON.stringify(workProgress));
+  const site = constructionSites.find(s=>s.id===siteId);
+  setFeedback('✅ Progres ' + (site?site.name:'Șantier') + ': ' + phase + ' — ' + completedPct + '%', 'ok');
+}
+
+function showSiteProgress(siteId) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  const progress = workProgress[siteId] || [];
+  const phases = {};
+  progress.forEach(p => { if (!phases[p.phase] || p.ts > phases[p.phase].ts) phases[p.phase] = p; });
+  const totalPct = Object.values(phases).length ? Math.round(Object.values(phases).reduce((s,p)=>s+p.pct,0)/Object.values(phases).length) : 0;
+  const el = document.getElementById('progress-content');
+  const html = '<div style="text-align:center;margin-bottom:16px"><div style="font-family:Barlow Condensed,sans-serif;font-size:48px;font-weight:900;color:' + (totalPct>=100?'#00e5a0':totalPct>=70?'#ffa502':'#fd9644') + '">' + totalPct + '%</div><div style="font-size:12px;color:#6b7a8d">Progres general</div></div>' +
+    '<div style="height:10px;background:#1e2530;border-radius:5px;margin-bottom:16px"><div style="height:100%;width:'+totalPct+'%;background:linear-gradient(90deg,#fd9644,#ffa502);border-radius:5px;transition:width 0.5s"></div></div>' +
+    Object.entries(phases).map(([phase, data]) =>
+      '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:#e8ecf0">' + phase + '</span><span style="font-size:12px;color:#fd9644;font-weight:700">' + data.pct + '%</span></div>' +
+      '<div style="height:6px;background:#1e2530;border-radius:3px"><div style="height:100%;width:'+data.pct+'%;background:#fd9644;border-radius:3px"></div></div>' +
+      (data.notes?'<div style="font-size:10px;color:#6b7a8d;margin-top:2px">'+data.notes+'</div>':'') + '</div>'
+    ).join('');
+  if (el) { el.innerHTML = html; document.getElementById('site-progress-modal').style.display = 'flex'; }
+}
+
+// PONTAJ MUNCITORI
+let workerTimesheet = JSON.parse(localStorage.getItem('sv_timesheet') || '[]');
+
+function logWorkerHours(workerName, siteId, date, hoursWorked, overtimeHours) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  workerTimesheet.push({ worker: workerName, site: site?site.name:'General', siteId, date: date||new Date().toISOString().slice(0,10), hours: parseFloat(hoursWorked)||8, overtime: parseFloat(overtimeHours)||0, ts: new Date().toISOString() });
+  localStorage.setItem('sv_timesheet', JSON.stringify(workerTimesheet.slice(-1000)));
+  setFeedback('✅ Pontaj: ' + workerName + ' — ' + hoursWorked + 'h' + (overtimeHours?' (+'+overtimeHours+'h ore suplimentare)':''), 'ok');
+}
+
+function showTimesheetReport() {
+  const workerHours = {};
+  workerTimesheet.forEach(t => {
+    if (!workerHours[t.worker]) workerHours[t.worker] = { total:0, overtime:0, days:0 };
+    workerHours[t.worker].total += t.hours;
+    workerHours[t.worker].overtime += t.overtime;
+    workerHours[t.worker].days++;
+  });
+  const el = document.getElementById('timesheet-content');
+  const html = Object.entries(workerHours).sort((a,b)=>b[1].total-a[1].total).map(([name, data]) =>
+    '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:5px">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;color:#e8ecf0">👷 ' + name + '</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#fd9644">' + data.total + 'h</div></div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + data.days + ' zile lucrătoare' + (data.overtime?' · '+data.overtime+'h ore suplimentare':'') + '</div>' +
+    '</div>'
+  ).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există pontaj.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('timesheet-modal').style.display = 'flex'; }
+}
+
+// BON CONSUM MATERIALE
+function generateMaterialConsumptionBon(siteId, materials) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  const bonNo = 'BC-' + Date.now().toString().slice(-6);
+  const win = window.open('','_blank','width=500,height=400');
+  const now = new Date().toLocaleString('ro-RO');
+  win.document.write('<html><head><title>Bon Consum ' + bonNo + '</title><style>body{font-family:Arial;margin:20px;font-size:13px}h2{color:#fd9644}table{width:100%;border-collapse:collapse}th{background:#333;color:#fff;padding:8px}td{padding:7px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style></head><body>');
+  win.document.write('<h2>📋 BON CONSUM MATERIALE</h2>');
+  win.document.write('<p><b>Nr:</b> ' + bonNo + ' · <b>Data:</b> ' + now + '</p>');
+  win.document.write('<p><b>Șantier:</b> ' + (site?site.name:'—') + ' · <b>Manager:</b> ' + (site?site.manager:'—') + '</p>');
+  win.document.write('<table><tr><th>Nr.</th><th>Material</th><th>Cantitate</th><th>UM</th><th>Valoare RON</th></tr>');
+  const total = (materials||[]).reduce((s,m)=>s+m.qty*(m.price||0),0);
+  (materials||[]).forEach((m,i) => win.document.write('<tr><td>' + (i+1) + '</td><td>' + m.name + '</td><td>' + m.qty + '</td><td>' + (m.unit||'buc') + '</td><td>' + (m.qty*(m.price||0)).toFixed(2) + '</td></tr>'));
+  win.document.write('</table><p><b>Total: ' + total.toFixed(2) + ' RON</b></p>');
+  win.document.write('<br><p>Responsabil: _______________ Semnătură: _______________</p>');
+  win.document.write('<button onclick="window.print()">🖨️ Printează</button>
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
+</body></html>');
+  win.document.close();
+  setFeedback('✅ Bon consum ' + bonNo + ' generat!', 'ok');
+}
+
+// ALERTĂ DEPĂȘIRE BUGET
+function checkSiteBudgets() {
+  constructionSites.filter(s=>s.status==='activ').forEach(site => {
+    if (!site.budget || site.budget === 0) return;
+    const pct = site.spent / site.budget * 100;
+    if (pct > 90 && !site.budgetAlerted90) {
+      site.budgetAlerted90 = true;
+      triggerAlert('💰 ATENȚIE: Șantier ' + site.name + ' a consumat ' + pct.toFixed(0) + '% din buget!', 'warn');
+      if (userProfile?.telegram_id) sendTelegramAlert('💰 Buget șantier ' + site.name + ': ' + pct.toFixed(0) + '% utilizat!
+Cheltuit: ' + site.spent.toFixed(0) + ' / ' + site.budget + ' RON', userProfile.telegram_id);
+    }
+    if (pct > 100 && !site.budgetAlerted100) {
+      site.budgetAlerted100 = true;
+      triggerAlert('🔴 DEPĂȘIRE BUGET: ' + site.name + '! +' + (site.spent-site.budget).toFixed(0) + ' RON peste buget!', 'err');
+    }
+  });
+  localStorage.setItem('sv_sites', JSON.stringify(constructionSites));
+}
+setInterval(function(){ if(typeof checkSiteBudgets==='function') checkSiteBudgets(); }, 3600000);
+
+// RAPORT ORE UTILAJE PER ȘANTIER
+function equipmentHoursPerSite() {
+  const bySite = {};
+  equipmentLog.forEach(e => {
+    if (!bySite[e.site]) bySite[e.site] = {};
+    if (!bySite[e.site][e.equipment]) bySite[e.site][e.equipment] = 0;
+    bySite[e.site][e.equipment] += e.hours;
+  });
+  const el = document.getElementById('equip-hours-content');
+  const html = Object.entries(bySite).map(([site, equip]) =>
+    '<div style="margin-bottom:12px;background:#181d24;border-radius:10px;padding:12px;border-left:3px solid #fd9644">' +
+    '<div style="font-weight:700;color:#fd9644;margin-bottom:6px">🏗️ ' + site + '</div>' +
+    Object.entries(equip).map(([e,h]) =>
+      '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #1e2530">' +
+      '<span style="color:#99a8b8">⚙️ ' + e + '</span><span style="color:#e8ecf0;font-weight:700">' + h.toFixed(1) + 'h</span></div>'
+    ).join('') + '</div>'
+  ).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există ore utilaje.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('equip-hours-modal').style.display = 'flex'; }
+}
+
+// CERERE DE OFERTĂ
+function generateRFQ(siteId, materials) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  const rfqNo = 'RFQ-' + Date.now().toString().slice(-6);
+  const now = new Date().toLocaleDateString('ro-RO');
+  const csvLines = [
+    'CERERE DE OFERTĂ ' + rfqNo,
+    'Data: ' + now,
+    'Șantier: ' + (site?site.name:'—'),
+    'Manager: ' + (site?site.manager:'—'),
+    '',
+    'Nr,Material,Cantitate,UM,Specificații',
+    ...(materials||stock.filter(p=>p.qty<=p.min)).map((m,i) =>
+      [(i+1),(m.name||m.name),(m.qty_needed||m.min||1),(m.unit||'buc'),(m.specs||m.sku||'—')].join(',')
+    ),
+    '',
+    'Vă rugăm să ofertați prețuri CU TVA inclus.',
+    'Termen livrare solicitat: _____________',
+    'Condiții plată: 30 zile'
+  ];
+  const blob = new Blob([csvLines.join('
+')], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=rfqNo+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+  setFeedback('✅ Cerere de ofertă ' + rfqNo + ' generată!', 'ok');
+}
+
+// GESTIUNE SUBCONTRACTORI
+let subcontractors = JSON.parse(localStorage.getItem('sv_subcontractors') || '[]');
+
+function addSubcontractor(name, specialty, contact, contractValue, siteId) {
+  const site = constructionSites.find(s=>s.id===siteId);
+  subcontractors.push({ id:Date.now(), name, specialty, contact, contractValue:parseFloat(contractValue)||0, paid:0, site:site?site.name:'General', siteId, active:true, created:new Date().toISOString() });
+  localStorage.setItem('sv_subcontractors', JSON.stringify(subcontractors));
+  setFeedback('✅ Subcontractor adăugat: ' + name + ' (' + specialty + ')', 'ok');
+}
+
+function showSubcontractors() {
+  const el = document.getElementById('subcontractors-content');
+  const html = subcontractors.filter(s=>s.active).map(s => {
+    const remaining = s.contractValue - s.paid;
+    return '<div style="background:#181d24;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #fd9644">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+      '<div style="font-weight:700;color:#e8ecf0">' + s.name + '</div>' +
+      '<div style="font-size:11px;color:#fd9644">' + s.specialty + '</div></div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + s.site + ' · ' + s.contact + '</div>' +
+      '<div style="display:flex;justify-content:space-between;margin-top:6px">' +
+      '<span style="font-size:12px;color:#99a8b8">Contract: ' + s.contractValue.toFixed(0) + ' RON</span>' +
+      '<span style="font-size:12px;color:' + (remaining<0?'#ff4757':remaining<s.contractValue*0.2?'#ffa502':'#00e5a0') + '">Rămas: ' + remaining.toFixed(0) + ' RON</span></div>' +
+      '</div>';
+  }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există subcontractori.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('subcontractors-modal').style.display = 'flex'; }
 }
 
 </script>
@@ -5387,6 +6715,114 @@ function generateSiteReport(siteId) {
 <datalist id="cats-constructii">
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
+
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
 
 </body></html>');
   pw.document.close();
@@ -9460,6 +10896,114 @@ function openTVDashboard() {
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
 
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
 </body></html>');
 }
 
@@ -10680,6 +12224,114 @@ async function exportReportWord() {
 <datalist id="cats-constructii">
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
+
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
 
 </body></html>';
 
@@ -19459,6 +21111,114 @@ function showNoMovementReport() {
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
 
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
 </body></html>';
   
   printWindow.document.write(html);
@@ -20284,6 +22044,114 @@ function showNoMovementReport() {
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
 
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
+
 </body></html>';
   printWindow.document.write(html);
 }
@@ -20968,6 +22836,114 @@ function showNoMovementReport() {
 <datalist id="cats-constructii">
   <option value="Beton&Mortar"><option value="Cărămizi&Blocuri"><option value="Fier&Metal"><option value="Lemn"><option value="Izolații"><option value="Instalații"><option value="Finisaje"><option value="Echipamente"><option value="Unelte"><option value="Chimice">
 </datalist>
+
+
+<!-- TABLE RESERVATIONS MODAL -->
+<div id="table-reservations-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📅 Rezervări Mese</div>
+      <button onclick="document.getElementById('table-reservations-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="table-reservations-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Nume client:');const t=prompt('Nr masă:');const p=parseInt(prompt('Nr persoane:'))||2;const d=prompt('Data (YYYY-MM-DD):');const h=prompt('Ora (HH:MM):');const ph=prompt('Telefon:');if(n&&t&&d&&h)addTableReservation(n,t,p,d,h,ph);showTableReservations()" style="width:100%;background:#ff6b9d;border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ REZERVARE NOUĂ →</button>
+    </div>
+  </div>
+</div>
+<!-- DISH SALES MODAL -->
+<div id="dish-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">📊 Vânzări per Preparat</div>
+      <button onclick="document.getElementById('dish-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="dish-sales-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- KITCHEN INVENTORY MODAL -->
+<div id="kitchen-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff6b9d;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff6b9d;text-transform:uppercase">🍳 Inventar Bucătărie</div>
+      <button onclick="document.getElementById('kitchen-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="kitchen-inventory-content" style="padding:16px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- HOURLY SALES MODAL -->
+<div id="hourly-sales-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">📊 Vânzări pe Oră</div>
+      <button onclick="document.getElementById('hourly-sales-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="hourly-sales-content" style="padding:20px 24px"></div>
+  </div>
+</div>
+<!-- TOP SELLING MODAL -->
+<div id="top-selling-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:460px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">🏆 Top Vânzări Azi</div>
+      <button onclick="document.getElementById('top-selling-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="top-selling-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SHELF REPORT MODAL -->
+<div id="shelf-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">🛒 Reaprovizionare Raft</div>
+      <button onclick="document.getElementById('shelf-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="shelf-report-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SITE PROGRESS MODAL -->
+<div id="site-progress-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Progres Șantier</div>
+      <button onclick="document.getElementById('site-progress-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="progress-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- TIMESHEET MODAL -->
+<div id="timesheet-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏱️ Pontaj Muncitori</div>
+      <button onclick="document.getElementById('timesheet-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="timesheet-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- EQUIP HOURS MODAL -->
+<div id="equip-hours-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⚙️ Ore Utilaje per Șantier</div>
+      <button onclick="document.getElementById('equip-hours-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="equip-hours-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+  </div>
+</div>
+<!-- SUBCONTRACTORS MODAL -->
+<div id="subcontractors-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:88vh;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 14px;border-bottom:1px solid #1e2530;flex-shrink:0">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🏢 Subcontractori</div>
+      <button onclick="document.getElementById('subcontractors-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
+    </div>
+    <div id="subcontractors-content" style="padding:20px 24px;overflow-y:auto;flex:1"></div>
+    <div style="padding:14px 24px;border-top:1px solid #1e2530;flex-shrink:0">
+      <button onclick="const n=prompt('Firmă:');const sp=prompt('Specialitate:');const c=prompt('Contact:');const v=prompt('Valoare contract RON:');if(n)addSubcontractor(n,sp,c,v,null);showSubcontractors()" style="width:100%;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;padding:12px;cursor:pointer;touch-action:manipulation">+ SUBCONTRACTOR NOU →</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html><!-- SORT BAR -->
