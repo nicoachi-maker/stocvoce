@@ -4881,6 +4881,44 @@ function resetPassword() {
 document.addEventListener('DOMContentLoaded', function() {
   selectIndustry(currentIndustry);
 });
+// Stubs - queue calls until main script loads
+var _pendingCall = null;
+function doLogin() {
+  if (typeof auth !== 'undefined' && typeof _doLoginReal === 'function') {
+    _doLoginReal();
+  } else {
+    // Main script not loaded yet - retry
+    _pendingCall = 'doLogin';
+    setTimeout(function() {
+      if (typeof _doLoginReal === 'function') _doLoginReal();
+    }, 500);
+  }
+}
+function doRegister() {
+  if (typeof auth !== 'undefined' && typeof _doRegisterReal === 'function') {
+    _doRegisterReal();
+  } else {
+    _pendingCall = 'doRegister';
+    setTimeout(function() {
+      if (typeof _doRegisterReal === 'function') _doRegisterReal();
+    }, 500);
+  }
+}
+function showTab(tab) {
+  var login = document.getElementById('tab-login');
+  var reg = document.getElementById('tab-register');
+  var tabs = document.querySelectorAll('.auth-tab');
+  if (login) login.style.display = tab === 'login' ? 'block' : 'none';
+  if (reg) reg.style.display = tab === 'register' ? 'block' : 'none';
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs.forEach(function(t) {
+    if ((tab === 'login' && t.textContent.includes('INTRĂ')) ||
+        (tab === 'register' && t.textContent.includes('CONT'))) {
+      t.classList.add('active');
+    }
+  });
+}
+
 </script>
 </head>
 <body onkeydown="if(event.key==='Escape'){closeQuickAction();}">
@@ -9002,27 +9040,17 @@ async function exportTelegramWithDetails() {
   const todayStr = new Date().toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit'});
   const todayOps = log.filter(e => e.time && e.time.startsWith(todayStr));
 
-  const msg = '<b>📊 RAPORT DETALIAT — ' + now + '</b>
-' +
-    '<b>🏭 ' + userProfile.depot + '</b>
-
-' +
-    '📦 Total produse: <b>' + stock.length + '</b>
-' +
-    '🔴 Epuizate: <b>' + zero + '</b>
-' +
-    '⚠️ Stoc scăzut: <b>' + low + '</b>
-' +
+  const msg = '<b>📊 RAPORT DETALIAT — ' + now + '</b>' +
+    '<b>🏭 ' + userProfile.depot + '</b>' +
+    '📦 Total produse: <b>' + stock.length + '</b>' +
+    '🔴 Epuizate: <b>' + zero + '</b>' +
+    '⚠️ Stoc scăzut: <b>' + low + '</b>' +
     '💰 Valoare stoc: <b>' + parseFloat(val.totalBuy||0).toFixed(0) + ' RON</b>
 
 ' +
-    '📈 Operații azi: <b>' + todayOps.length + '</b>
-' +
-    '➕ Intrări: <b>' + todayOps.filter(e=>e.type==='in').length + '</b>
-' +
-    '➖ Ieșiri: <b>' + todayOps.filter(e=>e.type==='out').length + '</b>
-
-' +
+    '📈 Operații azi: <b>' + todayOps.length + '</b>' +
+    '➕ Intrări: <b>' + todayOps.filter(e=>e.type==='in').length + '</b>' +
+    '➖ Ieșiri: <b>' + todayOps.filter(e=>e.type==='out').length + '</b>' +
     (zero > 0 ? '🔴 <b>Epuizate:</b> ' + stock.filter(p=>p.qty===0).slice(0,5).map(p=>p.name).join(', ') + '
 ' : '') +
     (low > 0 ? '⚠️ <b>Critice:</b> ' + stock.filter(p=>p.qty>0&&p.qty<=p.min).slice(0,5).map(p=>p.name+' ('+p.qty+')').join(', ') : '');
@@ -11783,8 +11811,7 @@ async function exportReportWord() {
     'tr:nth-child(even){background:#f5f5f5}' +
     '.stat{display:inline-block;background:#f0f0f0;border-radius:4pt;padding:8pt 16pt;margin:4pt;text-align:center}' +
     '.stat-val{font-size:18pt;font-weight:bold;color:#00b87a}' +
-    '</style>
-' +
+    '</style>' +
     '<h1>Raport Stoc — ' + depot + '</h1>' +
     '<p style="color:#666">' + now + ' · Generat de StocVoce</p>' +
     '<div>' +
@@ -13219,7 +13246,7 @@ function showTab(tab) {
 }
 
 // ── REGISTER ──
-async function doRegister() {
+async function _doRegisterReal() {
   const name  = document.getElementById('reg-name').value.trim();
   const depot = document.getElementById('reg-depot').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -13270,7 +13297,7 @@ async function doRegister() {
 }
 
 // ── LOGIN ──
-async function doLogin() {
+async function _doLoginReal() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
@@ -16367,8 +16394,7 @@ function printEtichete() {
     '.eticheta-name{font-weight:900;font-size:14px;margin-bottom:3px}' +
     '.eticheta-info{font-size:10px;color:#666;margin-bottom:2px}' +
     '@media print{body{margin:0}button{display:none}}' +
-    '</style>
-' +
+    '</style>' +
     '<button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;background:#000;color:#fff;border:none;cursor:pointer">Printeaza</button>' +
     '<div class="grid">' + eticheteHTML + '</div>' +
     '<scr' + 'ipt>' +
