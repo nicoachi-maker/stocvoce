@@ -14491,7 +14491,7 @@ function showTab(tab) {
 }
 
 // ── REGISTER ──
-async function _doRegisterReal() {
+async async function _doRegisterReal() {
   const name  = document.getElementById('reg-name').value.trim();
   const depot = document.getElementById('reg-depot').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -14542,16 +14542,16 @@ async function _doRegisterReal() {
 }
 
 // ── LOGIN ──
-async function _doLoginReal() {
+async async function _doLoginReal() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
-  errEl.classList.remove('show');
+  if (errEl) errEl.classList.remove('show');
 
   if (!email || !pass) { errEl.textContent='Completați email și parola!'; errEl.classList.add('show'); return; }
 
-  document.getElementById('auth-spinner').style.display='block';
-  document.getElementById('login-btn').disabled=true;
+  const spinner=document.getElementById('auth-spinner'); if(spinner) spinner.style.display='block';
+  const loginBtn=document.getElementById('login-btn'); if(loginBtn) loginBtn.disabled=true;
 
   try {
     await auth.signInWithEmailAndPassword(email, pass);
@@ -14561,8 +14561,8 @@ async function _doLoginReal() {
     if (e.code==='auth/wrong-password') msg='Parolă incorectă!';
     if (e.code==='auth/invalid-email') msg='Email invalid!';
     errEl.textContent=msg; errEl.classList.add('show');
-    document.getElementById('auth-spinner').style.display='none';
-    document.getElementById('login-btn').disabled=false;
+    if(spinner) spinner.style.display='none';
+    if(loginBtn) loginBtn.disabled=false;
   }
 }
 
@@ -21775,7 +21775,7 @@ function checkDuplicate(name) {
 const origNewName = document.getElementById ? document.getElementById('new-name') : null;
 
 // 20. AUTO-COMPLETARE NUME PRODUS
-function setupAutocomplete() {
+async function setupAutocomplete() {
   const input = document.getElementById('new-name');
   if (!input) return;
   
