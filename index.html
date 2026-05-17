@@ -14491,7 +14491,7 @@ function showTab(tab) {
 }
 
 // ── REGISTER ──
-async async function _doRegisterReal() {
+async function _doRegisterReal() {
   const name  = document.getElementById('reg-name').value.trim();
   const depot = document.getElementById('reg-depot').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -14542,7 +14542,7 @@ async async function _doRegisterReal() {
 }
 
 // ── LOGIN ──
-async async function _doLoginReal() {
+async function _doLoginReal() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-error');
