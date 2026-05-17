@@ -6234,24 +6234,7 @@ function showTab(tab) {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js">function printDashboard() {
-  const depot = userProfile ? userProfile.depot : 'Depozit';
-  const now = new Date().toLocaleDateString('ro-RO');
-  const pw = window.open('', '_blank');
-  if (!pw) { setFeedback('Permite popup-urile!', 'warn'); return; }
-  const rows = stock.map(p => {
-    const s = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
-    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td>' + p.qty + '</td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + s + '</td></tr>';
-  }).join('');
-  pw.document.write('<!DOCTYPE html><html><head><title>StocVoce ' + depot + '</title>' +
-    '<style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#000;color:#fff;padding:6px}td{padding:5px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style>
-' +
-    '<h2>StocVoce - ' + depot + ' - ' + now + '</h2>' +
-    '<p>Total: ' + stock.length + ' produse</p>' +
-    '<button onclick="window.print()">Print</button>' +
-    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Loc</th><th>Min</th><th>Status</th></tr>' +
-    rows + '</table>
-<!-- PWA INSTALL BANNER -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <div id="pwa-install-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111418;border:1px solid #00e5a0;border-radius:16px;padding:14px 20px;z-index:9999;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,229,160,0.2);max-width:380px;width:90%">
   <div style="font-size:28px">📱</div>
   <div style="flex:1">
@@ -14419,7 +14402,25 @@ function handleVoiceShortcut(text) {
 </script>
 
 <script>
-
+function printDashboard() {
+  const depot = userProfile ? userProfile.depot : 'Depozit';
+  const now = new Date().toLocaleDateString('ro-RO');
+  const pw = window.open('', '_blank');
+  if (!pw) { setFeedback('Permite popup-urile!', 'warn'); return; }
+  const rows = stock.map(p => {
+    const s = p.qty===0?'EPUIZAT':p.qty<=p.min?'SCAZUT':'OK';
+    return '<tr><td>' + p.name + '</td><td>' + (p.cat||'') + '</td><td>' + p.qty + '</td><td>' + p.unit + '</td><td>' + (p.loc||'') + '</td><td>' + p.min + '</td><td>' + s + '</td></tr>';
+  }).join('');
+  pw.document.write('<!DOCTYPE html><html><head><title>StocVoce ' + depot + '</title>' +
+    '<style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}th{background:#000;color:#fff;padding:6px}td{padding:5px;border-bottom:1px solid #ddd}@media print{button{display:none}}</style>' +
+    '</head><body>' +
+    '<h2>StocVoce - ' + depot + ' - ' + now + '</h2>' +
+    '<p>Total: ' + stock.length + ' produse</p>' +
+    '<button onclick="window.print()">Print</button>' +
+    '<table><tr><th>Produs</th><th>Cat</th><th>Cant</th><th>UM</th><th>Loc</th><th>Min</th><th>Status</th></tr>' +
+    rows + '</table></body></html>');
+  pw.document.close();
+}
 
 // Global safe element getter
 window.getEl = function(id) { return document.getElementById(id); };
@@ -21945,7 +21946,6 @@ function showNoMovementReport() {
 
 
 
-}
 
 
 // ══════════════════════════════════════════
