@@ -3733,10 +3733,15 @@ function applyIndustryTheme() {
   // Apply accent color
   document.documentElement.style.setProperty('--accent', cfg.color);
   
-  // Update toolbar tab names
-  updateToolbarLabels(cfg);
+  // Build toolbar with industry-specific buttons
+  if (typeof buildToolbar === 'function') {
+    buildToolbar(currentIndustry);
+  }
   
-  // Show/hide industry buttons
+  // Update tab labels
+  if (typeof updateToolbarLabels === 'function') updateToolbarLabels(cfg);
+  
+  // Show/hide data-industry buttons
   document.querySelectorAll('[data-industry]').forEach(el => {
     el.style.display = el.dataset.industry === currentIndustry ? '' : 'none';
   });
@@ -3745,11 +3750,11 @@ function applyIndustryTheme() {
   const depotTitle = document.getElementById('depot-title');
   if (depotTitle) {
     const icons = {depozit:'🏭',restaurant:'🍽️',retail:'🏪',constructii:'🏗️'};
-    depotTitle.textContent = (icons[currentIndustry]||'📦') + ' ' + (userProfile?userProfile.depot:'');
+    depotTitle.textContent = (icons[currentIndustry]||'📦') + ' ' + (userProfile ? userProfile.depot : '');
   }
   
-  // Update add-modal unit options
-  if (cfg.units) {
+  // Update unit options in add modal
+  if (cfg && cfg.units) {
     const unitSel = document.getElementById('new-unit');
     if (unitSel) {
       const current = unitSel.value;
@@ -3757,10 +3762,7 @@ function applyIndustryTheme() {
     }
   }
   
-  setFeedback(cfg.icon + ' Modul ' + cfg.name + ' activ!', 'ok');
-  
-  // Build toolbar for this industry
-  if (typeof buildToolbar === 'function') buildToolbar(currentIndustry);
+  setFeedback((cfg.icon||'✅') + ' Modul ' + (cfg.name||currentIndustry) + ' activ!', 'ok');
 }
 // OLD applyIndustryTheme was here - removed
 
@@ -3807,10 +3809,15 @@ function showIndustryButtons(cfg) {
 // Industry already initialized in <head> script
 // Re-apply after full script loads for complete theme
 document.addEventListener('DOMContentLoaded', function() {
+  // Build toolbar immediately when DOM is ready
   setTimeout(function() {
-    if (typeof buildToolbar === 'function') buildToolbar(currentIndustry);
-    if (typeof applyIndustryTheme === 'function') applyIndustryTheme();
-  }, 300);
+    if (typeof buildToolbar === 'function') {
+      buildToolbar(currentIndustry);
+    }
+    if (typeof applyIndustryTheme === 'function') {
+      applyIndustryTheme();
+    }
+  }, 100);
 });
 
 
@@ -5727,1326 +5734,6 @@ function showSubcontractors() {
   }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există subcontractori.</div>';
   if (el) { el.innerHTML = html; document.getElementById('subcontractors-modal').style.display = 'flex'; }
 }
-
-
-// ══════════════════════════════════════════
-// TOOLBAR DINAMIC PER INDUSTRIE
-// ══════════════════════════════════════════
-
-const TOOLBAR_CONFIG = {
-  depozit: {
-    tabNames: { stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT' },
-    stoc: [
-      {l:'+ Produs',f:'openAddModal',c:'#00e5a0'},
-      {l:'📊 Excel',f:'openImportModal',c:'#00e5a0'},
-      {l:'🔄 Transfer',f:'openTransferModal',c:'#00e5a0'},
-      {l:'🔁 Inventar',f:'openInventarModal',c:'#a78bfa'},
-      {l:'📷 Scan',f:'openQRModal',c:'#6b7a8d'},
-      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
-      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
-      {l:'🤖 Auto Min',f:'calcAutoMinStock',c:'#00e5a0'},
-      {l:'🗺️ Hartă',f:'openWarehouseMap',c:'#6b7a8d'},
-      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
-      {l:'📥 Recepție',f:'openReceptionModal',c:'#00e5a0'},
-      {l:'🤖 Voce AI',f:'toggleAIVoice',c:'#a78bfa'},
-      {l:'🛒 Livrare',f:'openDeliveryCartModal',c:'#ffa502'},
-      {l:'🔢 Inv. Rapid',f:'openPartialInventory',c:'#4d9fff'},
-      {l:'↩️ Retur',f:'openBonReturModal',c:'#ff4757'},
-      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
-      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#00e5a0'},
-      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
-      {l:'🚛 Tranzit',f:'showTransitModal',c:'#4d9fff'},
-      {l:'⚖️ Ajustare',f:'openInventarAdjust',c:'#ffa502'},
-      {l:'🛒 Coș',f:'openCartModal',c:'#00e5a0'},
-      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
-      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
-      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#00e5a0'},
-      {l:'📱 Share WA',f:'shareStockWhatsApp',c:'#00e5a0'},
-      {l:'🔄 Rotație',f:'stockTurnoverRate',c:'#00e5a0'},
-      {l:'🗺️ Zone',f:'openWarehouseZoneMap',c:'#a78bfa'},
-      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
-      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
-      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
-      {l:'📊 Reorder',f:'autoReorderPoint',c:'#00e5a0'},
-      {l:'🖨️ Print',f:'printDashboard',c:'#6b7a8d'},
-    ],
-    rapoarte: [
-      {l:'📈 Lunar',f:'openRaportLunarModal',c:'#00e5a0'},
-      {l:'🏆 Top 10',f:'showTop10',c:'#ffa502'},
-      {l:'💤 Stagnante',f:'showStagnant',c:'#ffa502'},
-      {l:'👤 Operatori',f:'showOperatorReport',c:'#6b7a8d'},
-      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
-      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
-      {l:'🔮 Predicții',f:'showPredictions',c:'#a78bfa'},
-      {l:'🔥 Heatmap',f:'showActivityHeatmap',c:'#a78bfa'},
-      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#00e5a0'},
-      {l:'📈 Tendințe AI',f:'showTrendsAnalysis',c:'#a78bfa'},
-      {l:'🖼️ Export Grafic',f:'exportChartAsPNG',c:'#6b7a8d'},
-      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#00e5a0'},
-      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
-      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
-      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
-      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
-      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
-      {l:'⚠️ Fără Furnizor',f:'showProductsWithoutSupplier',c:'#6b7a8d'},
-      {l:'📅 Pierderi',f:'showExpirationLosses',c:'#ff4757'},
-      {l:'📱 Dash Șef',f:'showMobileDashboard',c:'#a78bfa'},
-      {l:'👤 Inactivitate',f:'showOperatorInactivity',c:'#6b7a8d'},
-      {l:'🤖 Forecast Cat.',f:'aiForecastByCategory',c:'#a78bfa'},
-      {l:'⚡ Ef. Operatori',f:'showOperatorEfficiency',c:'#00e5a0'},
-      {l:'🌸 Sezonier',f:'showSeasonalReport',c:'#a78bfa'},
-      {l:'📈 Predictiv',f:'showPredictiveChart',c:'#a78bfa'},
-      {l:'💤 Fără Mișcare',f:'showNoMovement90Days',c:'#ffa502'},
-      {l:'📍 Val. Raft',f:'showValuePerRack',c:'#00e5a0'},
-      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
-      {l:'🤖 Forecast ML',f:'stockForecastML',c:'#a78bfa'},
-      {l:'📊 Sensib.',f:'demandSensitivity',c:'#ffa502'},
-      {l:'📊 ABC+XYZ',f:'abcXyzAnalysis',c:'#00e5a0'},
-      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
-      {l:'⚠️ Alertă Marjă',f:'productMarginAlert',c:'#ff4757'},
-      {l:'📊 Scor Sănătate',f:'stockHealthScore',c:'#00e5a0'},
-      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
-      {l:'⭐ Scoruri Prod.',f:'showAllProductScores',c:'#ffa502'},
-      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
-    ],
-    clienti: [
-      {l:'👥 Clienți',f:'openClientsModal',c:'#a78bfa'},
-      {l:'⏰ Rezervări',f:'openRezervariModal',c:'#ffa502'},
-      {l:'🔄 Bon Retur',f:'openBonReturModal',c:'#ff4757'},
-      {l:'📋 Comandă',f:'openComandaModal',c:'#00e5a0'},
-      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
-      {l:'🤖 AI Chat',f:'openPersistentChat',c:'#00e5a0'},
-      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
-      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
-      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
-      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
-      {l:'🧠 AI Memorie',f:'openPersistentChat',c:'#00e5a0'},
-      {l:'🔬 Audit AI',f:'aiFullDepotAudit',c:'#00e5a0'},
-      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
-      {l:'🌸 AI Sezon',f:'aiDetectSeasonality',c:'#a78bfa'},
-      {l:'⚠️ Risc Abandon',f:'aiPredictChurnRisk',c:'#ff4757'},
-      {l:'💎 Retenție',f:'showClientRetention',c:'#00e5a0'},
-      {l:'🧾 Factură Coș',f:'invoiceFromCart',c:'#ffa502'},
-      {l:'💳 Ageing',f:'clientAgeingReport',c:'#ff4757'},
-      {l:'🗺️ Teritorii',f:'salesTerritoryMap',c:'#4d9fff'},
-      {l:'📥 Import CSV',f:'openBulkClientImportModal',c:'#6b7a8d'},
-      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
-    ],
-    depozit: [
-      {l:'🚚 Livrări',f:'openDeliveryModal',c:'#ffa502'},
-      {l:'📅 Calendar',f:'openCalendarModal',c:'#a78bfa'},
-      {l:'💾 Backup Firebase',f:'doManualBackup',c:'#00e5a0'},
-      {l:'📺 Kiosk',f:'openKioskMode',c:'#00e5a0'},
-      {l:'💚 Sănătate',f:'stockHealthScore',c:'#00e5a0'},
-      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
-      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
-      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
-      {l:'💾 Backup Local',f:'exportFullBackupLocal',c:'#00e5a0'},
-      {l:'📂 Import Backup',f:'importBackupLocal',c:'#ffa502'},
-      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
-      {l:'🔐 Log Sesiuni',f:'showSessionLog',c:'#6b7a8d'},
-      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
-      {l:'📺 TV Dashboard',f:'openTVDashboard',c:'#00e5a0'},
-      {l:'🌐 Stoc Global',f:'loadConsolidatedStock',c:'#00e5a0'},
-      {l:'⚖️ Echilibrare',f:'multiDepotBalance',c:'#a78bfa'},
-      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
-      {l:'📦 Colete',f:'showShipments',c:'#4d9fff'},
-      {l:'📋 Picking',f:'pickingListGenerate',c:'#ffa502'},
-      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#00e5a0'},
-      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
-      {l:'☁️ Dropbox',f:'syncToDropbox',c:'#00e5a0'},
-      {l:'🔗 Webhook',f:'openWebhookSettings',c:'#6b7a8d'},
-      {l:'🔒 PIN Login',f:'openPinModal',c:'#ffa502'},
-      {l:'🛒 WooCommerce',f:'importWooCommerceOrders',c:'#a78bfa'},
-      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
-      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
-      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
-      {l:'↩️ Motive Retur',f:'returnReasonAnalysis',c:'#ffa502'},
-      {l:'⚡ Live Ops',f:'operatorPerformanceLive',c:'#00e5a0'},
-      {l:'📊 G.Sheets',f:'exportToGoogleSheets',c:'#00e5a0'},
-      {l:'🔗 API Link',f:'getAPILink',c:'#6b7a8d'},
-    ],
-  },
-
-  restaurant: {
-    tabNames: { stoc:'INGREDIENTE', rapoarte:'RAPOARTE', clienti:'COMENZI', depozit:'BUCĂTĂRIE' },
-    stoc: [
-      {l:'+ Ingredient',f:'openAddModal',c:'#ff6b9d'},
-      {l:'📥 Recepție',f:'openReceptionModal',c:'#ff6b9d'},
-      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
-      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
-      {l:'🍳 Inv. Bucătărie',f:'kitchenDailyInventory',c:'#ff6b9d'},
-      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
-      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
-      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
-      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ff6b9d'},
-      {l:'⚠️ Alertă Ing.',f:'checkMenuIngredients',c:'#ff4757'},
-      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
-      {l:'📊 Excel',f:'openImportModal',c:'#ff6b9d'},
-    ],
-    rapoarte: [
-      {l:'📊 Vânzări Preparate',f:'dishSalesReport',c:'#ff6b9d'},
-      {l:'📈 Tendințe',f:'showTrendsAnalysis',c:'#a78bfa'},
-      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
-      {l:'🧾 TVA 9%',f:'taxReportGenerate',c:'#6b7a8d'},
-      {l:'📅 FIFO Alimente',f:'foodFIFOReport',c:'#ffa502'},
-      {l:'♻️ Raport Deșeuri',f:'showWasteReport',c:'#ffa502'},
-      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
-      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
-      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ff6b9d'},
-      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
-      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ff6b9d'},
-    ],
-    clienti: [
-      {l:'🪑 Mese Active',f:'showTablesDashboard',c:'#ff6b9d'},
-      {l:'📅 Rezervări',f:'showTableReservations',c:'#ff6b9d'},
-      {l:'💳 Split Bill',f:'showTablesDashboard',c:'#ffa502'},
-      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
-      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
-      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
-      {l:'💎 Clienți Fideli',f:'showClientRetention',c:'#ff6b9d'},
-    ],
-    depozit: [
-      {l:'🍽️ Meniu',f:'renderMenu',c:'#ff6b9d'},
-      {l:'👨‍🍳 Prepară',f:'cookDishPrompt',c:'#ff6b9d'},
-      {l:'📱 QR Meniu',f:'generateMenuQR',c:'#a78bfa'},
-      {l:'🧾 Bon Fiscal',f:'printRestaurantBonPrompt',c:'#ff6b9d'},
-      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
-      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
-      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
-      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
-      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
-      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#ff6b9d'},
-      {l:'♻️ Log Deșeuri',f:'logFoodWastePrompt',c:'#ffa502'},
-    ],
-  },
-
-  retail: {
-    tabNames: { stoc:'PRODUSE', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'CASĂ' },
-    stoc: [
-      {l:'+ Produs',f:'openAddModal',c:'#ffa502'},
-      {l:'📊 Excel',f:'openImportModal',c:'#ffa502'},
-      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#ffa502'},
-      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
-      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
-      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
-      {l:'🛒 Coș',f:'openCartModal',c:'#ffa502'},
-      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
-      {l:'🏷️ Promoție',f:'addPromotionPrompt',c:'#ffa502'},
-      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ffa502'},
-      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
-      {l:'🖨️ Etichetă',f:'printProductLabelPrompt',c:'#6b7a8d'},
-      {l:'🛒 Lipsă Raft',f:'shelfReplenishmentReport',c:'#ff4757'},
-      {l:'📋 Lista Prețuri',f:'exportPriceList',c:'#6b7a8d'},
-    ],
-    rapoarte: [
-      {l:'🏪 Casă Azi',f:'showCashReport',c:'#ffa502'},
-      {l:'📊 Ore Vânzări',f:'hourlySalesReport',c:'#ffa502'},
-      {l:'🏆 Top Produse',f:'topSellingProducts',c:'#ffa502'},
-      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
-      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
-      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
-      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
-      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
-      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
-      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ffa502'},
-      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ffa502'},
-    ],
-    clienti: [
-      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
-      {l:'💎 Retenție',f:'showClientRetention',c:'#ffa502'},
-      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
-      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
-      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
-      {l:'↩️ Retur',f:'processRetailReturnPrompt',c:'#ff4757'},
-      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
-    ],
-    depozit: [
-      {l:'🏪 Casă POS',f:'openPosModal',c:'#ffa502'},
-      {l:'🧾 Chitanță',f:'printRetailReceiptPrompt',c:'#ffa502'},
-      {l:'▶ Start Tură',f:'startCashShiftPrompt',c:'#00e5a0'},
-      {l:'⏹ Stop Tură',f:'endCashShiftPrompt',c:'#ff4757'},
-      {l:'📺 Kiosk',f:'openKioskMode',c:'#ffa502'},
-      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
-      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
-      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
-      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
-      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
-    ],
-  },
-
-  constructii: {
-    tabNames: { stoc:'MATERIALE', rapoarte:'RAPOARTE', clienti:'ȘANTIERE', depozit:'UTILAJE' },
-    stoc: [
-      {l:'+ Material',f:'openAddModal',c:'#fd9644'},
-      {l:'📊 Excel',f:'openImportModal',c:'#fd9644'},
-      {l:'🔄 Transfer',f:'openTransferModal',c:'#fd9644'},
-      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
-      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#fd9644'},
-      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
-      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
-      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
-      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
-      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
-      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#fd9644'},
-      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
-      {l:'📊 Reorder',f:'autoReorderPoint',c:'#fd9644'},
-      {l:'📦 Bon Consum',f:'generateMaterialConsumptionPrompt',c:'#fd9644'},
-    ],
-    rapoarte: [
-      {l:'📊 Progres Șantier',f:'showSiteProgressPrompt',c:'#fd9644'},
-      {l:'⏱️ Pontaj',f:'showTimesheetReport',c:'#fd9644'},
-      {l:'⚙️ Ore Utilaje',f:'equipmentHoursPerSite',c:'#fd9644'},
-      {l:'💰 Buget Șantier',f:'showSitesDashboard',c:'#fd9644'},
-      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
-      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
-      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
-      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#fd9644'},
-      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
-      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#fd9644'},
-      {l:'⚠️ Buget Alert',f:'checkSiteBudgets',c:'#ff4757'},
-      {l:'📐 Faze Consum',f:'showPhaseReportPrompt',c:'#fd9644'},
-      {l:'📊 Plan vs Real',f:'showPlannedVsActualPrompt',c:'#fd9644'},
-      {l:'🔧 Scule Alerte',f:'toolOverdueAlert',c:'#ffa502'},
-    ],
-    clienti: [
-      {l:'🏗️ Șantiere',f:'showSitesDashboard',c:'#fd9644'},
-      {l:'🏢 Subcontractori',f:'showSubcontractors',c:'#fd9644'},
-      {l:'👷 Muncitori',f:'showWorkersDashboard',c:'#fd9644'},
-      {l:'📋 Deviz',f:'generateDevizPrompt',c:'#fd9644'},
-      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
-      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
-      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
-      {l:'📋 Cerere Ofertă',f:'generateRFQPrompt',c:'#fd9644'},
-      {l:'📋 Sit. Lucrări',f:'showSituatiePrompt',c:'#fd9644'},
-    ],
-    depozit: [
-      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#fd9644'},
-      {l:'🦺 Securitate',f:'showSafetyReport',c:'#ff4757'},
-      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
-      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
-      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
-      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
-      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
-      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
-      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
-      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
-      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
-      {l:'📋 Deviz PDF',f:'generateDevizPrompt',c:'#fd9644'},
-      {l:'📅 Gantt',f:'showGanttPrompt',c:'#fd9644'},
-      {l:'🔧 Scule',f:'toolInventory',c:'#fd9644'},
-      {l:'⚙️ ITP Echip.',f:'checkEquipmentExpiry',c:'#ffa502'},
-      {l:'💰 Cost Echip.',f:'equipmentCostReport',c:'#fd9644'},
-      {l:'📋 Decontări',f:'showDecontarePrompt',c:'#fd9644'},
-      {l:'⏰ Termene',f:'showDeadlinesPrompt',c:'#ffa502'},
-      {l:'⚠️ Penalități',f:'showPenaltiesPrompt',c:'#ff4757'},
-      {l:'🧮 Calculatoare',f:'openCalculatorModal',c:'#fd9644'},
-    ],
-  },
-};
-
-function buildToolbar(industry) {
-  const cfg = TOOLBAR_CONFIG[industry] || TOOLBAR_CONFIG.depozit;
-  const tabs = ['stoc','rapoarte','clienti','depozit'];
-  
-  tabs.forEach(tab => {
-    const el = document.getElementById('toolbar-' + tab);
-    if (!el) return;
-    const buttons = cfg[tab] || [];
-    el.innerHTML = buttons.map(b =>
-      '<button class="add-btn" onclick="safeCall(\'' + b.f + '\')" ' +
-      'style="flex-shrink:0;white-space:nowrap;border-color:' + b.c + ';color:' + b.c + '">' +
-      b.l + '</button>'
-    ).join('');
-  });
-  
-  // Update tab labels
-  if (cfg.tabNames) {
-    const tabBtns = document.querySelectorAll('.tab-btn, [onclick*="showTab"]');
-    Object.entries(cfg.tabNames).forEach(([tab, name]) => {
-      tabBtns.forEach(btn => {
-        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tab)) {
-          btn.textContent = name;
-        }
-      });
-    });
-  }
-  
-  // Update toolbar tab button labels
-  updateToolbarTabNames(cfg.tabNames || {});
-}
-
-function updateToolbarTabNames(names) {
-  const tabMap = {stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT'};
-  document.querySelectorAll('.toolbar-tab, [data-tab]').forEach(btn => {
-    const tab = btn.dataset.tab || '';
-    if (names[tab]) btn.textContent = names[tab];
-  });
-}
-
-// Add prompts for functions that need parameters
-function cookDishPrompt() {
-  const d = prompt('Preparat de gătit:');
-  const p = parseInt(prompt('Număr porții:')) || 1;
-  if (d && typeof cookDish === 'function') cookDish(d, p);
-}
-function printRestaurantBonPrompt() {
-  const t = prompt('Număr masă:');
-  if (t) printRestaurantBon(t, 'numerar');
-}
-function logFoodWastePrompt() {
-  const p = prompt('Produs:');
-  const q = parseFloat(prompt('Cantitate:')) || 0;
-  const r = prompt('Motiv (expirat/stricat/altul):') || 'expirat';
-  if (p && q) logFoodWaste(p, q, 'kg', r);
-}
-function addPromotionPrompt() {
-  const n = prompt('Nume promoție:');
-  const v = prompt('Discount %:');
-  if (n && v && typeof addPromotion === 'function') addPromotion(n, 'pct', v, []);
-}
-function startCashShiftPrompt() {
-  const op = prompt('Operator:');
-  const cash = prompt('Numerar inițial (RON):') || '0';
-  if (op) startCashShift(op, parseFloat(cash));
-}
-function endCashShiftPrompt() {
-  const cash = prompt('Numerar numărat (RON):') || '0';
-  endCashShift(parseFloat(cash));
-}
-function processRetailReturnPrompt() {
-  const name = prompt('Produs de returnat:');
-  if (!name) return;
-  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
-  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
-  const qty = parseInt(prompt('Cantitate:')) || 1;
-  const reason = prompt('Motiv retur:') || 'Nespecificat';
-  processRetailReturn(p.id, qty, reason);
-}
-function printRetailReceiptPrompt() {
-  const total = posCart.reduce((s,i)=>s+i.qty*i.price,0);
-  printRetailReceipt(null, total, 'numerar', null);
-}
-function printProductLabelPrompt() {
-  const name = prompt('Produs pentru etichetă:');
-  if (!name) return;
-  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
-  if (p) printProductLabel(p.id);
-  else setFeedback('Produs negăsit!', 'err');
-}
-function showSiteProgressPrompt() {
-  if (!constructionSites || !constructionSites.length) { alert('Nu există șantiere. Adaugă un șantier mai întâi!'); return; }
-  showSiteProgress(constructionSites[0].id);
-}
-function generateDevizPrompt() {
-  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  const lucrari = [
-    { name: 'Fundație beton', unit: 'm³', qty: 10, unitPrice: 500 },
-    { name: 'Zidărie cărămidă', unit: 'm²', qty: 50, unitPrice: 120 },
-  ];
-  generateDeviz(constructionSites[0].id, lucrari);
-}
-function generateRFQPrompt() {
-  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  generateRFQ(constructionSites[0].id, null);
-}
-function generateMaterialConsumptionPrompt() {
-  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  const materials = savedCart.map(i=>{const p=stock.find(s=>s.id===i.productId);return p?{name:p.name,qty:i.qty,unit:p.unit,price:p.price_buy||0}:null;}).filter(Boolean);
-  if (!materials.length) { alert('Adaugă materiale în coș mai întâi!'); return; }
-  generateMaterialConsumptionBon(constructionSites[0].id, materials);
-}
-function openPinModal() {
-  const el = document.getElementById('pin-modal');
-  if (el) el.style.display = 'flex';
-}
-function openPersistentChat() {
-  const el = document.getElementById('persistent-chat-modal');
-  if (el) el.style.display = 'flex';
-}
-function openPaymentScheduleModal() {
-  const el = document.getElementById('payment-schedule-modal');
-  if (el) { el.style.display='flex'; if(typeof renderPaymentSchedule==='function') renderPaymentSchedule(); }
-}
-function openClientSearchModal() {
-  const el = document.getElementById('client-search-modal');
-  if (el) el.style.display = 'flex';
-}
-function openPosModal() {
-  const el = document.getElementById('pos-modal');
-  if (el) el.style.display = 'flex';
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 1: GANTT & PLANIFICARE
-// ══════════════════════════════════════════
-
-let ganttTasks = JSON.parse(localStorage.getItem('sv_gantt') || '[]');
-
-// 1. CREARE GRAFIC GANTT VIZUAL
-function createGanttChart(siteId) {
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  const tasks = ganttTasks.filter(t => t.siteId === siteId);
-  const el = document.getElementById('gantt-content');
-  if (!el) { alert('Modal Gantt lipsă!'); return; }
-
-  if (!tasks.length) {
-    el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">Nu există etape. Adaugă prima etapă!</div>';
-    document.getElementById('gantt-modal').style.display = 'flex';
-    return;
-  }
-
-  // Find date range
-  const allDates = tasks.flatMap(t => [new Date(t.startDate), new Date(t.endDate)]);
-  const minDate = new Date(Math.min(...allDates));
-  const maxDate = new Date(Math.max(...allDates));
-  const totalDays = Math.max(1, Math.ceil((maxDate - minDate) / 86400000)) + 2;
-  const today = new Date();
-
-  const colors = ['#fd9644','#00e5a0','#4d9fff','#a78bfa','#ff6b9d','#ffa502','#ff4757'];
-  let html = '<div style="overflow-x:auto">';
-  html += '<div style="min-width:600px">';
-  
-  // Header: site name
-  html += '<div style="font-weight:700;color:#fd9644;font-size:13px;margin-bottom:12px">';
-  html += '🏗️ ' + (site ? site.name : 'Șantier') + '</div>';
-  
-  // Timeline header
-  html += '<div style="display:flex;margin-left:140px;margin-bottom:4px">';
-  for (let d = 0; d < totalDays; d += Math.ceil(totalDays / 8)) {
-    const dt = new Date(minDate); dt.setDate(dt.getDate() + d);
-    html += '<div style="flex:1;font-size:9px;color:#6b7a8d">' + dt.toLocaleDateString('ro-RO', {day:'2-digit',month:'2-digit'}) + '</div>';
-  }
-  html += '</div>';
-
-  // Tasks
-  tasks.forEach((task, i) => {
-    const start = new Date(task.startDate);
-    const end = new Date(task.endDate);
-    const startOffset = Math.max(0, Math.ceil((start - minDate) / 86400000));
-    const duration = Math.max(1, Math.ceil((end - start) / 86400000));
-    const leftPct = (startOffset / totalDays * 100).toFixed(1);
-    const widthPct = (duration / totalDays * 100).toFixed(1);
-    const color = colors[i % colors.length];
-    const pct = task.progress || 0;
-    const isOverdue = today > end && pct < 100;
-    const isDue = !isOverdue && (end - today) < 3 * 86400000 && pct < 100;
-
-    html += '<div style="display:flex;align-items:center;margin-bottom:8px">';
-    html += '<div style="width:135px;flex-shrink:0;font-size:11px;color:#e8ecf0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">';
-    html += (isOverdue ? '🔴 ' : isDue ? '🟡 ' : '✅ ') + task.name + '</div>';
-    html += '<div style="flex:1;position:relative;height:28px;background:#1e2530;border-radius:6px">';
-    html += '<div style="position:absolute;left:' + leftPct + '%;width:' + widthPct + '%;height:100%;background:' + (isOverdue ? '#ff4757' : color) + ';border-radius:6px;overflow:hidden">';
-    html += '<div style="height:100%;width:' + pct + '%;background:rgba(255,255,255,0.25)"></div>';
-    html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">' + pct + '%</div>';
-    html += '</div></div>';
-    html += '<div style="width:60px;flex-shrink:0;font-size:10px;color:#6b7a8d;text-align:right;padding-left:6px">' + (task.responsible || '') + '</div>';
-    html += '</div>';
-  });
-
-  // Today marker note
-  html += '<div style="font-size:10px;color:#6b7a8d;margin-top:8px">📅 Azi: ' + today.toLocaleDateString('ro-RO') + '</div>';
-  html += '</div></div>';
-  
-  el.innerHTML = html;
-  document.getElementById('gantt-modal').style.display = 'flex';
-}
-
-// 2. ADAUGĂ ETAPĂ GANTT
-function addGanttTask(siteId, name, startDate, endDate, responsible, phase) {
-  const task = {
-    id: Date.now(),
-    siteId,
-    name: name || 'Etapă nouă',
-    startDate: startDate || new Date().toISOString().slice(0,10),
-    endDate: endDate || new Date(Date.now() + 7*86400000).toISOString().slice(0,10),
-    responsible: responsible || '',
-    phase: phase || 'General',
-    progress: 0,
-    created: new Date().toISOString()
-  };
-  ganttTasks.push(task);
-  localStorage.setItem('sv_gantt', JSON.stringify(ganttTasks));
-  setFeedback('✅ Etapă adăugată: ' + task.name + ' (' + task.startDate + ' → ' + task.endDate + ')', 'ok');
-  speak('Etapa ' + task.name + ' adaugata in planificare.');
-  return task.id;
-}
-
-// 3. ACTUALIZARE PROGRES DIN VOCE
-function updateGanttProgress(siteId, taskNameOrId, progressPct) {
-  let task = ganttTasks.find(t => t.id === taskNameOrId && t.siteId === siteId);
-  if (!task) {
-    task = ganttTasks.find(t => t.siteId === siteId &&
-      normalizeText(t.name.toLowerCase()).includes(normalizeText(String(taskNameOrId).toLowerCase())));
-  }
-  if (!task) { setFeedback('Etapa negăsită: ' + taskNameOrId, 'err'); return; }
-  task.progress = Math.min(100, Math.max(0, parseInt(progressPct) || 0));
-  task.lastUpdate = new Date().toISOString();
-  localStorage.setItem('sv_gantt', JSON.stringify(ganttTasks));
-  setFeedback('✅ ' + task.name + ': ' + task.progress + '% finalizat', 'ok');
-  speak(task.name + ': ' + task.progress + ' la suta.');
-  if (task.progress === 100) triggerAlert('🎉 Etapa "' + task.name + '" finalizată 100%!', 'ok');
-}
-
-// 4. ALERTĂ ÎNTÂRZIERE GANTT
-function ganttDelayAlert(siteId) {
-  const today = new Date();
-  const delayed = ganttTasks.filter(t => {
-    if (siteId && t.siteId !== siteId) return false;
-    return new Date(t.endDate) < today && (t.progress || 0) < 100;
-  });
-  if (!delayed.length) {
-    setFeedback('✅ Nicio etapă întârziată!', 'ok');
-    speak('Toate etapele sunt la termen.');
-    return;
-  }
-  const msg = delayed.map(t => {
-    const days = Math.ceil((today - new Date(t.endDate)) / 86400000);
-    return t.name + ': +' + days + 'z (' + (t.progress||0) + '%)';
-  }).join('\n');
-  triggerAlert('⚠️ ETAPE ÎNTÂRZIATE:\n' + msg, 'err');
-  if (userProfile?.telegram_id) sendTelegramAlert('⚠️ Etape întârziate pe șantier:\n' + msg, userProfile.telegram_id);
-  speak(delayed.length + ' etape intarziate. Verificati planificarea.');
-}
-setInterval(function(){ if(currentIndustry==='constructii' && typeof ganttDelayAlert==='function') ganttDelayAlert(null); }, 3600000);
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 2: CONSUM PER FAZĂ
-// ══════════════════════════════════════════
-
-let phaseConsumption = JSON.parse(localStorage.getItem('sv_phase_consumption') || '[]');
-
-// 5. LOG CONSUM MATERIAL PE FAZĂ
-function logMaterialByPhase(siteId, productId, qty, phase, workerName) {
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  const p = stock.find(s => s.id === productId);
-  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
-  if (p.qty < qty) { setFeedback('❌ Stoc insuficient: ' + p.name + ' (' + p.qty + ' disponibil)', 'err'); return; }
-
-  const entry = {
-    id: Date.now(),
-    siteId, siteName: site ? site.name : 'General',
-    productId, productName: p.name,
-    qty, unit: p.unit,
-    phase: phase || 'General',
-    value: qty * (p.price_buy || 0),
-    workerName: workerName || (userProfile ? userProfile.name : ''),
-    date: new Date().toLocaleDateString('ro-RO'),
-    time: new Date().toLocaleTimeString('ro-RO'),
-    ts: new Date().toISOString()
-  };
-  phaseConsumption.push(entry);
-  localStorage.setItem('sv_phase_consumption', JSON.stringify(phaseConsumption.slice(-1000)));
-
-  // Scade din stoc
-  p.qty -= qty;
-  saveStockToFirebase(); renderStock(); updateStats();
-  addLog('Faza ' + phase + ' - ' + site?.name, 'OUT ' + qty + ' ' + p.unit + ' ' + p.name, 'out');
-  setFeedback('✅ ' + qty + ' ' + p.unit + ' ' + p.name + ' → faza "' + (phase||'General') + '" (' + entry.workerName + ')', 'ok');
-  speak(qty + ' ' + p.unit + ' ' + p.name + ' consumate in faza ' + (phase||'General') + '.');
-}
-
-// 6. RAPORT CONSUM PE FAZE
-function phaseConsumptionReport(siteId) {
-  const entries = phaseConsumption.filter(e => !siteId || e.siteId === siteId);
-  if (!entries.length) { setFeedback('Nu există consum înregistrat pe faze!', 'warn'); return; }
-
-  const byPhase = {};
-  entries.forEach(e => {
-    if (!byPhase[e.phase]) byPhase[e.phase] = { items: [], total: 0 };
-    byPhase[e.phase].items.push(e);
-    byPhase[e.phase].total += e.value;
-  });
-
-  const el = document.getElementById('phase-report-content');
-  const totalAll = entries.reduce((s,e) => s + e.value, 0);
-  let html = '<div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">';
-  html += '<span style="color:#6b7a8d;font-size:12px">TOTAL CONSUMAT</span>';
-  html += '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + totalAll.toFixed(0) + ' RON</span></div>';
-
-  Object.entries(byPhase).sort((a,b) => b[1].total - a[1].total).forEach(([phase, data]) => {
-    html += '<div style="margin-bottom:14px">';
-    html += '<div style="display:flex;justify-content:space-between;margin-bottom:6px">';
-    html += '<span style="font-weight:700;color:#fd9644;font-size:13px">📐 ' + phase + '</span>';
-    html += '<span style="color:#fd9644;font-weight:700">' + data.total.toFixed(0) + ' RON</span></div>';
-    html += data.items.slice(-5).map(e =>
-      '<div style="display:flex;justify-content:space-between;padding:5px 8px;background:#181d24;border-radius:6px;margin-bottom:2px;font-size:11px">' +
-      '<span style="color:#99a8b8">' + e.productName + ' — ' + e.qty + ' ' + e.unit + '</span>' +
-      '<span style="color:#6b7a8d">' + e.workerName + ' · ' + e.date + '</span></div>'
-    ).join('');
-    html += '</div>';
-  });
-
-  if (el) { el.innerHTML = html; document.getElementById('phase-report-modal').style.display = 'flex'; }
-  else alert('📐 Consum pe faze:\n' + Object.entries(byPhase).map(([p,d])=>p+': '+d.total.toFixed(0)+' RON').join('\n'));
-}
-
-// 7. PLANIFICAT VS ACTUAL
-function comparePlannedVsActual(siteId) {
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  if (!site) { setFeedback('Șantier negăsit!', 'err'); return; }
-  const actual = phaseConsumption.filter(e => e.siteId === siteId).reduce((s,e) => s + e.value, 0);
-  const planned = site.budget || 0;
-  const diff = actual - planned;
-  const pct = planned > 0 ? (actual / planned * 100).toFixed(1) : 0;
-
-  const el = document.getElementById('planned-actual-content');
-  const html = '<div style="text-align:center;padding:20px 0">' +
-    '<div style="font-size:12px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Buget planificat</div>' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:36px;font-weight:900;color:#6b7a8d">' + planned.toFixed(0) + ' RON</div>' +
-    '<div style="font-size:12px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin:16px 0 4px">Consumat actual</div>' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:48px;font-weight:900;color:' + (diff>0?'#ff4757':'#00e5a0') + '">' + actual.toFixed(0) + ' RON</div>' +
-    '<div style="height:12px;background:#1e2530;border-radius:6px;margin:16px 0">' +
-    '<div style="height:100%;width:' + Math.min(100,pct) + '%;background:' + (pct>100?'#ff4757':pct>80?'#ffa502':'#00e5a0') + ';border-radius:6px;transition:width 0.5s"></div></div>' +
-    '<div style="font-size:13px;color:' + (diff>0?'#ff4757':'#00e5a0') + ';font-weight:700">' +
-    (diff>0 ? '⚠️ Depășit cu ' + diff.toFixed(0) + ' RON (' + pct + '%)' : '✅ Încadrat în buget (' + pct + '%)') + '</div></div>';
-
-  if (el) { el.innerHTML = html; document.getElementById('planned-actual-modal').style.display = 'flex'; }
-  setFeedback((diff>0?'⚠️':'✅') + ' ' + site.name + ': ' + pct + '% din buget consumat', diff>0?'err':'ok');
-  speak('Buget ' + site.name + ': ' + pct + ' la suta consumat.');
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 3: SCULE & TRACKING
-// ══════════════════════════════════════════
-
-let toolsInventory = JSON.parse(localStorage.getItem('sv_tools') || '[]');
-let toolMovements = JSON.parse(localStorage.getItem('sv_tool_movements') || '[]');
-
-// 8. SCOATERE SCULĂ (CHECK OUT)
-function checkOutTool(toolName, workerName, siteId) {
-  const tool = toolsInventory.find(t =>
-    normalizeText(t.name.toLowerCase()).includes(normalizeText(toolName.toLowerCase()))
-  );
-  if (!tool) { setFeedback('❌ Scula "' + toolName + '" nu există în inventar!', 'err'); return; }
-  if (tool.status === 'out') {
-    setFeedback('⚠️ Scula "' + tool.name + '" este deja la ' + tool.currentHolder + '!', 'warn');
-    speak('Atentie! ' + tool.name + ' este deja la ' + tool.currentHolder + '.');
-    return;
-  }
-
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  const now = new Date();
-  const movement = {
-    id: Date.now(), toolId: tool.id, toolName: tool.name,
-    type: 'out', worker: workerName || (userProfile ? userProfile.name : ''),
-    site: site ? site.name : 'Șantier', siteId,
-    date: now.toLocaleDateString('ro-RO'),
-    time: now.toLocaleTimeString('ro-RO'),
-    ts: now.toISOString()
-  };
-  toolMovements.push(movement);
-  tool.status = 'out';
-  tool.currentHolder = workerName || (userProfile ? userProfile.name : '');
-  tool.checkoutTime = now.toISOString();
-  tool.site = site ? site.name : 'Șantier';
-
-  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
-  localStorage.setItem('sv_tool_movements', JSON.stringify(toolMovements.slice(-2000)));
-
-  setFeedback('🔧 ' + tool.name + ' → ' + tool.currentHolder + ' · ' + now.toLocaleTimeString('ro-RO'), 'ok');
-  speak(tool.name + ' luata de ' + tool.currentHolder + ' la ora ' + now.getHours() + ' si ' + now.getMinutes() + ' minute.');
-
-  // Telegram notification
-  if (userProfile?.telegram_id) {
-    sendTelegramAlert('🔧 SCULĂ SCOASĂ:\n' + tool.name + '\nLuat de: ' + tool.currentHolder + '\nOra: ' + now.toLocaleString('ro-RO') + '\nȘantier: ' + (site ? site.name : '—'), userProfile.telegram_id);
-  }
-}
-
-// 9. RETURNARE SCULĂ (CHECK IN)
-function checkInTool(toolName, workerName, condition) {
-  const tool = toolsInventory.find(t =>
-    normalizeText(t.name.toLowerCase()).includes(normalizeText(toolName.toLowerCase()))
-  );
-  if (!tool) { setFeedback('❌ Scula "' + toolName + '" nu există!', 'err'); return; }
-  if (tool.status === 'available') { setFeedback('ℹ️ Scula este deja disponibilă.', 'warn'); return; }
-
-  const now = new Date();
-  const hoursOut = tool.checkoutTime ? ((now - new Date(tool.checkoutTime)) / 3600000).toFixed(1) : '?';
-  const movement = {
-    id: Date.now(), toolId: tool.id, toolName: tool.name,
-    type: 'in', worker: workerName || tool.currentHolder,
-    condition: condition || 'bună',
-    hoursOut, date: now.toLocaleDateString('ro-RO'),
-    time: now.toLocaleTimeString('ro-RO'), ts: now.toISOString()
-  };
-  toolMovements.push(movement);
-
-  const holder = tool.currentHolder;
-  tool.status = condition === 'defectă' ? 'defect' : 'available';
-  tool.currentHolder = null;
-  tool.checkoutTime = null;
-  tool.lastReturn = now.toISOString();
-  tool.condition = condition || 'bună';
-
-  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
-  localStorage.setItem('sv_tool_movements', JSON.stringify(toolMovements.slice(-2000)));
-
-  const condMsg = condition === 'defectă' ? ' ⚠️ DEFECTĂ!' : ' · Stare: ' + (condition||'bună');
-  setFeedback('✅ ' + tool.name + ' returnată de ' + holder + ' după ' + hoursOut + 'h' + condMsg, 'ok');
-  speak(tool.name + ' returnata de ' + holder + '. Stare: ' + (condition||'buna') + '.');
-
-  if (condition === 'defectă') {
-    triggerAlert('⚠️ SCULĂ DEFECTĂ: ' + tool.name + ' returnată de ' + holder + ' în stare defectă!', 'err');
-    if (userProfile?.telegram_id) sendTelegramAlert('⚠️ SCULĂ DEFECTĂ: ' + tool.name + '\nReturnată de: ' + holder, userProfile.telegram_id);
-  }
-}
-
-// 10. INVENTAR SCULE
-function toolInventory() {
-  const el = document.getElementById('tool-inventory-content');
-  const available = toolsInventory.filter(t => t.status === 'available');
-  const out = toolsInventory.filter(t => t.status === 'out');
-  const defect = toolsInventory.filter(t => t.status === 'defect');
-
-  const html = '<div style="display:flex;gap:8px;margin-bottom:14px">' +
-    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #00e5a0">' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#00e5a0">' + available.length + '</div>' +
-    '<div style="font-size:10px;color:#6b7a8d">Disponibile</div></div>' +
-    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #ffa502">' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#ffa502">' + out.length + '</div>' +
-    '<div style="font-size:10px;color:#6b7a8d">În folosință</div></div>' +
-    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #ff4757">' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#ff4757">' + defect.length + '</div>' +
-    '<div style="font-size:10px;color:#6b7a8d">Defecte</div></div></div>' +
-    toolsInventory.map(t => {
-      const lastMove = toolMovements.filter(m => m.toolId === t.id).slice(-1)[0];
-      const statusColor = t.status==='available'?'#00e5a0':t.status==='defect'?'#ff4757':'#ffa502';
-      const statusLabel = t.status==='available'?'✅ Disponibil':t.status==='defect'?'❌ Defectă':'🔧 La '+t.currentHolder;
-      return '<div style="padding:10px;background:#181d24;border-radius:10px;margin-bottom:6px;border-left:3px solid '+statusColor+'">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center">' +
-        '<div><div style="font-weight:700;color:#e8ecf0">' + t.name + '</div>' +
-        '<div style="font-size:11px;color:#6b7a8d">' + (t.category||'Sculă') + (t.barcode?' · '+t.barcode:'') + '</div></div>' +
-        '<div style="text-align:right"><div style="font-size:11px;color:'+statusColor+';font-weight:700">' + statusLabel + '</div>' +
-        (t.status==='out'?'<div style="font-size:10px;color:#6b7a8d">' + (t.site||'') + '</div>':'') + '</div></div>' +
-        (lastMove?'<div style="font-size:10px;color:#6b7a8d;margin-top:4px">Ultima mișcare: ' + lastMove.worker + ' · ' + lastMove.date + ' ' + lastMove.time + '</div>':'') +
-        '</div>';
-    }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există scule în inventar.</div>';
-
-  if (el) { el.innerHTML = html; document.getElementById('tool-inventory-modal').style.display = 'flex'; }
-}
-
-// 11. SCAN COD SCULĂ
-function scanToolBarcode(barcode) {
-  const tool = toolsInventory.find(t => t.barcode === barcode);
-  if (!tool) { setFeedback('Cod ' + barcode + ' negăsit! Înregistrați scula mai întâi.', 'warn'); return null; }
-  const action = tool.status === 'available' ? 'out' : 'in';
-  const worker = userProfile ? userProfile.name : prompt('Numele dvs:') || 'Necunoscut';
-  if (action === 'out') checkOutTool(tool.name, worker, null);
-  else checkInTool(tool.name, worker, 'bună');
-  return tool;
-}
-
-// 12. COMANDĂ VOCALĂ SCULE
-function voiceToolCommand(text) {
-  const t = normalizeText(text.toLowerCase());
-  const takeKW = ['iau','ia','imi trebuie','folosesc','ridic','preiau'];
-  const returnKW = ['aduc','returnez','aduc inapoi','am terminat cu','inapoi'];
-  const isTake = takeKW.some(k => t.includes(k));
-  const isReturn = returnKW.some(k => t.includes(k));
-  if (!isTake && !isReturn) return false;
-
-  // Find tool name in text - remove action words
-  let toolText = t;
-  [...takeKW, ...returnKW].forEach(k => { toolText = toolText.replace(k, ''); });
-  toolText = toolText.trim();
-  if (!toolText || toolText.length < 2) return false;
-
-  const tool = toolsInventory.find(t =>
-    normalizeText(t.name.toLowerCase()).includes(toolText) ||
-    toolText.includes(normalizeText(t.name.toLowerCase()))
-  );
-  if (!tool) { setFeedback('Scula "' + toolText + '" nu e în inventar.', 'warn'); return false; }
-
-  const worker = userProfile ? userProfile.name : 'Operator';
-  if (isTake) checkOutTool(tool.name, worker, null);
-  else checkInTool(tool.name, worker, 'bună');
-  return true;
-}
-
-// 13. ALERTĂ SCULE NERETURATE
-function toolOverdueAlert() {
-  const maxHours = 8; // Return same day
-  const now = new Date();
-  const overdue = toolsInventory.filter(t => {
-    if (t.status !== 'out' || !t.checkoutTime) return false;
-    const hours = (now - new Date(t.checkoutTime)) / 3600000;
-    return hours > maxHours;
-  });
-  if (!overdue.length) return;
-  const msg = overdue.map(t => {
-    const h = ((now - new Date(t.checkoutTime)) / 3600000).toFixed(1);
-    return t.name + ' → ' + t.currentHolder + ' (' + h + 'h)';
-  }).join('\n');
-  triggerAlert('⏰ SCULE NERETURATE (' + overdue.length + '):\n' + msg, 'warn');
-  if (userProfile?.telegram_id) sendTelegramAlert('⏰ Scule nereturate:\n' + msg, userProfile.telegram_id);
-  speak(overdue.length + ' scule nereturate. Verificati inventarul.');
-}
-setInterval(function(){ if(currentIndustry==='constructii' && typeof toolOverdueAlert==='function') toolOverdueAlert(); }, 3600000);
-
-// HELPER: Adaugă sculă în inventar
-function addTool(name, category, barcode) {
-  toolsInventory.push({ id: Date.now(), name, category: category||'Sculă', barcode: barcode||'', status:'available', currentHolder:null, checkoutTime:null, condition:'bună', created: new Date().toISOString() });
-  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
-  setFeedback('✅ Sculă adăugată: ' + name, 'ok');
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 4: ECHIPAMENTE & ITP
-// ══════════════════════════════════════════
-
-let equipmentRegistry = JSON.parse(localStorage.getItem('sv_equipment_registry') || '[]');
-let maintenanceLog = JSON.parse(localStorage.getItem('sv_maintenance_log') || '[]');
-
-// 14. ADAUGĂ ITP / REVIZIE ECHIPAMENT
-function addEquipmentITP(equipmentName, itpDate, revizieDate, iscirDate, nextRevizieKm) {
-  let eq = equipmentRegistry.find(e => normalizeText(e.name.toLowerCase()).includes(normalizeText(equipmentName.toLowerCase())));
-  if (!eq) {
-    eq = { id: Date.now(), name: equipmentName, category: 'Echipament', created: new Date().toISOString() };
-    equipmentRegistry.push(eq);
-  }
-  if (itpDate) eq.itpDate = itpDate;
-  if (revizieDate) eq.revizieDate = revizieDate;
-  if (iscirDate) eq.iscirDate = iscirDate;
-  if (nextRevizieKm) eq.nextRevizieKm = parseInt(nextRevizieKm);
-  eq.updated = new Date().toISOString();
-  localStorage.setItem('sv_equipment_registry', JSON.stringify(equipmentRegistry));
-  setFeedback('✅ ITP actualizat: ' + eq.name + ' · ITP: ' + (itpDate||'—') + ' · Revizie: ' + (revizieDate||'—'), 'ok');
-}
-
-// 15. VERIFICARE EXPIRARE ITP
-function checkEquipmentExpiry() {
-  const today = new Date();
-  const warn30 = new Date(today.getTime() + 30 * 86400000);
-  const alerts = [];
-  equipmentRegistry.forEach(eq => {
-    ['itpDate','revizieDate','iscirDate'].forEach(field => {
-      if (!eq[field]) return;
-      const expDate = new Date(eq[field]);
-      const days = Math.ceil((expDate - today) / 86400000);
-      if (days < 0) alerts.push({ eq: eq.name, type: field.replace('Date','').toUpperCase(), days, overdue: true });
-      else if (days <= 30) alerts.push({ eq: eq.name, type: field.replace('Date','').toUpperCase(), days, overdue: false });
-    });
-  });
-  const el = document.getElementById('equipment-expiry-content');
-  const html = alerts.length ? alerts.map(a =>
-    '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ' + (a.overdue?'#ff4757':'#ffa502') + '">' +
-    '<div style="display:flex;justify-content:space-between">' +
-    '<div style="font-weight:700;color:#e8ecf0">' + a.eq + '</div>' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:' + (a.overdue?'#ff4757':'#ffa502') + '">' +
-    (a.overdue ? 'EXPIRAT' : a.days + 'z') + '</div></div>' +
-    '<div style="font-size:11px;color:#6b7a8d">' + a.type + (a.overdue?' — Expirat de ' + Math.abs(a.days) + ' zile!':' — Expiră în ' + a.days + ' zile') + '</div>' +
-    '</div>'
-  ).join('') : '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate documentele echipamentelor sunt valide!</div>';
-
-  if (el) { el.innerHTML = html; document.getElementById('equipment-expiry-modal').style.display = 'flex'; }
-  if (alerts.some(a => a.overdue)) {
-    const msg = alerts.filter(a=>a.overdue).map(a=>a.eq+' — '+a.type+' EXPIRAT').join('\n');
-    if (userProfile?.telegram_id) sendTelegramAlert('⚠️ ECHIPAMENTE CU DOCUMENTE EXPIRATE:\n' + msg, userProfile.telegram_id);
-  }
-  setFeedback((alerts.length?'⚠️':'✅') + ' ' + alerts.length + ' alerte documente echipamente', alerts.length?'warn':'ok');
-}
-setInterval(function(){ if(currentIndustry==='constructii' && typeof checkEquipmentExpiry==='function') checkEquipmentExpiry(); }, 86400000);
-
-// 16. JURNAL INTERVENȚII ECHIPAMENTE
-function equipmentMaintenanceLog(equipmentName, type, description, cost, technician) {
-  const eq = equipmentRegistry.find(e => normalizeText(e.name.toLowerCase()).includes(normalizeText(equipmentName.toLowerCase())));
-  const entry = {
-    id: Date.now(),
-    equipmentName, equipmentId: eq ? eq.id : null,
-    type: type || 'Revizie', // Revizie / Reparatie / Defectiune / Constatare
-    description: description || '',
-    cost: parseFloat(cost) || 0,
-    technician: technician || (userProfile ? userProfile.name : ''),
-    date: new Date().toLocaleDateString('ro-RO'),
-    ts: new Date().toISOString()
-  };
-  maintenanceLog.push(entry);
-  localStorage.setItem('sv_maintenance_log', JSON.stringify(maintenanceLog.slice(-500)));
-  setFeedback('✅ Intervenție înregistrată: ' + type + ' · ' + equipmentName + (cost?' · ' + cost + ' RON':''), 'ok');
-  if (type === 'Defectiune' || type === 'Defecțiune') {
-    triggerAlert('🔧 DEFECȚIUNE: ' + equipmentName + ' — ' + description, 'err');
-    if (userProfile?.telegram_id) sendTelegramAlert('🔧 DEFECȚIUNE ECHIPAMENT:\n' + equipmentName + '\n' + description, userProfile.telegram_id);
-  }
-}
-
-// 17. RAPORT COSTURI ECHIPAMENTE
-function equipmentCostReport() {
-  const byCost = {};
-  maintenanceLog.forEach(e => {
-    if (!byCost[e.equipmentName]) byCost[e.equipmentName] = { total: 0, interventions: 0 };
-    byCost[e.equipmentName].total += e.cost;
-    byCost[e.equipmentName].interventions++;
-  });
-  // Add usage hours from equipmentLog
-  if (typeof equipmentLog !== 'undefined') {
-    equipmentLog.forEach(e => {
-      if (!byCost[e.equipment]) byCost[e.equipment] = { total: 0, interventions: 0, hours: 0 };
-      byCost[e.equipment].hours = (byCost[e.equipment].hours || 0) + e.hours;
-    });
-  }
-  const sorted = Object.entries(byCost).sort((a,b) => b[1].total - a[1].total);
-  const el = document.getElementById('equipment-cost-content');
-  const html = sorted.length ? sorted.map(([name, data]) =>
-    '<div style="padding:10px;background:#181d24;border-radius:10px;margin-bottom:6px">' +
-    '<div style="display:flex;justify-content:space-between;align-items:center">' +
-    '<div><div style="font-weight:700;color:#e8ecf0">⚙️ ' + name + '</div>' +
-    '<div style="font-size:11px;color:#6b7a8d">' + data.interventions + ' intervenții' + (data.hours?' · ' + data.hours.toFixed(0) + 'h lucrate':'') + '</div></div>' +
-    '<div style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + data.total.toFixed(0) + ' RON</div>' +
-    '</div></div>'
-  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există date de cost.</div>';
-  if (el) { el.innerHTML = html; document.getElementById('equipment-cost-modal').style.display = 'flex'; }
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 5: SITUAȚIE LUCRĂRI & DECONTARE
-// ══════════════════════════════════════════
-
-let decontari = JSON.parse(localStorage.getItem('sv_decontari') || '[]');
-let contractDeadlines = JSON.parse(localStorage.getItem('sv_deadlines') || '[]');
-
-// 18. GENERARE SITUAȚIE LUCRĂRI PDF
-function generateSituatieLucrari(siteId) {
-  if (!window.jspdf) { setFeedback('jsPDF indisponibil!', 'err'); return; }
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  if (!site) { setFeedback('Selectați un șantier!', 'warn'); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const sitNo = 'SIT-' + Date.now().toString().slice(-6);
-  const now = new Date().toLocaleDateString('ro-RO');
-  const consumed = phaseConsumption.filter(e => e.siteId === siteId);
-  const byPhase = {};
-  consumed.forEach(e => {
-    if (!byPhase[e.phase]) byPhase[e.phase] = [];
-    byPhase[e.phase].push(e);
-  });
-
-  // Header
-  doc.setFillColor(17, 20, 24); doc.rect(0, 0, 210, 42, 'F');
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(232, 236, 240);
-  doc.text('SITUAȚIE DE LUCRĂRI', 14, 18);
-  doc.setFontSize(10); doc.setTextColor(253, 150, 68);
-  doc.text(sitNo + '  ·  ' + now, 14, 28);
-  doc.setTextColor(153, 168, 184);
-  doc.text('Obiectiv: ' + site.name + '  ·  Adresă: ' + (site.address || '—'), 14, 36);
-
-  let y = 50;
-  let grandTotal = 0;
-  Object.entries(byPhase).forEach(([phase, items]) => {
-    const phaseTotal = items.reduce((s, e) => s + e.value, 0);
-    grandTotal += phaseTotal;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(253, 150, 68);
-    doc.text('📐 ' + phase.toUpperCase(), 14, y); y += 6;
-    doc.autoTable({
-      startY: y,
-      head: [['Material', 'U.M.', 'Cantitate', 'Preț', 'Valoare']],
-      body: items.map(e => [e.productName, e.unit, e.qty, (e.value/e.qty).toFixed(2)+' RON', e.value.toFixed(2)+' RON']),
-      styles: { fontSize: 8, textColor: [0,0,0], fillColor: [255,255,255] },
-      headStyles: { fillColor: [17,20,24], textColor: [253,150,68], fontStyle: 'bold' },
-      alternateRowStyles: { fillColor: [245,245,245] },
-      margin: { left: 14, right: 14 }
-    });
-    y = doc.lastAutoTable.finalY + 4;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(0,0,0);
-    doc.text('Subtotal ' + phase + ': ' + phaseTotal.toFixed(2) + ' RON', 14, y); y += 10;
-  });
-
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(253, 150, 68);
-  doc.text('TOTAL GENERAL: ' + grandTotal.toFixed(2) + ' RON', 14, y + 4);
-  doc.text('TVA 19%: ' + (grandTotal * 0.19).toFixed(2) + ' RON', 14, y + 12);
-  doc.text('TOTAL CU TVA: ' + (grandTotal * 1.19).toFixed(2) + ' RON', 14, y + 20);
-  y += 32;
-  doc.setFontSize(9); doc.setTextColor(0,0,0);
-  doc.text('Beneficiar: ___________________', 14, y);
-  doc.text('Executant: ___________________', 120, y);
-  doc.save(sitNo + '_' + site.name.replace(/\s+/g,'_') + '.pdf');
-  setFeedback('✅ Situație lucrări ' + sitNo + ' generată!', 'ok');
-  speak('Situatie de lucrari generata cu succes.');
-}
-
-// 19. ADAUGĂ DECONTARE
-function addDecontare(siteId, category, description, amount, receipt, workerName) {
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  decontari.push({
-    id: Date.now(),
-    siteId, siteName: site ? site.name : 'General',
-    category: category || 'Diverse',
-    description: description || '',
-    amount: parseFloat(amount) || 0,
-    receipt: receipt || '',
-    worker: workerName || (userProfile ? userProfile.name : ''),
-    date: new Date().toLocaleDateString('ro-RO'),
-    ts: new Date().toISOString(),
-    status: 'pending'
-  });
-  localStorage.setItem('sv_decontari', JSON.stringify(decontari));
-  setFeedback('✅ Decontare adăugată: ' + description + ' — ' + amount + ' RON', 'ok');
-}
-
-// 20. RAPORT DECONTĂRI
-function decontareReport(siteId) {
-  const entries = decontari.filter(d => !siteId || d.siteId === siteId);
-  const total = entries.reduce((s, d) => s + d.amount, 0);
-  const byCat = {};
-  entries.forEach(d => { byCat[d.category] = (byCat[d.category] || 0) + d.amount; });
-  const el = document.getElementById('decontare-content');
-  const html = '<div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">' +
-    '<span style="color:#6b7a8d;font-size:12px">TOTAL DECONTĂRI</span>' +
-    '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + total.toFixed(0) + ' RON</span></div>' +
-    Object.entries(byCat).map(([cat, val]) =>
-      '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:#181d24;border-radius:6px;margin-bottom:3px">' +
-      '<span style="color:#e8ecf0;font-size:12px">📋 ' + cat + '</span><span style="color:#fd9644;font-weight:700">' + val.toFixed(0) + ' RON</span></div>'
-    ).join('') +
-    '<div style="margin-top:12px;font-size:12px;color:#6b7a8d;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Ultimele decontări</div>' +
-    entries.slice(-8).reverse().map(d =>
-      '<div style="padding:7px;background:#181d24;border-radius:6px;margin-bottom:3px;display:flex;justify-content:space-between">' +
-      '<div><div style="font-size:12px;color:#e8ecf0">' + d.description + '</div>' +
-      '<div style="font-size:10px;color:#6b7a8d">' + d.worker + ' · ' + d.date + ' · ' + d.category + '</div></div>' +
-      '<span style="font-weight:700;color:#fd9644;font-size:13px">' + d.amount.toFixed(0) + ' RON</span></div>'
-    ).join('');
-  if (el) { el.innerHTML = html; document.getElementById('decontare-modal').style.display = 'flex'; }
-  setFeedback('📋 Decontări: ' + entries.length + ' — Total: ' + total.toFixed(0) + ' RON', 'ok');
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 6: TERMENE & PENALITĂȚI
-// ══════════════════════════════════════════
-
-// 21. TERMEN CONTRACTUAL
-function addContractDeadline(siteId, phase, deadlineDate, penaltyPerDay) {
-  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
-  contractDeadlines.push({
-    id: Date.now(),
-    siteId, siteName: site ? site.name : 'General',
-    phase: phase || 'Finalizare',
-    deadlineDate, penaltyPerDay: parseFloat(penaltyPerDay) || 0,
-    created: new Date().toISOString(), alerted: false
-  });
-  localStorage.setItem('sv_deadlines', JSON.stringify(contractDeadlines));
-  setFeedback('✅ Termen adăugat: ' + (phase||'Finalizare') + ' → ' + deadlineDate + ' (penalitate: ' + (penaltyPerDay||0) + ' RON/zi)', 'ok');
-}
-
-// 22. CALCULARE PENALITĂȚI
-function checkPenalties(siteId) {
-  const today = new Date();
-  const results = contractDeadlines.filter(d => !siteId || d.siteId === siteId).map(d => {
-    const deadline = new Date(d.deadlineDate);
-    const daysLate = Math.max(0, Math.ceil((today - deadline) / 86400000));
-    const penalty = daysLate * d.penaltyPerDay;
-    return { ...d, daysLate, penalty };
-  }).filter(d => d.daysLate > 0);
-
-  const totalPenalty = results.reduce((s, d) => s + d.penalty, 0);
-  const el = document.getElementById('penalties-content');
-  const html = results.length ?
-    '<div style="background:rgba(255,71,87,0.1);border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">' +
-    '<span style="color:#ff4757;font-size:12px;font-weight:700">TOTAL PENALITĂȚI</span>' +
-    '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#ff4757">' + totalPenalty.toFixed(0) + ' RON</span></div>' +
-    results.map(r =>
-      '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #ff4757">' +
-      '<div style="display:flex;justify-content:space-between">' +
-      '<div><div style="font-weight:700;color:#e8ecf0">' + r.siteName + ' — ' + r.phase + '</div>' +
-      '<div style="font-size:11px;color:#6b7a8d">Termen: ' + r.deadlineDate + ' · Întârziere: ' + r.daysLate + ' zile</div></div>' +
-      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#ff4757">' + r.penalty.toFixed(0) + ' RON</div></div></div>'
-    ).join('') :
-    '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Nu există penalități acumulate!</div>';
-
-  if (el) { el.innerHTML = html; document.getElementById('penalties-modal').style.display = 'flex'; }
-  if (totalPenalty > 0) setFeedback('⚠️ Penalități totale: ' + totalPenalty.toFixed(0) + ' RON!', 'err');
-  speak(results.length > 0 ? 'Atentie! Penalitati acumulate: ' + totalPenalty.toFixed(0) + ' lei.' : 'Nu exista penalitati.');
-}
-
-// 23. COUNTDOWN TERMENE
-function deadlineCountdown(siteId) {
-  const today = new Date();
-  const upcoming = contractDeadlines
-    .filter(d => !siteId || d.siteId === siteId)
-    .map(d => {
-      const dl = new Date(d.deadlineDate);
-      const days = Math.ceil((dl - today) / 86400000);
-      return { ...d, daysLeft: days };
-    })
-    .sort((a, b) => a.daysLeft - b.daysLeft);
-
-  const el = document.getElementById('deadline-countdown-content');
-  const html = upcoming.length ? upcoming.map(d => {
-    const color = d.daysLeft < 0 ? '#ff4757' : d.daysLeft < 7 ? '#ffa502' : d.daysLeft < 30 ? '#fd9644' : '#00e5a0';
-    const label = d.daysLeft < 0 ? 'DEPĂȘIT cu ' + Math.abs(d.daysLeft) + ' zile!' : d.daysLeft === 0 ? 'AZI!' : d.daysLeft + ' zile rămase';
-    return '<div style="padding:12px;background:#181d24;border-radius:10px;margin-bottom:8px;border-left:4px solid ' + color + '">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center">' +
-      '<div><div style="font-weight:700;color:#e8ecf0">' + d.siteName + '</div>' +
-      '<div style="font-size:11px;color:#6b7a8d">' + d.phase + ' · ' + d.deadlineDate + '</div></div>' +
-      '<div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;color:' + color + '">' + label + '</div></div>' +
-      (d.penaltyPerDay > 0 ? '<div style="font-size:10px;color:#6b7a8d;margin-top:4px">Penalitate: ' + d.penaltyPerDay + ' RON/zi</div>' : '') +
-      '</div>';
-  }).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există termene contractuale.</div>';
-
-  if (el) { el.innerHTML = html; document.getElementById('deadline-countdown-modal').style.display = 'flex'; }
-}
-
-// ══════════════════════════════════════════
-// CONSTRUCȚII - BLOC 7: CALCULATOARE
-// ══════════════════════════════════════════
-
-// 24. CALCULATOR BETON
-function calcBeton(volumM3, clasa) {
-  const vol = parseFloat(volumM3) || 0;
-  if (!vol) { setFeedback('Introduceți volumul în m³!', 'warn'); return; }
-  // Rețete per clasă (saci 50kg / m³)
-  const recipes = {
-    'C8/10':  { ciment: 6,  nisip: 0.9, pietris: 0.9, apa: 170 },
-    'C12/15': { ciment: 7,  nisip: 0.85,pietris: 0.95,apa: 175 },
-    'C16/20': { ciment: 8,  nisip: 0.8, pietris: 1.0, apa: 180 },
-    'C20/25': { ciment: 9,  nisip: 0.75,pietris: 1.05,apa: 185 },
-    'C25/30': { ciment: 10, nisip: 0.7, pietris: 1.1, apa: 190 },
-  };
-  const cls = clasa || 'C16/20';
-  const r = recipes[cls] || recipes['C16/20'];
-  const result = {
-    ciment:  (vol * r.ciment).toFixed(0) + ' saci (50kg)',
-    nisip:   (vol * r.nisip).toFixed(2) + ' m³',
-    pietris: (vol * r.pietris).toFixed(2) + ' m³',
-    apa:     (vol * r.apa).toFixed(0) + ' litri'
-  };
-  const msg = '🧱 BETON ' + cls + ' pentru ' + vol + ' m³:\n' +
-    '• Ciment: ' + result.ciment + '\n' +
-    '• Nisip: ' + result.nisip + '\n' +
-    '• Pietriș: ' + result.pietris + '\n' +
-    '• Apă: ' + result.apa;
-  setFeedback('🧱 Beton ' + cls + ': ' + result.ciment + ' ciment, ' + result.nisip + ' nisip, ' + result.pietris + ' pietriș', 'ok');
-  speak('Pentru ' + vol + ' metri cubi beton clasa ' + cls + ' ai nevoie de ' + result.ciment + ' de ciment.');
-  showCalcResult('🧱 Calculator Beton', msg, result, vol, cls);
-  return result;
-}
-
-// 25. CALCULATOR MORTAR
-function calcMortar(suprafataM2, grosimeMM, dozaj) {
-  const sup = parseFloat(suprafataM2) || 0;
-  const gros = parseFloat(grosimeMM) || 20;
-  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
-  const volM3 = sup * (gros / 1000);
-  const doz = dozaj || 350; // kg ciment/m³
-  const cimentKg = (volM3 * doz).toFixed(0);
-  const cimentSaci = Math.ceil(cimentKg / 25);
-  const nisipM3 = (volM3 * 1.5).toFixed(2);
-  const result = { ciment: cimentSaci + ' saci (25kg)', nisip: nisipM3 + ' m³', volum: volM3.toFixed(3) + ' m³' };
-  const msg = '🪣 MORTAR pentru ' + sup + ' m² (grosime ' + gros + 'mm):\n' +
-    '• Volum mortar: ' + result.volum + '\n' +
-    '• Ciment: ' + result.ciment + '\n' +
-    '• Nisip: ' + result.nisip;
-  setFeedback('🪣 Mortar: ' + result.ciment + ' ciment, ' + result.nisip + ' nisip', 'ok');
-  speak('Pentru ' + sup + ' metri patrati de tencuiala ai nevoie de ' + cimentSaci + ' saci de ciment.');
-  showCalcResult('🪣 Calculator Mortar', msg, result, sup, gros);
-  return result;
-}
-
-// 26. CALCULATOR CĂRĂMIZI
-function calcCaramida(suprafataM2, tipZid) {
-  const sup = parseFloat(suprafataM2) || 0;
-  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
-  const types = {
-    'simplu': { buc: 64, mortar: 0.025 },
-    'dublu':  { buc: 128, mortar: 0.05 },
-    'BCA':    { buc: 8,  mortar: 0.012 },
-  };
-  const tip = tipZid || 'simplu';
-  const t = types[tip] || types.simplu;
-  const caramizi = Math.ceil(sup * t.buc * 1.05); // +5% pierderi
-  const mortarM3 = (sup * t.mortar).toFixed(3);
-  const cimentSaci = Math.ceil(sup * t.mortar * 350 / 25);
-  const result = { caramizi: caramizi + ' buc', mortar: mortarM3 + ' m³', ciment: cimentSaci + ' saci' };
-  const msg = '🧱 ZIDĂRIE ' + tip.toUpperCase() + ' pentru ' + sup + ' m²:\n' +
-    '• Cărămizi: ' + result.caramizi + ' (+5% pierderi)\n' +
-    '• Mortar: ' + result.mortar + '\n' +
-    '• Ciment: ' + result.ciment;
-  setFeedback('🧱 Zidărie: ' + result.caramizi + ' cărămizi, ' + result.ciment + ' ciment', 'ok');
-  speak('Pentru ' + sup + ' metri patrati zidarie ai nevoie de ' + caramizi + ' caramizi.');
-  showCalcResult('🧱 Calculator Zidărie', msg, result, sup, tip);
-  return result;
-}
-
-// 27. CALCULATOR ARMĂTURĂ
-function calcArmatura(suprafataM2, tipElement, greutateKgM2) {
-  const sup = parseFloat(suprafataM2) || 0;
-  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
-  const defaults = { 'placa': 15, 'grinda': 120, 'stalp': 160, 'fundatie': 45 };
-  const tip = tipElement || 'placa';
-  const kgM2 = parseFloat(greutateKgM2) || defaults[tip] || 15;
-  const totalKg = (sup * kgM2).toFixed(0);
-  const tone = (sup * kgM2 / 1000).toFixed(3);
-  // Bare OB37 / PC52
-  const bare12 = Math.ceil(sup * kgM2 / 0.888); // 1m bara ∅12 = 0.888 kg
-  const bare16 = Math.ceil(sup * kgM2 / 1.578); // 1m bara ∅16 = 1.578 kg
-  const result = { total: totalKg + ' kg', tone: tone + ' t', bare12: bare12 + ' ml (∅12)', bare16: bare16 + ' ml (∅16)' };
-  const msg = '⚙️ ARMĂTURĂ ' + tip.toUpperCase() + ' pentru ' + sup + ' m²:\n' +
-    '• Total fier: ' + result.total + ' (' + result.tone + ')\n' +
-    '• Bare ∅12: ' + result.bare12 + '\n' +
-    '• Bare ∅16: ' + result.bare16;
-  setFeedback('⚙️ Armătură: ' + result.total + ' fier beton', 'ok');
-  speak('Pentru ' + sup + ' metri patrati ' + tip + ' ai nevoie de ' + totalKg + ' kilograme de fier beton.');
-  showCalcResult('⚙️ Calculator Armătură', msg, result, sup, tip);
-  return result;
-}
-
-// HELPER: Afișare rezultat calculator
-function showCalcResult(title, message, result, input, param) {
-  const el = document.getElementById('calculator-result');
-  if (el) {
-    el.innerHTML = '<div style="font-weight:700;color:#fd9644;margin-bottom:10px">' + title + '</div>' +
-      '<div style="white-space:pre-line;font-size:13px;color:#e8ecf0;line-height:1.6">' + message + '</div>' +
-      '<button onclick="navigator.clipboard.writeText(' + JSON.stringify(message) + ').then(()=>setFeedback(\'✅ Copiat!\',\'ok\'))" ' +
-      'style="margin-top:12px;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer;touch-action:manipulation">📋 Copiază</button>';
-    document.getElementById('calculator-modal').style.display = 'flex';
-  } else {
-    alert(message);
-  }
-}
-
-
-
-// Constructii helper prompts
-function showGanttPrompt() {
-  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  createGanttChart(constructionSites[0].id);
-}
-function showPhaseReportPrompt() {
-  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
-  phaseConsumptionReport(siteId);
-}
-function showPlannedVsActualPrompt() {
-  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  comparePlannedVsActual(constructionSites[0].id);
-}
-function showDecontarePrompt() {
-  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
-  decontareReport(siteId);
-}
-function showDeadlinesPrompt() {
-  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
-  deadlineCountdown(siteId);
-}
-function showPenaltiesPrompt() {
-  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
-  checkPenalties(siteId);
-}
-function showSituatiePrompt() {
-  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
-  generateSituatieLucrari(constructionSites[0].id);
-}
-function openCalculatorModal() {
-  const el = document.getElementById('calculator-modal');
-  if (el) el.style.display = 'flex';
-}
-// Hook voice commands for tools into voice processing
-const _origVoiceHandlers = typeof _voiceHandlerNames !== 'undefined' ? _voiceHandlerNames : [];
-if (Array.isArray(_origVoiceHandlers) && !_origVoiceHandlers.includes('voiceToolCommand')) {
-  _origVoiceHandlers.push('voiceToolCommand');
-}
-
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <script>
@@ -23255,6 +21942,1330 @@ function showNoMovementReport() {
 
   document.getElementById('no-movement-modal').style.display = 'flex';
 }
+
+
+
+}
+
+
+// ══════════════════════════════════════════
+// TOOLBAR DINAMIC PER INDUSTRIE
+// ══════════════════════════════════════════
+
+const TOOLBAR_CONFIG = {
+  depozit: {
+    tabNames: { stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT' },
+    stoc: [
+      {l:'+ Produs',f:'openAddModal',c:'#00e5a0'},
+      {l:'📊 Excel',f:'openImportModal',c:'#00e5a0'},
+      {l:'🔄 Transfer',f:'openTransferModal',c:'#00e5a0'},
+      {l:'🔁 Inventar',f:'openInventarModal',c:'#a78bfa'},
+      {l:'📷 Scan',f:'openQRModal',c:'#6b7a8d'},
+      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'🤖 Auto Min',f:'calcAutoMinStock',c:'#00e5a0'},
+      {l:'🗺️ Hartă',f:'openWarehouseMap',c:'#6b7a8d'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'📥 Recepție',f:'openReceptionModal',c:'#00e5a0'},
+      {l:'🤖 Voce AI',f:'toggleAIVoice',c:'#a78bfa'},
+      {l:'🛒 Livrare',f:'openDeliveryCartModal',c:'#ffa502'},
+      {l:'🔢 Inv. Rapid',f:'openPartialInventory',c:'#4d9fff'},
+      {l:'↩️ Retur',f:'openBonReturModal',c:'#ff4757'},
+      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#00e5a0'},
+      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
+      {l:'🚛 Tranzit',f:'showTransitModal',c:'#4d9fff'},
+      {l:'⚖️ Ajustare',f:'openInventarAdjust',c:'#ffa502'},
+      {l:'🛒 Coș',f:'openCartModal',c:'#00e5a0'},
+      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#00e5a0'},
+      {l:'📱 Share WA',f:'shareStockWhatsApp',c:'#00e5a0'},
+      {l:'🔄 Rotație',f:'stockTurnoverRate',c:'#00e5a0'},
+      {l:'🗺️ Zone',f:'openWarehouseZoneMap',c:'#a78bfa'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'📊 Reorder',f:'autoReorderPoint',c:'#00e5a0'},
+      {l:'🖨️ Print',f:'printDashboard',c:'#6b7a8d'},
+    ],
+    rapoarte: [
+      {l:'📈 Lunar',f:'openRaportLunarModal',c:'#00e5a0'},
+      {l:'🏆 Top 10',f:'showTop10',c:'#ffa502'},
+      {l:'💤 Stagnante',f:'showStagnant',c:'#ffa502'},
+      {l:'👤 Operatori',f:'showOperatorReport',c:'#6b7a8d'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
+      {l:'🔮 Predicții',f:'showPredictions',c:'#a78bfa'},
+      {l:'🔥 Heatmap',f:'showActivityHeatmap',c:'#a78bfa'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#00e5a0'},
+      {l:'📈 Tendințe AI',f:'showTrendsAnalysis',c:'#a78bfa'},
+      {l:'🖼️ Export Grafic',f:'exportChartAsPNG',c:'#6b7a8d'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#00e5a0'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
+      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
+      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
+      {l:'⚠️ Fără Furnizor',f:'showProductsWithoutSupplier',c:'#6b7a8d'},
+      {l:'📅 Pierderi',f:'showExpirationLosses',c:'#ff4757'},
+      {l:'📱 Dash Șef',f:'showMobileDashboard',c:'#a78bfa'},
+      {l:'👤 Inactivitate',f:'showOperatorInactivity',c:'#6b7a8d'},
+      {l:'🤖 Forecast Cat.',f:'aiForecastByCategory',c:'#a78bfa'},
+      {l:'⚡ Ef. Operatori',f:'showOperatorEfficiency',c:'#00e5a0'},
+      {l:'🌸 Sezonier',f:'showSeasonalReport',c:'#a78bfa'},
+      {l:'📈 Predictiv',f:'showPredictiveChart',c:'#a78bfa'},
+      {l:'💤 Fără Mișcare',f:'showNoMovement90Days',c:'#ffa502'},
+      {l:'📍 Val. Raft',f:'showValuePerRack',c:'#00e5a0'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'🤖 Forecast ML',f:'stockForecastML',c:'#a78bfa'},
+      {l:'📊 Sensib.',f:'demandSensitivity',c:'#ffa502'},
+      {l:'📊 ABC+XYZ',f:'abcXyzAnalysis',c:'#00e5a0'},
+      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
+      {l:'⚠️ Alertă Marjă',f:'productMarginAlert',c:'#ff4757'},
+      {l:'📊 Scor Sănătate',f:'stockHealthScore',c:'#00e5a0'},
+      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
+      {l:'⭐ Scoruri Prod.',f:'showAllProductScores',c:'#ffa502'},
+      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
+    ],
+    clienti: [
+      {l:'👥 Clienți',f:'openClientsModal',c:'#a78bfa'},
+      {l:'⏰ Rezervări',f:'openRezervariModal',c:'#ffa502'},
+      {l:'🔄 Bon Retur',f:'openBonReturModal',c:'#ff4757'},
+      {l:'📋 Comandă',f:'openComandaModal',c:'#00e5a0'},
+      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
+      {l:'🤖 AI Chat',f:'openPersistentChat',c:'#00e5a0'},
+      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'🧠 AI Memorie',f:'openPersistentChat',c:'#00e5a0'},
+      {l:'🔬 Audit AI',f:'aiFullDepotAudit',c:'#00e5a0'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+      {l:'🌸 AI Sezon',f:'aiDetectSeasonality',c:'#a78bfa'},
+      {l:'⚠️ Risc Abandon',f:'aiPredictChurnRisk',c:'#ff4757'},
+      {l:'💎 Retenție',f:'showClientRetention',c:'#00e5a0'},
+      {l:'🧾 Factură Coș',f:'invoiceFromCart',c:'#ffa502'},
+      {l:'💳 Ageing',f:'clientAgeingReport',c:'#ff4757'},
+      {l:'🗺️ Teritorii',f:'salesTerritoryMap',c:'#4d9fff'},
+      {l:'📥 Import CSV',f:'openBulkClientImportModal',c:'#6b7a8d'},
+      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
+    ],
+    depozit: [
+      {l:'🚚 Livrări',f:'openDeliveryModal',c:'#ffa502'},
+      {l:'📅 Calendar',f:'openCalendarModal',c:'#a78bfa'},
+      {l:'💾 Backup Firebase',f:'doManualBackup',c:'#00e5a0'},
+      {l:'📺 Kiosk',f:'openKioskMode',c:'#00e5a0'},
+      {l:'💚 Sănătate',f:'stockHealthScore',c:'#00e5a0'},
+      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
+      {l:'💾 Backup Local',f:'exportFullBackupLocal',c:'#00e5a0'},
+      {l:'📂 Import Backup',f:'importBackupLocal',c:'#ffa502'},
+      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
+      {l:'🔐 Log Sesiuni',f:'showSessionLog',c:'#6b7a8d'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+      {l:'📺 TV Dashboard',f:'openTVDashboard',c:'#00e5a0'},
+      {l:'🌐 Stoc Global',f:'loadConsolidatedStock',c:'#00e5a0'},
+      {l:'⚖️ Echilibrare',f:'multiDepotBalance',c:'#a78bfa'},
+      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
+      {l:'📦 Colete',f:'showShipments',c:'#4d9fff'},
+      {l:'📋 Picking',f:'pickingListGenerate',c:'#ffa502'},
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#00e5a0'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'☁️ Dropbox',f:'syncToDropbox',c:'#00e5a0'},
+      {l:'🔗 Webhook',f:'openWebhookSettings',c:'#6b7a8d'},
+      {l:'🔒 PIN Login',f:'openPinModal',c:'#ffa502'},
+      {l:'🛒 WooCommerce',f:'importWooCommerceOrders',c:'#a78bfa'},
+      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
+      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
+      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
+      {l:'↩️ Motive Retur',f:'returnReasonAnalysis',c:'#ffa502'},
+      {l:'⚡ Live Ops',f:'operatorPerformanceLive',c:'#00e5a0'},
+      {l:'📊 G.Sheets',f:'exportToGoogleSheets',c:'#00e5a0'},
+      {l:'🔗 API Link',f:'getAPILink',c:'#6b7a8d'},
+    ],
+  },
+
+  restaurant: {
+    tabNames: { stoc:'INGREDIENTE', rapoarte:'RAPOARTE', clienti:'COMENZI', depozit:'BUCĂTĂRIE' },
+    stoc: [
+      {l:'+ Ingredient',f:'openAddModal',c:'#ff6b9d'},
+      {l:'📥 Recepție',f:'openReceptionModal',c:'#ff6b9d'},
+      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'🍳 Inv. Bucătărie',f:'kitchenDailyInventory',c:'#ff6b9d'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ff6b9d'},
+      {l:'⚠️ Alertă Ing.',f:'checkMenuIngredients',c:'#ff4757'},
+      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
+      {l:'📊 Excel',f:'openImportModal',c:'#ff6b9d'},
+    ],
+    rapoarte: [
+      {l:'📊 Vânzări Preparate',f:'dishSalesReport',c:'#ff6b9d'},
+      {l:'📈 Tendințe',f:'showTrendsAnalysis',c:'#a78bfa'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA 9%',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📅 FIFO Alimente',f:'foodFIFOReport',c:'#ffa502'},
+      {l:'♻️ Raport Deșeuri',f:'showWasteReport',c:'#ffa502'},
+      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ff6b9d'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ff6b9d'},
+    ],
+    clienti: [
+      {l:'🪑 Mese Active',f:'showTablesDashboard',c:'#ff6b9d'},
+      {l:'📅 Rezervări',f:'showTableReservations',c:'#ff6b9d'},
+      {l:'💳 Split Bill',f:'showTablesDashboard',c:'#ffa502'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
+      {l:'💎 Clienți Fideli',f:'showClientRetention',c:'#ff6b9d'},
+    ],
+    depozit: [
+      {l:'🍽️ Meniu',f:'renderMenu',c:'#ff6b9d'},
+      {l:'👨‍🍳 Prepară',f:'cookDishPrompt',c:'#ff6b9d'},
+      {l:'📱 QR Meniu',f:'generateMenuQR',c:'#a78bfa'},
+      {l:'🧾 Bon Fiscal',f:'printRestaurantBonPrompt',c:'#ff6b9d'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#ff6b9d'},
+      {l:'♻️ Log Deșeuri',f:'logFoodWastePrompt',c:'#ffa502'},
+    ],
+  },
+
+  retail: {
+    tabNames: { stoc:'PRODUSE', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'CASĂ' },
+    stoc: [
+      {l:'+ Produs',f:'openAddModal',c:'#ffa502'},
+      {l:'📊 Excel',f:'openImportModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#ffa502'},
+      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'🛒 Coș',f:'openCartModal',c:'#ffa502'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'🏷️ Promoție',f:'addPromotionPrompt',c:'#ffa502'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ffa502'},
+      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
+      {l:'🖨️ Etichetă',f:'printProductLabelPrompt',c:'#6b7a8d'},
+      {l:'🛒 Lipsă Raft',f:'shelfReplenishmentReport',c:'#ff4757'},
+      {l:'📋 Lista Prețuri',f:'exportPriceList',c:'#6b7a8d'},
+    ],
+    rapoarte: [
+      {l:'🏪 Casă Azi',f:'showCashReport',c:'#ffa502'},
+      {l:'📊 Ore Vânzări',f:'hourlySalesReport',c:'#ffa502'},
+      {l:'🏆 Top Produse',f:'topSellingProducts',c:'#ffa502'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
+      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ffa502'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ffa502'},
+    ],
+    clienti: [
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💎 Retenție',f:'showClientRetention',c:'#ffa502'},
+      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
+      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'↩️ Retur',f:'processRetailReturnPrompt',c:'#ff4757'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+    ],
+    depozit: [
+      {l:'🏪 Casă POS',f:'openPosModal',c:'#ffa502'},
+      {l:'🧾 Chitanță',f:'printRetailReceiptPrompt',c:'#ffa502'},
+      {l:'▶ Start Tură',f:'startCashShiftPrompt',c:'#00e5a0'},
+      {l:'⏹ Stop Tură',f:'endCashShiftPrompt',c:'#ff4757'},
+      {l:'📺 Kiosk',f:'openKioskMode',c:'#ffa502'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+    ],
+  },
+
+  constructii: {
+    tabNames: { stoc:'MATERIALE', rapoarte:'RAPOARTE', clienti:'ȘANTIERE', depozit:'UTILAJE' },
+    stoc: [
+      {l:'+ Material',f:'openAddModal',c:'#fd9644'},
+      {l:'📊 Excel',f:'openImportModal',c:'#fd9644'},
+      {l:'🔄 Transfer',f:'openTransferModal',c:'#fd9644'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#fd9644'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
+      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#fd9644'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'📊 Reorder',f:'autoReorderPoint',c:'#fd9644'},
+      {l:'📦 Bon Consum',f:'generateMaterialConsumptionPrompt',c:'#fd9644'},
+    ],
+    rapoarte: [
+      {l:'📊 Progres Șantier',f:'showSiteProgressPrompt',c:'#fd9644'},
+      {l:'⏱️ Pontaj',f:'showTimesheetReport',c:'#fd9644'},
+      {l:'⚙️ Ore Utilaje',f:'equipmentHoursPerSite',c:'#fd9644'},
+      {l:'💰 Buget Șantier',f:'showSitesDashboard',c:'#fd9644'},
+      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#fd9644'},
+      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#fd9644'},
+      {l:'⚠️ Buget Alert',f:'checkSiteBudgets',c:'#ff4757'},
+      {l:'📐 Faze Consum',f:'showPhaseReportPrompt',c:'#fd9644'},
+      {l:'📊 Plan vs Real',f:'showPlannedVsActualPrompt',c:'#fd9644'},
+      {l:'🔧 Scule Alerte',f:'toolOverdueAlert',c:'#ffa502'},
+    ],
+    clienti: [
+      {l:'🏗️ Șantiere',f:'showSitesDashboard',c:'#fd9644'},
+      {l:'🏢 Subcontractori',f:'showSubcontractors',c:'#fd9644'},
+      {l:'👷 Muncitori',f:'showWorkersDashboard',c:'#fd9644'},
+      {l:'📋 Deviz',f:'generateDevizPrompt',c:'#fd9644'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+      {l:'📋 Cerere Ofertă',f:'generateRFQPrompt',c:'#fd9644'},
+      {l:'📋 Sit. Lucrări',f:'showSituatiePrompt',c:'#fd9644'},
+    ],
+    depozit: [
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#fd9644'},
+      {l:'🦺 Securitate',f:'showSafetyReport',c:'#ff4757'},
+      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
+      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
+      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
+      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'📋 Deviz PDF',f:'generateDevizPrompt',c:'#fd9644'},
+      {l:'📅 Gantt',f:'showGanttPrompt',c:'#fd9644'},
+      {l:'🔧 Scule',f:'toolInventory',c:'#fd9644'},
+      {l:'⚙️ ITP Echip.',f:'checkEquipmentExpiry',c:'#ffa502'},
+      {l:'💰 Cost Echip.',f:'equipmentCostReport',c:'#fd9644'},
+      {l:'📋 Decontări',f:'showDecontarePrompt',c:'#fd9644'},
+      {l:'⏰ Termene',f:'showDeadlinesPrompt',c:'#ffa502'},
+      {l:'⚠️ Penalități',f:'showPenaltiesPrompt',c:'#ff4757'},
+      {l:'🧮 Calculatoare',f:'openCalculatorModal',c:'#fd9644'},
+    ],
+  },
+};
+
+function buildToolbar(industry) {
+  const cfg = TOOLBAR_CONFIG[industry] || TOOLBAR_CONFIG.depozit;
+  const tabs = ['stoc','rapoarte','clienti','depozit'];
+  
+  tabs.forEach(tab => {
+    const el = document.getElementById('toolbar-' + tab);
+    if (!el) return;
+    const buttons = cfg[tab] || [];
+    el.innerHTML = buttons.map(b =>
+      '<button class="add-btn" onclick="safeCall(\'' + b.f + '\')" ' +
+      'style="flex-shrink:0;white-space:nowrap;border-color:' + b.c + ';color:' + b.c + '">' +
+      b.l + '</button>'
+    ).join('');
+  });
+  
+  // Update tab labels
+  if (cfg.tabNames) {
+    const tabBtns = document.querySelectorAll('.tab-btn, [onclick*="showTab"]');
+    Object.entries(cfg.tabNames).forEach(([tab, name]) => {
+      tabBtns.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tab)) {
+          btn.textContent = name;
+        }
+      });
+    });
+  }
+  
+  // Update toolbar tab button labels
+  updateToolbarTabNames(cfg.tabNames || {});
+}
+
+function updateToolbarTabNames(names) {
+  const tabMap = {stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT'};
+  document.querySelectorAll('.toolbar-tab, [data-tab]').forEach(btn => {
+    const tab = btn.dataset.tab || '';
+    if (names[tab]) btn.textContent = names[tab];
+  });
+}
+
+// Add prompts for functions that need parameters
+function cookDishPrompt() {
+  const d = prompt('Preparat de gătit:');
+  const p = parseInt(prompt('Număr porții:')) || 1;
+  if (d && typeof cookDish === 'function') cookDish(d, p);
+}
+function printRestaurantBonPrompt() {
+  const t = prompt('Număr masă:');
+  if (t) printRestaurantBon(t, 'numerar');
+}
+function logFoodWastePrompt() {
+  const p = prompt('Produs:');
+  const q = parseFloat(prompt('Cantitate:')) || 0;
+  const r = prompt('Motiv (expirat/stricat/altul):') || 'expirat';
+  if (p && q) logFoodWaste(p, q, 'kg', r);
+}
+function addPromotionPrompt() {
+  const n = prompt('Nume promoție:');
+  const v = prompt('Discount %:');
+  if (n && v && typeof addPromotion === 'function') addPromotion(n, 'pct', v, []);
+}
+function startCashShiftPrompt() {
+  const op = prompt('Operator:');
+  const cash = prompt('Numerar inițial (RON):') || '0';
+  if (op) startCashShift(op, parseFloat(cash));
+}
+function endCashShiftPrompt() {
+  const cash = prompt('Numerar numărat (RON):') || '0';
+  endCashShift(parseFloat(cash));
+}
+function processRetailReturnPrompt() {
+  const name = prompt('Produs de returnat:');
+  if (!name) return;
+  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
+  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
+  const qty = parseInt(prompt('Cantitate:')) || 1;
+  const reason = prompt('Motiv retur:') || 'Nespecificat';
+  processRetailReturn(p.id, qty, reason);
+}
+function printRetailReceiptPrompt() {
+  const total = posCart.reduce((s,i)=>s+i.qty*i.price,0);
+  printRetailReceipt(null, total, 'numerar', null);
+}
+function printProductLabelPrompt() {
+  const name = prompt('Produs pentru etichetă:');
+  if (!name) return;
+  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
+  if (p) printProductLabel(p.id);
+  else setFeedback('Produs negăsit!', 'err');
+}
+function showSiteProgressPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Nu există șantiere. Adaugă un șantier mai întâi!'); return; }
+  showSiteProgress(constructionSites[0].id);
+}
+function generateDevizPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  const lucrari = [
+    { name: 'Fundație beton', unit: 'm³', qty: 10, unitPrice: 500 },
+    { name: 'Zidărie cărămidă', unit: 'm²', qty: 50, unitPrice: 120 },
+  ];
+  generateDeviz(constructionSites[0].id, lucrari);
+}
+function generateRFQPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  generateRFQ(constructionSites[0].id, null);
+}
+function generateMaterialConsumptionPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  const materials = savedCart.map(i=>{const p=stock.find(s=>s.id===i.productId);return p?{name:p.name,qty:i.qty,unit:p.unit,price:p.price_buy||0}:null;}).filter(Boolean);
+  if (!materials.length) { alert('Adaugă materiale în coș mai întâi!'); return; }
+  generateMaterialConsumptionBon(constructionSites[0].id, materials);
+}
+function openPinModal() {
+  const el = document.getElementById('pin-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPersistentChat() {
+  const el = document.getElementById('persistent-chat-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPaymentScheduleModal() {
+  const el = document.getElementById('payment-schedule-modal');
+  if (el) { el.style.display='flex'; if(typeof renderPaymentSchedule==='function') renderPaymentSchedule(); }
+}
+function openClientSearchModal() {
+  const el = document.getElementById('client-search-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPosModal() {
+  const el = document.getElementById('pos-modal');
+  if (el) el.style.display = 'flex';
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 1: GANTT & PLANIFICARE
+// ══════════════════════════════════════════
+
+let ganttTasks = JSON.parse(localStorage.getItem('sv_gantt') || '[]');
+
+// 1. CREARE GRAFIC GANTT VIZUAL
+function createGanttChart(siteId) {
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  const tasks = ganttTasks.filter(t => t.siteId === siteId);
+  const el = document.getElementById('gantt-content');
+  if (!el) { alert('Modal Gantt lipsă!'); return; }
+
+  if (!tasks.length) {
+    el.innerHTML = '<div style="color:#6b7a8d;text-align:center;padding:30px">Nu există etape. Adaugă prima etapă!</div>';
+    document.getElementById('gantt-modal').style.display = 'flex';
+    return;
+  }
+
+  // Find date range
+  const allDates = tasks.flatMap(t => [new Date(t.startDate), new Date(t.endDate)]);
+  const minDate = new Date(Math.min(...allDates));
+  const maxDate = new Date(Math.max(...allDates));
+  const totalDays = Math.max(1, Math.ceil((maxDate - minDate) / 86400000)) + 2;
+  const today = new Date();
+
+  const colors = ['#fd9644','#00e5a0','#4d9fff','#a78bfa','#ff6b9d','#ffa502','#ff4757'];
+  let html = '<div style="overflow-x:auto">';
+  html += '<div style="min-width:600px">';
+  
+  // Header: site name
+  html += '<div style="font-weight:700;color:#fd9644;font-size:13px;margin-bottom:12px">';
+  html += '🏗️ ' + (site ? site.name : 'Șantier') + '</div>';
+  
+  // Timeline header
+  html += '<div style="display:flex;margin-left:140px;margin-bottom:4px">';
+  for (let d = 0; d < totalDays; d += Math.ceil(totalDays / 8)) {
+    const dt = new Date(minDate); dt.setDate(dt.getDate() + d);
+    html += '<div style="flex:1;font-size:9px;color:#6b7a8d">' + dt.toLocaleDateString('ro-RO', {day:'2-digit',month:'2-digit'}) + '</div>';
+  }
+  html += '</div>';
+
+  // Tasks
+  tasks.forEach((task, i) => {
+    const start = new Date(task.startDate);
+    const end = new Date(task.endDate);
+    const startOffset = Math.max(0, Math.ceil((start - minDate) / 86400000));
+    const duration = Math.max(1, Math.ceil((end - start) / 86400000));
+    const leftPct = (startOffset / totalDays * 100).toFixed(1);
+    const widthPct = (duration / totalDays * 100).toFixed(1);
+    const color = colors[i % colors.length];
+    const pct = task.progress || 0;
+    const isOverdue = today > end && pct < 100;
+    const isDue = !isOverdue && (end - today) < 3 * 86400000 && pct < 100;
+
+    html += '<div style="display:flex;align-items:center;margin-bottom:8px">';
+    html += '<div style="width:135px;flex-shrink:0;font-size:11px;color:#e8ecf0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px">';
+    html += (isOverdue ? '🔴 ' : isDue ? '🟡 ' : '✅ ') + task.name + '</div>';
+    html += '<div style="flex:1;position:relative;height:28px;background:#1e2530;border-radius:6px">';
+    html += '<div style="position:absolute;left:' + leftPct + '%;width:' + widthPct + '%;height:100%;background:' + (isOverdue ? '#ff4757' : color) + ';border-radius:6px;overflow:hidden">';
+    html += '<div style="height:100%;width:' + pct + '%;background:rgba(255,255,255,0.25)"></div>';
+    html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">' + pct + '%</div>';
+    html += '</div></div>';
+    html += '<div style="width:60px;flex-shrink:0;font-size:10px;color:#6b7a8d;text-align:right;padding-left:6px">' + (task.responsible || '') + '</div>';
+    html += '</div>';
+  });
+
+  // Today marker note
+  html += '<div style="font-size:10px;color:#6b7a8d;margin-top:8px">📅 Azi: ' + today.toLocaleDateString('ro-RO') + '</div>';
+  html += '</div></div>';
+  
+  el.innerHTML = html;
+  document.getElementById('gantt-modal').style.display = 'flex';
+}
+
+// 2. ADAUGĂ ETAPĂ GANTT
+function addGanttTask(siteId, name, startDate, endDate, responsible, phase) {
+  const task = {
+    id: Date.now(),
+    siteId,
+    name: name || 'Etapă nouă',
+    startDate: startDate || new Date().toISOString().slice(0,10),
+    endDate: endDate || new Date(Date.now() + 7*86400000).toISOString().slice(0,10),
+    responsible: responsible || '',
+    phase: phase || 'General',
+    progress: 0,
+    created: new Date().toISOString()
+  };
+  ganttTasks.push(task);
+  localStorage.setItem('sv_gantt', JSON.stringify(ganttTasks));
+  setFeedback('✅ Etapă adăugată: ' + task.name + ' (' + task.startDate + ' → ' + task.endDate + ')', 'ok');
+  speak('Etapa ' + task.name + ' adaugata in planificare.');
+  return task.id;
+}
+
+// 3. ACTUALIZARE PROGRES DIN VOCE
+function updateGanttProgress(siteId, taskNameOrId, progressPct) {
+  let task = ganttTasks.find(t => t.id === taskNameOrId && t.siteId === siteId);
+  if (!task) {
+    task = ganttTasks.find(t => t.siteId === siteId &&
+      normalizeText(t.name.toLowerCase()).includes(normalizeText(String(taskNameOrId).toLowerCase())));
+  }
+  if (!task) { setFeedback('Etapa negăsită: ' + taskNameOrId, 'err'); return; }
+  task.progress = Math.min(100, Math.max(0, parseInt(progressPct) || 0));
+  task.lastUpdate = new Date().toISOString();
+  localStorage.setItem('sv_gantt', JSON.stringify(ganttTasks));
+  setFeedback('✅ ' + task.name + ': ' + task.progress + '% finalizat', 'ok');
+  speak(task.name + ': ' + task.progress + ' la suta.');
+  if (task.progress === 100) triggerAlert('🎉 Etapa "' + task.name + '" finalizată 100%!', 'ok');
+}
+
+// 4. ALERTĂ ÎNTÂRZIERE GANTT
+function ganttDelayAlert(siteId) {
+  const today = new Date();
+  const delayed = ganttTasks.filter(t => {
+    if (siteId && t.siteId !== siteId) return false;
+    return new Date(t.endDate) < today && (t.progress || 0) < 100;
+  });
+  if (!delayed.length) {
+    setFeedback('✅ Nicio etapă întârziată!', 'ok');
+    speak('Toate etapele sunt la termen.');
+    return;
+  }
+  const msg = delayed.map(t => {
+    const days = Math.ceil((today - new Date(t.endDate)) / 86400000);
+    return t.name + ': +' + days + 'z (' + (t.progress||0) + '%)';
+  }).join('\n');
+  triggerAlert('⚠️ ETAPE ÎNTÂRZIATE:\n' + msg, 'err');
+  if (userProfile?.telegram_id) sendTelegramAlert('⚠️ Etape întârziate pe șantier:\n' + msg, userProfile.telegram_id);
+  speak(delayed.length + ' etape intarziate. Verificati planificarea.');
+}
+setInterval(function(){ if(currentIndustry==='constructii' && typeof ganttDelayAlert==='function') ganttDelayAlert(null); }, 3600000);
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 2: CONSUM PER FAZĂ
+// ══════════════════════════════════════════
+
+let phaseConsumption = JSON.parse(localStorage.getItem('sv_phase_consumption') || '[]');
+
+// 5. LOG CONSUM MATERIAL PE FAZĂ
+function logMaterialByPhase(siteId, productId, qty, phase, workerName) {
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  const p = stock.find(s => s.id === productId);
+  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
+  if (p.qty < qty) { setFeedback('❌ Stoc insuficient: ' + p.name + ' (' + p.qty + ' disponibil)', 'err'); return; }
+
+  const entry = {
+    id: Date.now(),
+    siteId, siteName: site ? site.name : 'General',
+    productId, productName: p.name,
+    qty, unit: p.unit,
+    phase: phase || 'General',
+    value: qty * (p.price_buy || 0),
+    workerName: workerName || (userProfile ? userProfile.name : ''),
+    date: new Date().toLocaleDateString('ro-RO'),
+    time: new Date().toLocaleTimeString('ro-RO'),
+    ts: new Date().toISOString()
+  };
+  phaseConsumption.push(entry);
+  localStorage.setItem('sv_phase_consumption', JSON.stringify(phaseConsumption.slice(-1000)));
+
+  // Scade din stoc
+  p.qty -= qty;
+  saveStockToFirebase(); renderStock(); updateStats();
+  addLog('Faza ' + phase + ' - ' + site?.name, 'OUT ' + qty + ' ' + p.unit + ' ' + p.name, 'out');
+  setFeedback('✅ ' + qty + ' ' + p.unit + ' ' + p.name + ' → faza "' + (phase||'General') + '" (' + entry.workerName + ')', 'ok');
+  speak(qty + ' ' + p.unit + ' ' + p.name + ' consumate in faza ' + (phase||'General') + '.');
+}
+
+// 6. RAPORT CONSUM PE FAZE
+function phaseConsumptionReport(siteId) {
+  const entries = phaseConsumption.filter(e => !siteId || e.siteId === siteId);
+  if (!entries.length) { setFeedback('Nu există consum înregistrat pe faze!', 'warn'); return; }
+
+  const byPhase = {};
+  entries.forEach(e => {
+    if (!byPhase[e.phase]) byPhase[e.phase] = { items: [], total: 0 };
+    byPhase[e.phase].items.push(e);
+    byPhase[e.phase].total += e.value;
+  });
+
+  const el = document.getElementById('phase-report-content');
+  const totalAll = entries.reduce((s,e) => s + e.value, 0);
+  let html = '<div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">';
+  html += '<span style="color:#6b7a8d;font-size:12px">TOTAL CONSUMAT</span>';
+  html += '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + totalAll.toFixed(0) + ' RON</span></div>';
+
+  Object.entries(byPhase).sort((a,b) => b[1].total - a[1].total).forEach(([phase, data]) => {
+    html += '<div style="margin-bottom:14px">';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:6px">';
+    html += '<span style="font-weight:700;color:#fd9644;font-size:13px">📐 ' + phase + '</span>';
+    html += '<span style="color:#fd9644;font-weight:700">' + data.total.toFixed(0) + ' RON</span></div>';
+    html += data.items.slice(-5).map(e =>
+      '<div style="display:flex;justify-content:space-between;padding:5px 8px;background:#181d24;border-radius:6px;margin-bottom:2px;font-size:11px">' +
+      '<span style="color:#99a8b8">' + e.productName + ' — ' + e.qty + ' ' + e.unit + '</span>' +
+      '<span style="color:#6b7a8d">' + e.workerName + ' · ' + e.date + '</span></div>'
+    ).join('');
+    html += '</div>';
+  });
+
+  if (el) { el.innerHTML = html; document.getElementById('phase-report-modal').style.display = 'flex'; }
+  else alert('📐 Consum pe faze:\n' + Object.entries(byPhase).map(([p,d])=>p+': '+d.total.toFixed(0)+' RON').join('\n'));
+}
+
+// 7. PLANIFICAT VS ACTUAL
+function comparePlannedVsActual(siteId) {
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  if (!site) { setFeedback('Șantier negăsit!', 'err'); return; }
+  const actual = phaseConsumption.filter(e => e.siteId === siteId).reduce((s,e) => s + e.value, 0);
+  const planned = site.budget || 0;
+  const diff = actual - planned;
+  const pct = planned > 0 ? (actual / planned * 100).toFixed(1) : 0;
+
+  const el = document.getElementById('planned-actual-content');
+  const html = '<div style="text-align:center;padding:20px 0">' +
+    '<div style="font-size:12px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Buget planificat</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:36px;font-weight:900;color:#6b7a8d">' + planned.toFixed(0) + ' RON</div>' +
+    '<div style="font-size:12px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin:16px 0 4px">Consumat actual</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:48px;font-weight:900;color:' + (diff>0?'#ff4757':'#00e5a0') + '">' + actual.toFixed(0) + ' RON</div>' +
+    '<div style="height:12px;background:#1e2530;border-radius:6px;margin:16px 0">' +
+    '<div style="height:100%;width:' + Math.min(100,pct) + '%;background:' + (pct>100?'#ff4757':pct>80?'#ffa502':'#00e5a0') + ';border-radius:6px;transition:width 0.5s"></div></div>' +
+    '<div style="font-size:13px;color:' + (diff>0?'#ff4757':'#00e5a0') + ';font-weight:700">' +
+    (diff>0 ? '⚠️ Depășit cu ' + diff.toFixed(0) + ' RON (' + pct + '%)' : '✅ Încadrat în buget (' + pct + '%)') + '</div></div>';
+
+  if (el) { el.innerHTML = html; document.getElementById('planned-actual-modal').style.display = 'flex'; }
+  setFeedback((diff>0?'⚠️':'✅') + ' ' + site.name + ': ' + pct + '% din buget consumat', diff>0?'err':'ok');
+  speak('Buget ' + site.name + ': ' + pct + ' la suta consumat.');
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 3: SCULE & TRACKING
+// ══════════════════════════════════════════
+
+let toolsInventory = JSON.parse(localStorage.getItem('sv_tools') || '[]');
+let toolMovements = JSON.parse(localStorage.getItem('sv_tool_movements') || '[]');
+
+// 8. SCOATERE SCULĂ (CHECK OUT)
+function checkOutTool(toolName, workerName, siteId) {
+  const tool = toolsInventory.find(t =>
+    normalizeText(t.name.toLowerCase()).includes(normalizeText(toolName.toLowerCase()))
+  );
+  if (!tool) { setFeedback('❌ Scula "' + toolName + '" nu există în inventar!', 'err'); return; }
+  if (tool.status === 'out') {
+    setFeedback('⚠️ Scula "' + tool.name + '" este deja la ' + tool.currentHolder + '!', 'warn');
+    speak('Atentie! ' + tool.name + ' este deja la ' + tool.currentHolder + '.');
+    return;
+  }
+
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  const now = new Date();
+  const movement = {
+    id: Date.now(), toolId: tool.id, toolName: tool.name,
+    type: 'out', worker: workerName || (userProfile ? userProfile.name : ''),
+    site: site ? site.name : 'Șantier', siteId,
+    date: now.toLocaleDateString('ro-RO'),
+    time: now.toLocaleTimeString('ro-RO'),
+    ts: now.toISOString()
+  };
+  toolMovements.push(movement);
+  tool.status = 'out';
+  tool.currentHolder = workerName || (userProfile ? userProfile.name : '');
+  tool.checkoutTime = now.toISOString();
+  tool.site = site ? site.name : 'Șantier';
+
+  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
+  localStorage.setItem('sv_tool_movements', JSON.stringify(toolMovements.slice(-2000)));
+
+  setFeedback('🔧 ' + tool.name + ' → ' + tool.currentHolder + ' · ' + now.toLocaleTimeString('ro-RO'), 'ok');
+  speak(tool.name + ' luata de ' + tool.currentHolder + ' la ora ' + now.getHours() + ' si ' + now.getMinutes() + ' minute.');
+
+  // Telegram notification
+  if (userProfile?.telegram_id) {
+    sendTelegramAlert('🔧 SCULĂ SCOASĂ:\n' + tool.name + '\nLuat de: ' + tool.currentHolder + '\nOra: ' + now.toLocaleString('ro-RO') + '\nȘantier: ' + (site ? site.name : '—'), userProfile.telegram_id);
+  }
+}
+
+// 9. RETURNARE SCULĂ (CHECK IN)
+function checkInTool(toolName, workerName, condition) {
+  const tool = toolsInventory.find(t =>
+    normalizeText(t.name.toLowerCase()).includes(normalizeText(toolName.toLowerCase()))
+  );
+  if (!tool) { setFeedback('❌ Scula "' + toolName + '" nu există!', 'err'); return; }
+  if (tool.status === 'available') { setFeedback('ℹ️ Scula este deja disponibilă.', 'warn'); return; }
+
+  const now = new Date();
+  const hoursOut = tool.checkoutTime ? ((now - new Date(tool.checkoutTime)) / 3600000).toFixed(1) : '?';
+  const movement = {
+    id: Date.now(), toolId: tool.id, toolName: tool.name,
+    type: 'in', worker: workerName || tool.currentHolder,
+    condition: condition || 'bună',
+    hoursOut, date: now.toLocaleDateString('ro-RO'),
+    time: now.toLocaleTimeString('ro-RO'), ts: now.toISOString()
+  };
+  toolMovements.push(movement);
+
+  const holder = tool.currentHolder;
+  tool.status = condition === 'defectă' ? 'defect' : 'available';
+  tool.currentHolder = null;
+  tool.checkoutTime = null;
+  tool.lastReturn = now.toISOString();
+  tool.condition = condition || 'bună';
+
+  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
+  localStorage.setItem('sv_tool_movements', JSON.stringify(toolMovements.slice(-2000)));
+
+  const condMsg = condition === 'defectă' ? ' ⚠️ DEFECTĂ!' : ' · Stare: ' + (condition||'bună');
+  setFeedback('✅ ' + tool.name + ' returnată de ' + holder + ' după ' + hoursOut + 'h' + condMsg, 'ok');
+  speak(tool.name + ' returnata de ' + holder + '. Stare: ' + (condition||'buna') + '.');
+
+  if (condition === 'defectă') {
+    triggerAlert('⚠️ SCULĂ DEFECTĂ: ' + tool.name + ' returnată de ' + holder + ' în stare defectă!', 'err');
+    if (userProfile?.telegram_id) sendTelegramAlert('⚠️ SCULĂ DEFECTĂ: ' + tool.name + '\nReturnată de: ' + holder, userProfile.telegram_id);
+  }
+}
+
+// 10. INVENTAR SCULE
+function toolInventory() {
+  const el = document.getElementById('tool-inventory-content');
+  const available = toolsInventory.filter(t => t.status === 'available');
+  const out = toolsInventory.filter(t => t.status === 'out');
+  const defect = toolsInventory.filter(t => t.status === 'defect');
+
+  const html = '<div style="display:flex;gap:8px;margin-bottom:14px">' +
+    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #00e5a0">' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#00e5a0">' + available.length + '</div>' +
+    '<div style="font-size:10px;color:#6b7a8d">Disponibile</div></div>' +
+    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #ffa502">' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#ffa502">' + out.length + '</div>' +
+    '<div style="font-size:10px;color:#6b7a8d">În folosință</div></div>' +
+    '<div style="flex:1;background:#181d24;border-radius:8px;padding:10px;text-align:center;border-top:3px solid #ff4757">' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:28px;font-weight:900;color:#ff4757">' + defect.length + '</div>' +
+    '<div style="font-size:10px;color:#6b7a8d">Defecte</div></div></div>' +
+    toolsInventory.map(t => {
+      const lastMove = toolMovements.filter(m => m.toolId === t.id).slice(-1)[0];
+      const statusColor = t.status==='available'?'#00e5a0':t.status==='defect'?'#ff4757':'#ffa502';
+      const statusLabel = t.status==='available'?'✅ Disponibil':t.status==='defect'?'❌ Defectă':'🔧 La '+t.currentHolder;
+      return '<div style="padding:10px;background:#181d24;border-radius:10px;margin-bottom:6px;border-left:3px solid '+statusColor+'">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div><div style="font-weight:700;color:#e8ecf0">' + t.name + '</div>' +
+        '<div style="font-size:11px;color:#6b7a8d">' + (t.category||'Sculă') + (t.barcode?' · '+t.barcode:'') + '</div></div>' +
+        '<div style="text-align:right"><div style="font-size:11px;color:'+statusColor+';font-weight:700">' + statusLabel + '</div>' +
+        (t.status==='out'?'<div style="font-size:10px;color:#6b7a8d">' + (t.site||'') + '</div>':'') + '</div></div>' +
+        (lastMove?'<div style="font-size:10px;color:#6b7a8d;margin-top:4px">Ultima mișcare: ' + lastMove.worker + ' · ' + lastMove.date + ' ' + lastMove.time + '</div>':'') +
+        '</div>';
+    }).join('') || '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există scule în inventar.</div>';
+
+  if (el) { el.innerHTML = html; document.getElementById('tool-inventory-modal').style.display = 'flex'; }
+}
+
+// 11. SCAN COD SCULĂ
+function scanToolBarcode(barcode) {
+  const tool = toolsInventory.find(t => t.barcode === barcode);
+  if (!tool) { setFeedback('Cod ' + barcode + ' negăsit! Înregistrați scula mai întâi.', 'warn'); return null; }
+  const action = tool.status === 'available' ? 'out' : 'in';
+  const worker = userProfile ? userProfile.name : prompt('Numele dvs:') || 'Necunoscut';
+  if (action === 'out') checkOutTool(tool.name, worker, null);
+  else checkInTool(tool.name, worker, 'bună');
+  return tool;
+}
+
+// 12. COMANDĂ VOCALĂ SCULE
+function voiceToolCommand(text) {
+  const t = normalizeText(text.toLowerCase());
+  const takeKW = ['iau','ia','imi trebuie','folosesc','ridic','preiau'];
+  const returnKW = ['aduc','returnez','aduc inapoi','am terminat cu','inapoi'];
+  const isTake = takeKW.some(k => t.includes(k));
+  const isReturn = returnKW.some(k => t.includes(k));
+  if (!isTake && !isReturn) return false;
+
+  // Find tool name in text - remove action words
+  let toolText = t;
+  [...takeKW, ...returnKW].forEach(k => { toolText = toolText.replace(k, ''); });
+  toolText = toolText.trim();
+  if (!toolText || toolText.length < 2) return false;
+
+  const tool = toolsInventory.find(t =>
+    normalizeText(t.name.toLowerCase()).includes(toolText) ||
+    toolText.includes(normalizeText(t.name.toLowerCase()))
+  );
+  if (!tool) { setFeedback('Scula "' + toolText + '" nu e în inventar.', 'warn'); return false; }
+
+  const worker = userProfile ? userProfile.name : 'Operator';
+  if (isTake) checkOutTool(tool.name, worker, null);
+  else checkInTool(tool.name, worker, 'bună');
+  return true;
+}
+
+// 13. ALERTĂ SCULE NERETURATE
+function toolOverdueAlert() {
+  const maxHours = 8; // Return same day
+  const now = new Date();
+  const overdue = toolsInventory.filter(t => {
+    if (t.status !== 'out' || !t.checkoutTime) return false;
+    const hours = (now - new Date(t.checkoutTime)) / 3600000;
+    return hours > maxHours;
+  });
+  if (!overdue.length) return;
+  const msg = overdue.map(t => {
+    const h = ((now - new Date(t.checkoutTime)) / 3600000).toFixed(1);
+    return t.name + ' → ' + t.currentHolder + ' (' + h + 'h)';
+  }).join('\n');
+  triggerAlert('⏰ SCULE NERETURATE (' + overdue.length + '):\n' + msg, 'warn');
+  if (userProfile?.telegram_id) sendTelegramAlert('⏰ Scule nereturate:\n' + msg, userProfile.telegram_id);
+  speak(overdue.length + ' scule nereturate. Verificati inventarul.');
+}
+setInterval(function(){ if(currentIndustry==='constructii' && typeof toolOverdueAlert==='function') toolOverdueAlert(); }, 3600000);
+
+// HELPER: Adaugă sculă în inventar
+function addTool(name, category, barcode) {
+  toolsInventory.push({ id: Date.now(), name, category: category||'Sculă', barcode: barcode||'', status:'available', currentHolder:null, checkoutTime:null, condition:'bună', created: new Date().toISOString() });
+  localStorage.setItem('sv_tools', JSON.stringify(toolsInventory));
+  setFeedback('✅ Sculă adăugată: ' + name, 'ok');
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 4: ECHIPAMENTE & ITP
+// ══════════════════════════════════════════
+
+let equipmentRegistry = JSON.parse(localStorage.getItem('sv_equipment_registry') || '[]');
+let maintenanceLog = JSON.parse(localStorage.getItem('sv_maintenance_log') || '[]');
+
+// 14. ADAUGĂ ITP / REVIZIE ECHIPAMENT
+function addEquipmentITP(equipmentName, itpDate, revizieDate, iscirDate, nextRevizieKm) {
+  let eq = equipmentRegistry.find(e => normalizeText(e.name.toLowerCase()).includes(normalizeText(equipmentName.toLowerCase())));
+  if (!eq) {
+    eq = { id: Date.now(), name: equipmentName, category: 'Echipament', created: new Date().toISOString() };
+    equipmentRegistry.push(eq);
+  }
+  if (itpDate) eq.itpDate = itpDate;
+  if (revizieDate) eq.revizieDate = revizieDate;
+  if (iscirDate) eq.iscirDate = iscirDate;
+  if (nextRevizieKm) eq.nextRevizieKm = parseInt(nextRevizieKm);
+  eq.updated = new Date().toISOString();
+  localStorage.setItem('sv_equipment_registry', JSON.stringify(equipmentRegistry));
+  setFeedback('✅ ITP actualizat: ' + eq.name + ' · ITP: ' + (itpDate||'—') + ' · Revizie: ' + (revizieDate||'—'), 'ok');
+}
+
+// 15. VERIFICARE EXPIRARE ITP
+function checkEquipmentExpiry() {
+  const today = new Date();
+  const warn30 = new Date(today.getTime() + 30 * 86400000);
+  const alerts = [];
+  equipmentRegistry.forEach(eq => {
+    ['itpDate','revizieDate','iscirDate'].forEach(field => {
+      if (!eq[field]) return;
+      const expDate = new Date(eq[field]);
+      const days = Math.ceil((expDate - today) / 86400000);
+      if (days < 0) alerts.push({ eq: eq.name, type: field.replace('Date','').toUpperCase(), days, overdue: true });
+      else if (days <= 30) alerts.push({ eq: eq.name, type: field.replace('Date','').toUpperCase(), days, overdue: false });
+    });
+  });
+  const el = document.getElementById('equipment-expiry-content');
+  const html = alerts.length ? alerts.map(a =>
+    '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid ' + (a.overdue?'#ff4757':'#ffa502') + '">' +
+    '<div style="display:flex;justify-content:space-between">' +
+    '<div style="font-weight:700;color:#e8ecf0">' + a.eq + '</div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:' + (a.overdue?'#ff4757':'#ffa502') + '">' +
+    (a.overdue ? 'EXPIRAT' : a.days + 'z') + '</div></div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + a.type + (a.overdue?' — Expirat de ' + Math.abs(a.days) + ' zile!':' — Expiră în ' + a.days + ' zile') + '</div>' +
+    '</div>'
+  ).join('') : '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Toate documentele echipamentelor sunt valide!</div>';
+
+  if (el) { el.innerHTML = html; document.getElementById('equipment-expiry-modal').style.display = 'flex'; }
+  if (alerts.some(a => a.overdue)) {
+    const msg = alerts.filter(a=>a.overdue).map(a=>a.eq+' — '+a.type+' EXPIRAT').join('\n');
+    if (userProfile?.telegram_id) sendTelegramAlert('⚠️ ECHIPAMENTE CU DOCUMENTE EXPIRATE:\n' + msg, userProfile.telegram_id);
+  }
+  setFeedback((alerts.length?'⚠️':'✅') + ' ' + alerts.length + ' alerte documente echipamente', alerts.length?'warn':'ok');
+}
+setInterval(function(){ if(currentIndustry==='constructii' && typeof checkEquipmentExpiry==='function') checkEquipmentExpiry(); }, 86400000);
+
+// 16. JURNAL INTERVENȚII ECHIPAMENTE
+function equipmentMaintenanceLog(equipmentName, type, description, cost, technician) {
+  const eq = equipmentRegistry.find(e => normalizeText(e.name.toLowerCase()).includes(normalizeText(equipmentName.toLowerCase())));
+  const entry = {
+    id: Date.now(),
+    equipmentName, equipmentId: eq ? eq.id : null,
+    type: type || 'Revizie', // Revizie / Reparatie / Defectiune / Constatare
+    description: description || '',
+    cost: parseFloat(cost) || 0,
+    technician: technician || (userProfile ? userProfile.name : ''),
+    date: new Date().toLocaleDateString('ro-RO'),
+    ts: new Date().toISOString()
+  };
+  maintenanceLog.push(entry);
+  localStorage.setItem('sv_maintenance_log', JSON.stringify(maintenanceLog.slice(-500)));
+  setFeedback('✅ Intervenție înregistrată: ' + type + ' · ' + equipmentName + (cost?' · ' + cost + ' RON':''), 'ok');
+  if (type === 'Defectiune' || type === 'Defecțiune') {
+    triggerAlert('🔧 DEFECȚIUNE: ' + equipmentName + ' — ' + description, 'err');
+    if (userProfile?.telegram_id) sendTelegramAlert('🔧 DEFECȚIUNE ECHIPAMENT:\n' + equipmentName + '\n' + description, userProfile.telegram_id);
+  }
+}
+
+// 17. RAPORT COSTURI ECHIPAMENTE
+function equipmentCostReport() {
+  const byCost = {};
+  maintenanceLog.forEach(e => {
+    if (!byCost[e.equipmentName]) byCost[e.equipmentName] = { total: 0, interventions: 0 };
+    byCost[e.equipmentName].total += e.cost;
+    byCost[e.equipmentName].interventions++;
+  });
+  // Add usage hours from equipmentLog
+  if (typeof equipmentLog !== 'undefined') {
+    equipmentLog.forEach(e => {
+      if (!byCost[e.equipment]) byCost[e.equipment] = { total: 0, interventions: 0, hours: 0 };
+      byCost[e.equipment].hours = (byCost[e.equipment].hours || 0) + e.hours;
+    });
+  }
+  const sorted = Object.entries(byCost).sort((a,b) => b[1].total - a[1].total);
+  const el = document.getElementById('equipment-cost-content');
+  const html = sorted.length ? sorted.map(([name, data]) =>
+    '<div style="padding:10px;background:#181d24;border-radius:10px;margin-bottom:6px">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<div><div style="font-weight:700;color:#e8ecf0">⚙️ ' + name + '</div>' +
+    '<div style="font-size:11px;color:#6b7a8d">' + data.interventions + ' intervenții' + (data.hours?' · ' + data.hours.toFixed(0) + 'h lucrate':'') + '</div></div>' +
+    '<div style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + data.total.toFixed(0) + ' RON</div>' +
+    '</div></div>'
+  ).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există date de cost.</div>';
+  if (el) { el.innerHTML = html; document.getElementById('equipment-cost-modal').style.display = 'flex'; }
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 5: SITUAȚIE LUCRĂRI & DECONTARE
+// ══════════════════════════════════════════
+
+let decontari = JSON.parse(localStorage.getItem('sv_decontari') || '[]');
+let contractDeadlines = JSON.parse(localStorage.getItem('sv_deadlines') || '[]');
+
+// 18. GENERARE SITUAȚIE LUCRĂRI PDF
+function generateSituatieLucrari(siteId) {
+  if (!window.jspdf) { setFeedback('jsPDF indisponibil!', 'err'); return; }
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  if (!site) { setFeedback('Selectați un șantier!', 'warn'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const sitNo = 'SIT-' + Date.now().toString().slice(-6);
+  const now = new Date().toLocaleDateString('ro-RO');
+  const consumed = phaseConsumption.filter(e => e.siteId === siteId);
+  const byPhase = {};
+  consumed.forEach(e => {
+    if (!byPhase[e.phase]) byPhase[e.phase] = [];
+    byPhase[e.phase].push(e);
+  });
+
+  // Header
+  doc.setFillColor(17, 20, 24); doc.rect(0, 0, 210, 42, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(232, 236, 240);
+  doc.text('SITUAȚIE DE LUCRĂRI', 14, 18);
+  doc.setFontSize(10); doc.setTextColor(253, 150, 68);
+  doc.text(sitNo + '  ·  ' + now, 14, 28);
+  doc.setTextColor(153, 168, 184);
+  doc.text('Obiectiv: ' + site.name + '  ·  Adresă: ' + (site.address || '—'), 14, 36);
+
+  let y = 50;
+  let grandTotal = 0;
+  Object.entries(byPhase).forEach(([phase, items]) => {
+    const phaseTotal = items.reduce((s, e) => s + e.value, 0);
+    grandTotal += phaseTotal;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(253, 150, 68);
+    doc.text('📐 ' + phase.toUpperCase(), 14, y); y += 6;
+    doc.autoTable({
+      startY: y,
+      head: [['Material', 'U.M.', 'Cantitate', 'Preț', 'Valoare']],
+      body: items.map(e => [e.productName, e.unit, e.qty, (e.value/e.qty).toFixed(2)+' RON', e.value.toFixed(2)+' RON']),
+      styles: { fontSize: 8, textColor: [0,0,0], fillColor: [255,255,255] },
+      headStyles: { fillColor: [17,20,24], textColor: [253,150,68], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [245,245,245] },
+      margin: { left: 14, right: 14 }
+    });
+    y = doc.lastAutoTable.finalY + 4;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(0,0,0);
+    doc.text('Subtotal ' + phase + ': ' + phaseTotal.toFixed(2) + ' RON', 14, y); y += 10;
+  });
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(253, 150, 68);
+  doc.text('TOTAL GENERAL: ' + grandTotal.toFixed(2) + ' RON', 14, y + 4);
+  doc.text('TVA 19%: ' + (grandTotal * 0.19).toFixed(2) + ' RON', 14, y + 12);
+  doc.text('TOTAL CU TVA: ' + (grandTotal * 1.19).toFixed(2) + ' RON', 14, y + 20);
+  y += 32;
+  doc.setFontSize(9); doc.setTextColor(0,0,0);
+  doc.text('Beneficiar: ___________________', 14, y);
+  doc.text('Executant: ___________________', 120, y);
+  doc.save(sitNo + '_' + site.name.replace(/\s+/g,'_') + '.pdf');
+  setFeedback('✅ Situație lucrări ' + sitNo + ' generată!', 'ok');
+  speak('Situatie de lucrari generata cu succes.');
+}
+
+// 19. ADAUGĂ DECONTARE
+function addDecontare(siteId, category, description, amount, receipt, workerName) {
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  decontari.push({
+    id: Date.now(),
+    siteId, siteName: site ? site.name : 'General',
+    category: category || 'Diverse',
+    description: description || '',
+    amount: parseFloat(amount) || 0,
+    receipt: receipt || '',
+    worker: workerName || (userProfile ? userProfile.name : ''),
+    date: new Date().toLocaleDateString('ro-RO'),
+    ts: new Date().toISOString(),
+    status: 'pending'
+  });
+  localStorage.setItem('sv_decontari', JSON.stringify(decontari));
+  setFeedback('✅ Decontare adăugată: ' + description + ' — ' + amount + ' RON', 'ok');
+}
+
+// 20. RAPORT DECONTĂRI
+function decontareReport(siteId) {
+  const entries = decontari.filter(d => !siteId || d.siteId === siteId);
+  const total = entries.reduce((s, d) => s + d.amount, 0);
+  const byCat = {};
+  entries.forEach(d => { byCat[d.category] = (byCat[d.category] || 0) + d.amount; });
+  const el = document.getElementById('decontare-content');
+  const html = '<div style="background:#181d24;border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">' +
+    '<span style="color:#6b7a8d;font-size:12px">TOTAL DECONTĂRI</span>' +
+    '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#fd9644">' + total.toFixed(0) + ' RON</span></div>' +
+    Object.entries(byCat).map(([cat, val]) =>
+      '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:#181d24;border-radius:6px;margin-bottom:3px">' +
+      '<span style="color:#e8ecf0;font-size:12px">📋 ' + cat + '</span><span style="color:#fd9644;font-weight:700">' + val.toFixed(0) + ' RON</span></div>'
+    ).join('') +
+    '<div style="margin-top:12px;font-size:12px;color:#6b7a8d;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Ultimele decontări</div>' +
+    entries.slice(-8).reverse().map(d =>
+      '<div style="padding:7px;background:#181d24;border-radius:6px;margin-bottom:3px;display:flex;justify-content:space-between">' +
+      '<div><div style="font-size:12px;color:#e8ecf0">' + d.description + '</div>' +
+      '<div style="font-size:10px;color:#6b7a8d">' + d.worker + ' · ' + d.date + ' · ' + d.category + '</div></div>' +
+      '<span style="font-weight:700;color:#fd9644;font-size:13px">' + d.amount.toFixed(0) + ' RON</span></div>'
+    ).join('');
+  if (el) { el.innerHTML = html; document.getElementById('decontare-modal').style.display = 'flex'; }
+  setFeedback('📋 Decontări: ' + entries.length + ' — Total: ' + total.toFixed(0) + ' RON', 'ok');
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 6: TERMENE & PENALITĂȚI
+// ══════════════════════════════════════════
+
+// 21. TERMEN CONTRACTUAL
+function addContractDeadline(siteId, phase, deadlineDate, penaltyPerDay) {
+  const site = (typeof constructionSites !== 'undefined' ? constructionSites : []).find(s => s.id === siteId);
+  contractDeadlines.push({
+    id: Date.now(),
+    siteId, siteName: site ? site.name : 'General',
+    phase: phase || 'Finalizare',
+    deadlineDate, penaltyPerDay: parseFloat(penaltyPerDay) || 0,
+    created: new Date().toISOString(), alerted: false
+  });
+  localStorage.setItem('sv_deadlines', JSON.stringify(contractDeadlines));
+  setFeedback('✅ Termen adăugat: ' + (phase||'Finalizare') + ' → ' + deadlineDate + ' (penalitate: ' + (penaltyPerDay||0) + ' RON/zi)', 'ok');
+}
+
+// 22. CALCULARE PENALITĂȚI
+function checkPenalties(siteId) {
+  const today = new Date();
+  const results = contractDeadlines.filter(d => !siteId || d.siteId === siteId).map(d => {
+    const deadline = new Date(d.deadlineDate);
+    const daysLate = Math.max(0, Math.ceil((today - deadline) / 86400000));
+    const penalty = daysLate * d.penaltyPerDay;
+    return { ...d, daysLate, penalty };
+  }).filter(d => d.daysLate > 0);
+
+  const totalPenalty = results.reduce((s, d) => s + d.penalty, 0);
+  const el = document.getElementById('penalties-content');
+  const html = results.length ?
+    '<div style="background:rgba(255,71,87,0.1);border-radius:8px;padding:10px;margin-bottom:12px;display:flex;justify-content:space-between">' +
+    '<span style="color:#ff4757;font-size:12px;font-weight:700">TOTAL PENALITĂȚI</span>' +
+    '<span style="font-family:Barlow Condensed,sans-serif;font-size:22px;font-weight:900;color:#ff4757">' + totalPenalty.toFixed(0) + ' RON</span></div>' +
+    results.map(r =>
+      '<div style="padding:10px;background:#181d24;border-radius:8px;margin-bottom:6px;border-left:3px solid #ff4757">' +
+      '<div style="display:flex;justify-content:space-between">' +
+      '<div><div style="font-weight:700;color:#e8ecf0">' + r.siteName + ' — ' + r.phase + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">Termen: ' + r.deadlineDate + ' · Întârziere: ' + r.daysLate + ' zile</div></div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:20px;font-weight:900;color:#ff4757">' + r.penalty.toFixed(0) + ' RON</div></div></div>'
+    ).join('') :
+    '<div style="color:#00e5a0;text-align:center;padding:20px">✅ Nu există penalități acumulate!</div>';
+
+  if (el) { el.innerHTML = html; document.getElementById('penalties-modal').style.display = 'flex'; }
+  if (totalPenalty > 0) setFeedback('⚠️ Penalități totale: ' + totalPenalty.toFixed(0) + ' RON!', 'err');
+  speak(results.length > 0 ? 'Atentie! Penalitati acumulate: ' + totalPenalty.toFixed(0) + ' lei.' : 'Nu exista penalitati.');
+}
+
+// 23. COUNTDOWN TERMENE
+function deadlineCountdown(siteId) {
+  const today = new Date();
+  const upcoming = contractDeadlines
+    .filter(d => !siteId || d.siteId === siteId)
+    .map(d => {
+      const dl = new Date(d.deadlineDate);
+      const days = Math.ceil((dl - today) / 86400000);
+      return { ...d, daysLeft: days };
+    })
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+
+  const el = document.getElementById('deadline-countdown-content');
+  const html = upcoming.length ? upcoming.map(d => {
+    const color = d.daysLeft < 0 ? '#ff4757' : d.daysLeft < 7 ? '#ffa502' : d.daysLeft < 30 ? '#fd9644' : '#00e5a0';
+    const label = d.daysLeft < 0 ? 'DEPĂȘIT cu ' + Math.abs(d.daysLeft) + ' zile!' : d.daysLeft === 0 ? 'AZI!' : d.daysLeft + ' zile rămase';
+    return '<div style="padding:12px;background:#181d24;border-radius:10px;margin-bottom:8px;border-left:4px solid ' + color + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<div><div style="font-weight:700;color:#e8ecf0">' + d.siteName + '</div>' +
+      '<div style="font-size:11px;color:#6b7a8d">' + d.phase + ' · ' + d.deadlineDate + '</div></div>' +
+      '<div style="font-family:Barlow Condensed,sans-serif;font-size:18px;font-weight:900;color:' + color + '">' + label + '</div></div>' +
+      (d.penaltyPerDay > 0 ? '<div style="font-size:10px;color:#6b7a8d;margin-top:4px">Penalitate: ' + d.penaltyPerDay + ' RON/zi</div>' : '') +
+      '</div>';
+  }).join('') : '<div style="color:#6b7a8d;text-align:center;padding:20px">Nu există termene contractuale.</div>';
+
+  if (el) { el.innerHTML = html; document.getElementById('deadline-countdown-modal').style.display = 'flex'; }
+}
+
+// ══════════════════════════════════════════
+// CONSTRUCȚII - BLOC 7: CALCULATOARE
+// ══════════════════════════════════════════
+
+// 24. CALCULATOR BETON
+function calcBeton(volumM3, clasa) {
+  const vol = parseFloat(volumM3) || 0;
+  if (!vol) { setFeedback('Introduceți volumul în m³!', 'warn'); return; }
+  // Rețete per clasă (saci 50kg / m³)
+  const recipes = {
+    'C8/10':  { ciment: 6,  nisip: 0.9, pietris: 0.9, apa: 170 },
+    'C12/15': { ciment: 7,  nisip: 0.85,pietris: 0.95,apa: 175 },
+    'C16/20': { ciment: 8,  nisip: 0.8, pietris: 1.0, apa: 180 },
+    'C20/25': { ciment: 9,  nisip: 0.75,pietris: 1.05,apa: 185 },
+    'C25/30': { ciment: 10, nisip: 0.7, pietris: 1.1, apa: 190 },
+  };
+  const cls = clasa || 'C16/20';
+  const r = recipes[cls] || recipes['C16/20'];
+  const result = {
+    ciment:  (vol * r.ciment).toFixed(0) + ' saci (50kg)',
+    nisip:   (vol * r.nisip).toFixed(2) + ' m³',
+    pietris: (vol * r.pietris).toFixed(2) + ' m³',
+    apa:     (vol * r.apa).toFixed(0) + ' litri'
+  };
+  const msg = '🧱 BETON ' + cls + ' pentru ' + vol + ' m³:\n' +
+    '• Ciment: ' + result.ciment + '\n' +
+    '• Nisip: ' + result.nisip + '\n' +
+    '• Pietriș: ' + result.pietris + '\n' +
+    '• Apă: ' + result.apa;
+  setFeedback('🧱 Beton ' + cls + ': ' + result.ciment + ' ciment, ' + result.nisip + ' nisip, ' + result.pietris + ' pietriș', 'ok');
+  speak('Pentru ' + vol + ' metri cubi beton clasa ' + cls + ' ai nevoie de ' + result.ciment + ' de ciment.');
+  showCalcResult('🧱 Calculator Beton', msg, result, vol, cls);
+  return result;
+}
+
+// 25. CALCULATOR MORTAR
+function calcMortar(suprafataM2, grosimeMM, dozaj) {
+  const sup = parseFloat(suprafataM2) || 0;
+  const gros = parseFloat(grosimeMM) || 20;
+  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
+  const volM3 = sup * (gros / 1000);
+  const doz = dozaj || 350; // kg ciment/m³
+  const cimentKg = (volM3 * doz).toFixed(0);
+  const cimentSaci = Math.ceil(cimentKg / 25);
+  const nisipM3 = (volM3 * 1.5).toFixed(2);
+  const result = { ciment: cimentSaci + ' saci (25kg)', nisip: nisipM3 + ' m³', volum: volM3.toFixed(3) + ' m³' };
+  const msg = '🪣 MORTAR pentru ' + sup + ' m² (grosime ' + gros + 'mm):\n' +
+    '• Volum mortar: ' + result.volum + '\n' +
+    '• Ciment: ' + result.ciment + '\n' +
+    '• Nisip: ' + result.nisip;
+  setFeedback('🪣 Mortar: ' + result.ciment + ' ciment, ' + result.nisip + ' nisip', 'ok');
+  speak('Pentru ' + sup + ' metri patrati de tencuiala ai nevoie de ' + cimentSaci + ' saci de ciment.');
+  showCalcResult('🪣 Calculator Mortar', msg, result, sup, gros);
+  return result;
+}
+
+// 26. CALCULATOR CĂRĂMIZI
+function calcCaramida(suprafataM2, tipZid) {
+  const sup = parseFloat(suprafataM2) || 0;
+  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
+  const types = {
+    'simplu': { buc: 64, mortar: 0.025 },
+    'dublu':  { buc: 128, mortar: 0.05 },
+    'BCA':    { buc: 8,  mortar: 0.012 },
+  };
+  const tip = tipZid || 'simplu';
+  const t = types[tip] || types.simplu;
+  const caramizi = Math.ceil(sup * t.buc * 1.05); // +5% pierderi
+  const mortarM3 = (sup * t.mortar).toFixed(3);
+  const cimentSaci = Math.ceil(sup * t.mortar * 350 / 25);
+  const result = { caramizi: caramizi + ' buc', mortar: mortarM3 + ' m³', ciment: cimentSaci + ' saci' };
+  const msg = '🧱 ZIDĂRIE ' + tip.toUpperCase() + ' pentru ' + sup + ' m²:\n' +
+    '• Cărămizi: ' + result.caramizi + ' (+5% pierderi)\n' +
+    '• Mortar: ' + result.mortar + '\n' +
+    '• Ciment: ' + result.ciment;
+  setFeedback('🧱 Zidărie: ' + result.caramizi + ' cărămizi, ' + result.ciment + ' ciment', 'ok');
+  speak('Pentru ' + sup + ' metri patrati zidarie ai nevoie de ' + caramizi + ' caramizi.');
+  showCalcResult('🧱 Calculator Zidărie', msg, result, sup, tip);
+  return result;
+}
+
+// 27. CALCULATOR ARMĂTURĂ
+function calcArmatura(suprafataM2, tipElement, greutateKgM2) {
+  const sup = parseFloat(suprafataM2) || 0;
+  if (!sup) { setFeedback('Introduceți suprafața în m²!', 'warn'); return; }
+  const defaults = { 'placa': 15, 'grinda': 120, 'stalp': 160, 'fundatie': 45 };
+  const tip = tipElement || 'placa';
+  const kgM2 = parseFloat(greutateKgM2) || defaults[tip] || 15;
+  const totalKg = (sup * kgM2).toFixed(0);
+  const tone = (sup * kgM2 / 1000).toFixed(3);
+  // Bare OB37 / PC52
+  const bare12 = Math.ceil(sup * kgM2 / 0.888); // 1m bara ∅12 = 0.888 kg
+  const bare16 = Math.ceil(sup * kgM2 / 1.578); // 1m bara ∅16 = 1.578 kg
+  const result = { total: totalKg + ' kg', tone: tone + ' t', bare12: bare12 + ' ml (∅12)', bare16: bare16 + ' ml (∅16)' };
+  const msg = '⚙️ ARMĂTURĂ ' + tip.toUpperCase() + ' pentru ' + sup + ' m²:\n' +
+    '• Total fier: ' + result.total + ' (' + result.tone + ')\n' +
+    '• Bare ∅12: ' + result.bare12 + '\n' +
+    '• Bare ∅16: ' + result.bare16;
+  setFeedback('⚙️ Armătură: ' + result.total + ' fier beton', 'ok');
+  speak('Pentru ' + sup + ' metri patrati ' + tip + ' ai nevoie de ' + totalKg + ' kilograme de fier beton.');
+  showCalcResult('⚙️ Calculator Armătură', msg, result, sup, tip);
+  return result;
+}
+
+// HELPER: Afișare rezultat calculator
+function showCalcResult(title, message, result, input, param) {
+  const el = document.getElementById('calculator-result');
+  if (el) {
+    el.innerHTML = '<div style="font-weight:700;color:#fd9644;margin-bottom:10px">' + title + '</div>' +
+      '<div style="white-space:pre-line;font-size:13px;color:#e8ecf0;line-height:1.6">' + message + '</div>' +
+      '<button onclick="navigator.clipboard.writeText(' + JSON.stringify(message) + ').then(()=>setFeedback(\'✅ Copiat!\',\'ok\'))" ' +
+      'style="margin-top:12px;background:#fd9644;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:14px;padding:8px 16px;cursor:pointer;touch-action:manipulation">📋 Copiază</button>';
+    document.getElementById('calculator-modal').style.display = 'flex';
+  } else {
+    alert(message);
+  }
+}
+
+
+
+// Constructii helper prompts
+function showGanttPrompt() {
+  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  createGanttChart(constructionSites[0].id);
+}
+function showPhaseReportPrompt() {
+  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
+  phaseConsumptionReport(siteId);
+}
+function showPlannedVsActualPrompt() {
+  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  comparePlannedVsActual(constructionSites[0].id);
+}
+function showDecontarePrompt() {
+  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
+  decontareReport(siteId);
+}
+function showDeadlinesPrompt() {
+  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
+  deadlineCountdown(siteId);
+}
+function showPenaltiesPrompt() {
+  const siteId = constructionSites&&constructionSites.length ? constructionSites[0].id : null;
+  checkPenalties(siteId);
+}
+function showSituatiePrompt() {
+  if (!constructionSites||!constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  generateSituatieLucrari(constructionSites[0].id);
+}
+function openCalculatorModal() {
+  const el = document.getElementById('calculator-modal');
+  if (el) el.style.display = 'flex';
+}
+// Hook voice commands for tools into voice processing
+const _origVoiceHandlers = typeof _voiceHandlerNames !== 'undefined' ? _voiceHandlerNames : [];
+if (Array.isArray(_origVoiceHandlers) && !_origVoiceHandlers.includes('voiceToolCommand')) {
+  _origVoiceHandlers.push('voiceToolCommand');
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </script>
 
