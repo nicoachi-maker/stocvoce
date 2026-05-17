@@ -24,7 +24,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* ── AUTH SCREEN ── */
 #auth-screen{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:1000;display:flex;align-items:center;justify-content:center}
-.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:420px;width:90%;text-align:center}
+.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:24px;max-width:440px;width:94%;text-align:center;max-height:95vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .auth-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:32px;letter-spacing:3px;color:var(--text);margin-bottom:4px}.auth-logo span{color:var(--accent)}
 .auth-sub{font-size:13px;color:var(--text-dim);margin-bottom:32px}
 .auth-tabs{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
@@ -592,11 +592,81 @@ function selectIndustry(ind) {
   var disp = document.getElementById('reg-industry-display');
   if(disp){disp.textContent=(icons[ind]||'📦')+' '+(names[ind]||ind);disp.style.color=color;disp.style.borderColor=color;}
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 function hexRgb(h){try{return parseInt(h.slice(1,3),16)+','+parseInt(h.slice(3,5),16)+','+parseInt(h.slice(5,7),16);}catch(e){return '0,229,160';}}
 function hexToRgbSafe(h){return hexRgb(h);}
 
-document.addEventListener('DOMContentLoaded',function(){selectIndustry(currentIndustry);});
+function goToLogin() {
+  var step1 = document.getElementById('step-industry');
+  var step2 = document.getElementById('step-login');
+  if (step1) step1.style.display = 'none';
+  if (step2) step2.style.display = 'block';
+  
+  // Update badge
+  var badge = document.getElementById('industry-badge');
+  var icons = {depozit:'🏭',restaurant:'🍽️',retail:'🏪',constructii:'🏗️'};
+  var names = {depozit:'Depozit',restaurant:'Restaurant',retail:'Casă/Retail',constructii:'Construcții'};
+  if (badge) {
+    badge.textContent = (icons[currentIndustry]||'📦') + ' ' + (names[currentIndustry]||currentIndustry);
+    var colors = {depozit:'#00e5a0',restaurant:'#ff6b9d',retail:'#ffa502',constructii:'#fd9644'};
+    badge.style.color = colors[currentIndustry] || '#00e5a0';
+    badge.style.borderColor = colors[currentIndustry] || '#00e5a0';
+  }
+  
+  // Focus email field
+  setTimeout(function(){
+    var em = document.getElementById('login-email');
+    if(em) em.focus();
+  }, 100);
+}
+
+function goBackToIndustry() {
+  var step1 = document.getElementById('step-industry');
+  var step2 = document.getElementById('step-login');
+  if (step1) step1.style.display = 'block';
+  if (step2) step2.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if already chose industry - go straight to login
+  var saved = localStorage.getItem('sv_industry');
+  selectIndustry(saved || 'depozit');
+  
+  // If returning user, skip industry selection
+  if (saved) {
+    // Still show industry step first so they can change it
+    var step1 = document.getElementById('step-industry');
+    if (step1) step1.style.display = 'block';
+  }
+});
+
+function resetPassword() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) { 
+    document.getElementById('login-error').textContent = 'Introduceți emailul mai întâi!';
+    document.getElementById('login-error').classList.add('show');
+    return; 
+  }
+  auth.sendPasswordResetEmail(email).then(() => {
+    document.getElementById('login-error').textContent = '';
+    alert('✅ Email de resetare trimis la ' + email);
+  }).catch(e => {
+    document.getElementById('login-error').textContent = 'Email invalid sau inexistent.';
+    document.getElementById('login-error').classList.add('show');
+  });
+}
 </script>
 
 <script>
@@ -661,6 +731,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -1385,6 +1467,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -2375,6 +2469,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -3558,6 +3664,18 @@ function selectIndustry(industry) {
   
   // Update CSS accent color
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexToRgbSafe(hex) {
@@ -4139,6 +4257,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -4475,6 +4605,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -4794,6 +4936,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -5098,6 +5252,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -5398,6 +5564,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -5418,107 +5596,142 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- AUTH SCREEN -->
 <div id="auth-screen">
   <div class="auth-box">
-    <div class="auth-logo">Stoc<span>Voce</span></div>
-    <div class="auth-sub">Sistem de gestiune cu voce — adaptabil oricărei industrii</div>
     
-    <!-- INDUSTRY SELECTOR -->
-    <div id="industry-selector" style="margin:18px 0 8px">
-      <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;text-align:center">Alege industria ta</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button type="button" id="ind-depozit" class="ind-btn" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('depozit')">
-          <div style="font-size:24px;margin-bottom:4px">🏭</div>
-          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#00e5a0;text-transform:uppercase">Depozit</div>
-          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Logistică & stoc</div>
+    <!-- STEP 1: CHOOSE INDUSTRY -->
+    <div id="step-industry" style="display:block">
+      <div class="auth-logo">Stoc<span>Voce</span></div>
+      <div style="font-size:13px;color:#6b7a8d;margin:6px 0 18px">Alege industria ta pentru a continua</div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+        <button type="button" id="ind-depozit" class="ind-btn" onclick="selectIndustry('depozit')"
+          style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:14px;padding:16px 8px;cursor:pointer;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
+          <div style="font-size:28px;margin-bottom:6px">🏭</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#00e5a0;text-transform:uppercase">Depozit</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:3px">Logistică & stoc</div>
         </button>
-        <button type="button" id="ind-restaurant" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('restaurant')">
-          <div style="font-size:24px;margin-bottom:4px">🍽️</div>
-          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Restaurant</div>
-          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">HoReCa & meniu</div>
+        <button type="button" id="ind-restaurant" class="ind-btn" onclick="selectIndustry('restaurant')"
+          style="background:#181d24;border:2px solid #1e2530;border-radius:14px;padding:16px 8px;cursor:pointer;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
+          <div style="font-size:28px;margin-bottom:6px">🍽️</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#e8ecf0;text-transform:uppercase">Restaurant</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:3px">HoReCa & meniu</div>
         </button>
-        <button type="button" id="ind-retail" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('retail')">
-          <div style="font-size:24px;margin-bottom:4px">🏪</div>
-          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Casă / Retail</div>
-          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Magazin & vânzări</div>
+        <button type="button" id="ind-retail" class="ind-btn" onclick="selectIndustry('retail')"
+          style="background:#181d24;border:2px solid #1e2530;border-radius:14px;padding:16px 8px;cursor:pointer;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
+          <div style="font-size:28px;margin-bottom:6px">🏪</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#e8ecf0;text-transform:uppercase">Casă / Retail</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:3px">Magazin & vânzări</div>
         </button>
-        <button type="button" id="ind-constructii" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('constructii')">
-          <div style="font-size:24px;margin-bottom:4px">🏗️</div>
-          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Construcții</div>
-          <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Șantier & materiale</div>
+        <button type="button" id="ind-constructii" class="ind-btn" onclick="selectIndustry('constructii')"
+          style="background:#181d24;border:2px solid #1e2530;border-radius:14px;padding:16px 8px;cursor:pointer;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
+          <div style="font-size:28px;margin-bottom:6px">🏗️</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#e8ecf0;text-transform:uppercase">Construcții</div>
+          <div style="font-size:10px;color:#6b7a8d;margin-top:3px">Șantier & materiale</div>
         </button>
+      </div>
+      
+      <button type="button" id="industry-continue-btn" onclick="goToLogin()"
+        style="width:100%;background:#00e5a0;border:none;border-radius:12px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:2px;padding:16px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent">
+        CONTINUĂ →
+      </button>
+      
+      <div style="margin-top:12px;font-size:11px;color:#6b7a8d">
+        Același email funcționează pentru toate industriile
       </div>
     </div>
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="showTab('login')">INTRĂ</button>
-      <button class="auth-tab" onclick="showTab('register')">CONT NOU</button>
-    </div>
-
-    <!-- LOGIN -->
-    <div id="tab-login" class="auth-form">
-      <div class="auth-field">
-        <label class="auth-label">Email</label>
-        <input class="auth-input" id="login-email" type="email" placeholder="ion@depozit.ro">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Parolă</label>
-        <input class="auth-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      </div>
-      <div class="auth-error" id="login-error"></div>
-      <button class="auth-btn" onclick="doLogin()" id="login-btn">INTRĂ →</button>
-    </div>
-
-    <!-- REGISTER -->
-    <div id="tab-register" class="auth-form" style="display:none">
-      <div class="auth-field">
-        <label class="auth-label">Numele tău complet</label>
-        <input class="auth-input" id="reg-name" placeholder="Ion Popescu">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label depot-label" for="reg-depot">Depozitul / Locația ta</label>
-        <input class="auth-input" id="reg-depot" placeholder="ex: Depozit Cluj, Depozit București...">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Rolul tău</label>
-        <select class="auth-input" id="reg-role" style="cursor:pointer">
-          <option value="operator">👷 Operator</option>
-          <option value="depot_admin">👔 Administrator Depozit</option>
-        </select>
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Email</label>
-        <input class="auth-input" id="reg-email" type="email" placeholder="ion@depozit.ro">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Industrie selectată</label>
-        <div id="reg-industry-display" style="background:#181d24;border:1px solid #1e2530;border-radius:10px;padding:10px 14px;color:#00e5a0;font-weight:700;font-size:13px">🏭 Depozit / Logistică</div>
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Parolă (minim 6 caractere)</label>
-        <input class="auth-input" id="reg-pass" type="password" placeholder="••••••••">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Confirmă parola</label>
-        <input class="auth-input" id="reg-pass2" type="password" placeholder="••••••••">
-      </div>
-      <div class="auth-field">
-        <label class="auth-label">Telegram Chat ID (opțional)</label>
-        <input class="auth-input" id="reg-telegram" placeholder="ex: 123456789" onkeydown="if(event.key==='Enter')doRegister()">
-        <div style="font-size:11px;color:#6b7a8d;margin-top:4px">
-          Deschide <strong style="color:#00e5a0">@stocvoce_alert_bot</strong> pe Telegram → /start → copiază ID-ul
+    <!-- STEP 2: LOGIN / REGISTER -->
+    <div id="step-login" style="display:none">
+      
+      <!-- Header with back button + industry badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <button type="button" onclick="goBackToIndustry()" 
+          style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:20px;width:38px;height:38px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center">←</button>
+        <div id="industry-badge" 
+          style="flex:1;background:#181d24;border:2px solid #00e5a0;border-radius:8px;padding:8px 12px;font-size:13px;color:#00e5a0;font-weight:700;text-align:left">
+          🏭 Depozit
         </div>
       </div>
-      <div class="auth-error" id="reg-error"></div>
-      <div class="auth-success" id="reg-success"></div>
-      <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);border-radius:8px;padding:10px;font-size:12px;color:#a78bfa;margin-bottom:8px">
-        📱 <b>Cum obții Telegram Chat ID:</b><br>
-        1. Deschide Telegram → caută <b>@userinfobot</b><br>
-        2. Click <b>Start</b><br>
-        3. Îți răspunde automat cu ID-ul tău (ex: 123456789)
+      
+      <div class="auth-logo" style="margin-bottom:2px">Stoc<span>Voce</span></div>
+      <div style="font-size:12px;color:#6b7a8d;margin-bottom:14px">Intră cu emailul tău sau creează cont</div>
+
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showTab('login')" type="button">INTRĂ</button>
+        <button class="auth-tab" onclick="showTab('register')" type="button">CONT NOU</button>
       </div>
-      <button class="auth-btn" onclick="doRegister()" id="reg-btn">CREEAZĂ CONT →</button>
+
+      <!-- LOGIN FORM -->
+      <div id="tab-login" class="auth-form">
+        <div class="auth-field">
+          <label class="auth-label">Email</label>
+          <input class="auth-input" id="login-email" type="email" placeholder="ion@email.ro" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Parolă</label>
+          <input class="auth-input" id="login-pass" type="password" placeholder="••••••••" 
+            autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="auth-error" id="login-error"></div>
+        <button class="auth-btn" type="button" onclick="doLogin()" id="login-btn"
+          style="touch-action:manipulation;-webkit-tap-highlight-color:transparent">INTRĂ →</button>
+        <div style="margin-top:10px;font-size:12px;color:#6b7a8d;cursor:pointer" onclick="resetPassword()">
+          Am uitat parola
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="tab-register" class="auth-form" style="display:none">
+        <div class="auth-field">
+          <label class="auth-label">Numele tău complet</label>
+          <input class="auth-input" id="reg-name" placeholder="Ion Popescu" autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label depot-label">Depozitul / Locația ta</label>
+          <input class="auth-input" id="reg-depot" placeholder="ex: Depozit Cluj..." autocomplete="organization">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Industrie</label>
+          <div id="reg-industry-display" 
+            style="background:#181d24;border:2px solid #00e5a0;border-radius:10px;padding:10px 14px;color:#00e5a0;font-weight:700;font-size:13px;text-align:left">
+            🏭 Depozit / Logistică
+          </div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Rolul tău</label>
+          <select class="auth-input" id="reg-role" style="cursor:pointer">
+            <option value="operator">👷 Operator</option>
+            <option value="depot_admin">👔 Administrator</option>
+          </select>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Email</label>
+          <input class="auth-input" id="reg-email" type="email" placeholder="ion@email.ro" autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Parolă (minim 6 caractere)</label>
+          <input class="auth-input" id="reg-pass" type="password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Confirmă parola</label>
+          <input class="auth-input" id="reg-pass2" type="password" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Telegram Chat ID (opțional)</label>
+          <input class="auth-input" id="reg-telegram" placeholder="ex: 123456789">
+        </div>
+        <div class="auth-error" id="reg-error"></div>
+        <div class="auth-success" id="reg-success"></div>
+        <button class="auth-btn" type="button" onclick="doRegister()" id="reg-btn"
+          style="touch-action:manipulation;-webkit-tap-highlight-color:transparent">CREEAZĂ CONT →</button>
+      </div>
+
+      <!-- Hidden elements for compatibility -->
+      <div id="industry-selector" style="display:none"></div>
     </div>
 
-    <div style="margin-top:16px">
+    <div style="margin-top:14px">
       <div class="spinner" id="auth-spinner" style="display:none"></div>
     </div>
   </div>
@@ -5930,6 +6143,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -11094,6 +11319,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -12493,6 +12730,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
@@ -14033,10 +14282,17 @@ auth.onAuthStateChanged(async (user) => {
     const snap = await db.ref('users/' + user.uid).once('value');
     userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email, status: 'approved' };
     
-    // Load industry from profile
-    if (userProfile.industry) {
+    // Industry: use profile setting OR current selection
+    // Same email can be used for ANY industry - industry is just UI
+    if (userProfile.industry && !localStorage.getItem('sv_industry_override')) {
       currentIndustry = userProfile.industry;
-      localStorage.setItem('sv_industry', currentIndustry);
+    }
+    // Always save current selection
+    localStorage.setItem('sv_industry', currentIndustry);
+    // Update profile if different
+    if (userProfile.industry !== currentIndustry) {
+      db.ref('users/' + user.uid + '/industry').set(currentIndustry);
+      userProfile.industry = currentIndustry;
     }
 
     // Check if admin - goes directly to app
@@ -14118,11 +14374,7 @@ auth.onAuthStateChanged(async (user) => {
 // ── FIREBASE STOCK ──
 function getDepotKey() {
   if (!userProfile || !userProfile.depot) return 'depozit_default';
-  const industry = userProfile.industry || currentIndustry || 'depozit';
-  const dKey = normalizeText(userProfile.depot.toLowerCase()).replace(/[^a-z0-9]/g,'_');
-  // Each industry gets its OWN Firebase path
-  const prefix = industry === 'depozit' ? 'depozite' : industry + '_depozite';
-  return prefix + '/' + dKey;
+  return 'depozite/' + normalizeText(userProfile.depot.toLowerCase()).replace(/[^a-z0-9]/g,'_');
 }
 
 function loadStockFromFirebase() {
@@ -17150,6 +17402,18 @@ function selectIndustry(ind) {
 
   // CSS accent
   document.documentElement.style.setProperty('--accent', color);
+  
+  // Update continue button color
+  var contBtn = document.getElementById('industry-continue-btn');
+  if (contBtn) { contBtn.style.background = color; }
+  
+  // Update badge if visible
+  var badge = document.getElementById('industry-badge');
+  if (badge) {
+    badge.textContent = (icons[ind]||'📦') + ' ' + (names[ind]||ind);
+    badge.style.color = color;
+    badge.style.borderColor = color;
+  }
 }
 
 function hexRgb(hex) {
