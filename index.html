@@ -3347,6 +3347,9 @@ function applyIndustryTheme() {
   }
   
   setFeedback(cfg.icon + ' Modul ' + cfg.name + ' activ!', 'ok');
+  
+  // Build toolbar for this industry
+  if (typeof buildToolbar === 'function') buildToolbar(currentIndustry);
 }
 // OLD applyIndustryTheme was here - removed
 
@@ -3393,9 +3396,10 @@ function showIndustryButtons(cfg) {
 // Industry already initialized in <head> script
 // Re-apply after full script loads for complete theme
 document.addEventListener('DOMContentLoaded', function() {
-  if (typeof applyIndustryTheme === 'function') {
-    setTimeout(applyIndustryTheme, 200);
-  }
+  setTimeout(function() {
+    if (typeof buildToolbar === 'function') buildToolbar(currentIndustry);
+    if (typeof applyIndustryTheme === 'function') applyIndustryTheme();
+  }, 300);
 });
 
 
@@ -4765,6 +4769,443 @@ function showSubcontractors() {
   if (el) { el.innerHTML = html; document.getElementById('subcontractors-modal').style.display = 'flex'; }
 }
 
+
+// ══════════════════════════════════════════
+// TOOLBAR DINAMIC PER INDUSTRIE
+// ══════════════════════════════════════════
+
+const TOOLBAR_CONFIG = {
+  depozit: {
+    tabNames: { stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT' },
+    stoc: [
+      {l:'+ Produs',f:'openAddModal',c:'#00e5a0'},
+      {l:'📊 Excel',f:'openImportModal',c:'#00e5a0'},
+      {l:'🔄 Transfer',f:'openTransferModal',c:'#00e5a0'},
+      {l:'🔁 Inventar',f:'openInventarModal',c:'#a78bfa'},
+      {l:'📷 Scan',f:'openQRModal',c:'#6b7a8d'},
+      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'🤖 Auto Min',f:'calcAutoMinStock',c:'#00e5a0'},
+      {l:'🗺️ Hartă',f:'openWarehouseMap',c:'#6b7a8d'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'📥 Recepție',f:'openReceptionModal',c:'#00e5a0'},
+      {l:'🤖 Voce AI',f:'toggleAIVoice',c:'#a78bfa'},
+      {l:'🛒 Livrare',f:'openDeliveryCartModal',c:'#ffa502'},
+      {l:'🔢 Inv. Rapid',f:'openPartialInventory',c:'#4d9fff'},
+      {l:'↩️ Retur',f:'openBonReturModal',c:'#ff4757'},
+      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#00e5a0'},
+      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
+      {l:'🚛 Tranzit',f:'showTransitModal',c:'#4d9fff'},
+      {l:'⚖️ Ajustare',f:'openInventarAdjust',c:'#ffa502'},
+      {l:'🛒 Coș',f:'openCartModal',c:'#00e5a0'},
+      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#00e5a0'},
+      {l:'📱 Share WA',f:'shareStockWhatsApp',c:'#00e5a0'},
+      {l:'🔄 Rotație',f:'stockTurnoverRate',c:'#00e5a0'},
+      {l:'🗺️ Zone',f:'openWarehouseZoneMap',c:'#a78bfa'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'📊 Reorder',f:'autoReorderPoint',c:'#00e5a0'},
+      {l:'🖨️ Print',f:'printDashboard',c:'#6b7a8d'},
+    ],
+    rapoarte: [
+      {l:'📈 Lunar',f:'openRaportLunarModal',c:'#00e5a0'},
+      {l:'🏆 Top 10',f:'showTop10',c:'#ffa502'},
+      {l:'💤 Stagnante',f:'showStagnant',c:'#ffa502'},
+      {l:'👤 Operatori',f:'showOperatorReport',c:'#6b7a8d'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
+      {l:'🔮 Predicții',f:'showPredictions',c:'#a78bfa'},
+      {l:'🔥 Heatmap',f:'showActivityHeatmap',c:'#a78bfa'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#00e5a0'},
+      {l:'📈 Tendințe AI',f:'showTrendsAnalysis',c:'#a78bfa'},
+      {l:'🖼️ Export Grafic',f:'exportChartAsPNG',c:'#6b7a8d'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#00e5a0'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
+      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
+      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
+      {l:'⚠️ Fără Furnizor',f:'showProductsWithoutSupplier',c:'#6b7a8d'},
+      {l:'📅 Pierderi',f:'showExpirationLosses',c:'#ff4757'},
+      {l:'📱 Dash Șef',f:'showMobileDashboard',c:'#a78bfa'},
+      {l:'👤 Inactivitate',f:'showOperatorInactivity',c:'#6b7a8d'},
+      {l:'🤖 Forecast Cat.',f:'aiForecastByCategory',c:'#a78bfa'},
+      {l:'⚡ Ef. Operatori',f:'showOperatorEfficiency',c:'#00e5a0'},
+      {l:'🌸 Sezonier',f:'showSeasonalReport',c:'#a78bfa'},
+      {l:'📈 Predictiv',f:'showPredictiveChart',c:'#a78bfa'},
+      {l:'💤 Fără Mișcare',f:'showNoMovement90Days',c:'#ffa502'},
+      {l:'📍 Val. Raft',f:'showValuePerRack',c:'#00e5a0'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'🤖 Forecast ML',f:'stockForecastML',c:'#a78bfa'},
+      {l:'📊 Sensib.',f:'demandSensitivity',c:'#ffa502'},
+      {l:'📊 ABC+XYZ',f:'abcXyzAnalysis',c:'#00e5a0'},
+      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
+      {l:'⚠️ Alertă Marjă',f:'productMarginAlert',c:'#ff4757'},
+      {l:'📊 Scor Sănătate',f:'stockHealthScore',c:'#00e5a0'},
+      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
+      {l:'⭐ Scoruri Prod.',f:'showAllProductScores',c:'#ffa502'},
+      {l:'🏭 Comp. Furnizori',f:'compareSupplierPrices',c:'#ffa502'},
+    ],
+    clienti: [
+      {l:'👥 Clienți',f:'openClientsModal',c:'#a78bfa'},
+      {l:'⏰ Rezervări',f:'openRezervariModal',c:'#ffa502'},
+      {l:'🔄 Bon Retur',f:'openBonReturModal',c:'#ff4757'},
+      {l:'📋 Comandă',f:'openComandaModal',c:'#00e5a0'},
+      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
+      {l:'🤖 AI Chat',f:'openPersistentChat',c:'#00e5a0'},
+      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'🧠 AI Memorie',f:'openPersistentChat',c:'#00e5a0'},
+      {l:'🔬 Audit AI',f:'aiFullDepotAudit',c:'#00e5a0'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+      {l:'🌸 AI Sezon',f:'aiDetectSeasonality',c:'#a78bfa'},
+      {l:'⚠️ Risc Abandon',f:'aiPredictChurnRisk',c:'#ff4757'},
+      {l:'💎 Retenție',f:'showClientRetention',c:'#00e5a0'},
+      {l:'🧾 Factură Coș',f:'invoiceFromCart',c:'#ffa502'},
+      {l:'💳 Ageing',f:'clientAgeingReport',c:'#ff4757'},
+      {l:'🗺️ Teritorii',f:'salesTerritoryMap',c:'#4d9fff'},
+      {l:'📥 Import CSV',f:'openBulkClientImportModal',c:'#6b7a8d'},
+      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
+    ],
+    depozit: [
+      {l:'🚚 Livrări',f:'openDeliveryModal',c:'#ffa502'},
+      {l:'📅 Calendar',f:'openCalendarModal',c:'#a78bfa'},
+      {l:'💾 Backup Firebase',f:'doManualBackup',c:'#00e5a0'},
+      {l:'📺 Kiosk',f:'openKioskMode',c:'#00e5a0'},
+      {l:'💚 Sănătate',f:'stockHealthScore',c:'#00e5a0'},
+      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
+      {l:'💾 Backup Local',f:'exportFullBackupLocal',c:'#00e5a0'},
+      {l:'📂 Import Backup',f:'importBackupLocal',c:'#ffa502'},
+      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
+      {l:'🔐 Log Sesiuni',f:'showSessionLog',c:'#6b7a8d'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+      {l:'📺 TV Dashboard',f:'openTVDashboard',c:'#00e5a0'},
+      {l:'🌐 Stoc Global',f:'loadConsolidatedStock',c:'#00e5a0'},
+      {l:'⚖️ Echilibrare',f:'multiDepotBalance',c:'#a78bfa'},
+      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
+      {l:'📦 Colete',f:'showShipments',c:'#4d9fff'},
+      {l:'📋 Picking',f:'pickingListGenerate',c:'#ffa502'},
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#00e5a0'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'☁️ Dropbox',f:'syncToDropbox',c:'#00e5a0'},
+      {l:'🔗 Webhook',f:'openWebhookSettings',c:'#6b7a8d'},
+      {l:'🔒 PIN Login',f:'openPinModal',c:'#ffa502'},
+      {l:'🛒 WooCommerce',f:'importWooCommerceOrders',c:'#a78bfa'},
+      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
+      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
+      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
+      {l:'↩️ Motive Retur',f:'returnReasonAnalysis',c:'#ffa502'},
+      {l:'⚡ Live Ops',f:'operatorPerformanceLive',c:'#00e5a0'},
+      {l:'📊 G.Sheets',f:'exportToGoogleSheets',c:'#00e5a0'},
+      {l:'🔗 API Link',f:'getAPILink',c:'#6b7a8d'},
+    ],
+  },
+
+  restaurant: {
+    tabNames: { stoc:'INGREDIENTE', rapoarte:'RAPOARTE', clienti:'COMENZI', depozit:'BUCĂTĂRIE' },
+    stoc: [
+      {l:'+ Ingredient',f:'openAddModal',c:'#ff6b9d'},
+      {l:'📥 Recepție',f:'openReceptionModal',c:'#ff6b9d'},
+      {l:'📅 FEFO',f:'sortByExpiry',c:'#ffa502'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'🍳 Inv. Bucătărie',f:'kitchenDailyInventory',c:'#ff6b9d'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ff6b9d'},
+      {l:'⚠️ Alertă Ing.',f:'checkMenuIngredients',c:'#ff4757'},
+      {l:'📋 Import Text',f:'openTextImportModal',c:'#6b7a8d'},
+      {l:'📊 Excel',f:'openImportModal',c:'#ff6b9d'},
+    ],
+    rapoarte: [
+      {l:'📊 Vânzări Preparate',f:'dishSalesReport',c:'#ff6b9d'},
+      {l:'📈 Tendințe',f:'showTrendsAnalysis',c:'#a78bfa'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA 9%',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📅 FIFO Alimente',f:'foodFIFOReport',c:'#ffa502'},
+      {l:'♻️ Raport Deșeuri',f:'showWasteReport',c:'#ffa502'},
+      {l:'📊 Grafice',f:'openChartsModal',c:'#a78bfa'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ff6b9d'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ff6b9d'},
+    ],
+    clienti: [
+      {l:'🪑 Mese Active',f:'showTablesDashboard',c:'#ff6b9d'},
+      {l:'📅 Rezervări',f:'showTableReservations',c:'#ff6b9d'},
+      {l:'💳 Split Bill',f:'showTablesDashboard',c:'#ffa502'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📊 Export Excel',f:'exportClientsExcel',c:'#00e5a0'},
+      {l:'💎 Clienți Fideli',f:'showClientRetention',c:'#ff6b9d'},
+    ],
+    depozit: [
+      {l:'🍽️ Meniu',f:'renderMenu',c:'#ff6b9d'},
+      {l:'👨‍🍳 Prepară',f:'cookDishPrompt',c:'#ff6b9d'},
+      {l:'📱 QR Meniu',f:'generateMenuQR',c:'#a78bfa'},
+      {l:'🧾 Bon Fiscal',f:'printRestaurantBonPrompt',c:'#ff6b9d'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#ff6b9d'},
+      {l:'♻️ Log Deșeuri',f:'logFoodWastePrompt',c:'#ffa502'},
+    ],
+  },
+
+  retail: {
+    tabNames: { stoc:'PRODUSE', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'CASĂ' },
+    stoc: [
+      {l:'+ Produs',f:'openAddModal',c:'#ffa502'},
+      {l:'📊 Excel',f:'openImportModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#ffa502'},
+      {l:'🏷️ Etichete',f:'openEticheteModal',c:'#ffa502'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'🛒 Coș',f:'openCartModal',c:'#ffa502'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'🏷️ Promoție',f:'addPromotionPrompt',c:'#ffa502'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#ffa502'},
+      {l:'🔔 Reaproviz.',f:'checkAutoReplenishPDF',c:'#ffa502'},
+      {l:'🖨️ Etichetă',f:'printProductLabelPrompt',c:'#6b7a8d'},
+      {l:'🛒 Lipsă Raft',f:'shelfReplenishmentReport',c:'#ff4757'},
+      {l:'📋 Lista Prețuri',f:'exportPriceList',c:'#6b7a8d'},
+    ],
+    rapoarte: [
+      {l:'🏪 Casă Azi',f:'showCashReport',c:'#ffa502'},
+      {l:'📊 Ore Vânzări',f:'hourlySalesReport',c:'#ffa502'},
+      {l:'🏆 Top Produse',f:'topSellingProducts',c:'#ffa502'},
+      {l:'💰 Profit',f:'showProfitReport',c:'#00e5a0'},
+      {l:'🧾 TVA',f:'taxReportGenerate',c:'#6b7a8d'},
+      {l:'📊 ABC',f:'showABCAnalysis',c:'#00e5a0'},
+      {l:'💹 ROI',f:'showROIReport',c:'#ffa502'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#ffa502'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#ffa502'},
+    ],
+    clienti: [
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💎 Retenție',f:'showClientRetention',c:'#ffa502'},
+      {l:'🏆 Top Clienți',f:'showTopClientsByValue',c:'#ffa502'},
+      {l:'⭐ Segmente',f:'showClientSegments',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'↩️ Retur',f:'processRetailReturnPrompt',c:'#ff4757'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+    ],
+    depozit: [
+      {l:'🏪 Casă POS',f:'openPosModal',c:'#ffa502'},
+      {l:'🧾 Chitanță',f:'printRetailReceiptPrompt',c:'#ffa502'},
+      {l:'▶ Start Tură',f:'startCashShiftPrompt',c:'#00e5a0'},
+      {l:'⏹ Stop Tură',f:'endCashShiftPrompt',c:'#ff4757'},
+      {l:'📺 Kiosk',f:'openKioskMode',c:'#ffa502'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'🔑 API Key',f:'generateDepotAPIKey',c:'#6b7a8d'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'👁️ Prezentare',f:'togglePresentationMode',c:'#a78bfa'},
+    ],
+  },
+
+  constructii: {
+    tabNames: { stoc:'MATERIALE', rapoarte:'RAPOARTE', clienti:'ȘANTIERE', depozit:'UTILAJE' },
+    stoc: [
+      {l:'+ Material',f:'openAddModal',c:'#fd9644'},
+      {l:'📊 Excel',f:'openImportModal',c:'#fd9644'},
+      {l:'🔄 Transfer',f:'openTransferModal',c:'#fd9644'},
+      {l:'⚖️ Inv. Fizic',f:'openPhysicalInventoryModal',c:'#ffa502'},
+      {l:'📷 Scan EAN',f:'openBarcodeScanModal',c:'#fd9644'},
+      {l:'🏷️ Categ.',f:'openCategoriesModal',c:'#a78bfa'},
+      {l:'↩️ Undo',f:'undoLastOperation',c:'#ff4757'},
+      {l:'📦 Îmbătrânire',f:'stockAgingReport',c:'#ffa502'},
+      {l:'⚖️ Capacitate',f:'warehouseCapacityCheck',c:'#4d9fff'},
+      {l:'📦 Mut Masiv',f:'openMassMovementModal',c:'#ffa502'},
+      {l:'🛡️ Stoc Sigur',f:'updateAllSafetyStocks',c:'#fd9644'},
+      {l:'💰 Preț Masă',f:'openBulkPriceModal',c:'#ffa502'},
+      {l:'📊 Reorder',f:'autoReorderPoint',c:'#fd9644'},
+      {l:'📦 Bon Consum',f:'generateMaterialConsumptionPrompt',c:'#fd9644'},
+    ],
+    rapoarte: [
+      {l:'📊 Progres Șantier',f:'showSiteProgressPrompt',c:'#fd9644'},
+      {l:'⏱️ Pontaj',f:'showTimesheetReport',c:'#fd9644'},
+      {l:'⚙️ Ore Utilaje',f:'equipmentHoursPerSite',c:'#fd9644'},
+      {l:'💰 Buget Șantier',f:'showSitesDashboard',c:'#fd9644'},
+      {l:'💸 Cashflow',f:'showCashflowChart',c:'#ffa502'},
+      {l:'📝 Export Word',f:'exportReportWord',c:'#6b7a8d'},
+      {l:'📊 Export Excel',f:'exportToExcel',c:'#00e5a0'},
+      {l:'📡 Telegram',f:'exportTelegramWithDetails',c:'#fd9644'},
+      {l:'🔄 Pred. Tură',f:'shiftHandoverReport',c:'#a78bfa'},
+      {l:'📅 Raport Azi',f:'generateDailyDetailedReport',c:'#fd9644'},
+      {l:'⚠️ Buget Alert',f:'checkSiteBudgets',c:'#ff4757'},
+    ],
+    clienti: [
+      {l:'🏗️ Șantiere',f:'showSitesDashboard',c:'#fd9644'},
+      {l:'🏢 Subcontractori',f:'showSubcontractors',c:'#fd9644'},
+      {l:'👷 Muncitori',f:'showWorkersDashboard',c:'#fd9644'},
+      {l:'📋 Deviz',f:'generateDevizPrompt',c:'#fd9644'},
+      {l:'🔍 Caută Client',f:'openClientSearchModal',c:'#a78bfa'},
+      {l:'💳 Scadențar',f:'openPaymentScheduleModal',c:'#00e5a0'},
+      {l:'📊 Export CRM',f:'exportCRMExcel',c:'#ffa502'},
+      {l:'📋 Cerere Ofertă',f:'generateRFQPrompt',c:'#fd9644'},
+    ],
+    depozit: [
+      {l:'📄 Bon Comandă',f:'generatePurchaseOrder',c:'#fd9644'},
+      {l:'🦺 Securitate',f:'showSafetyReport',c:'#ff4757'},
+      {l:'🔬 Control Cal.',f:'showQualityLog',c:'#00e5a0'},
+      {l:'🌡️ Temperatură',f:'showTemperatureLog',c:'#4d9fff'},
+      {l:'⚠️ Defecte',f:'defectiveStockReport',c:'#ff4757'},
+      {l:'💾 Backup',f:'doManualBackup',c:'#00e5a0'},
+      {l:'♻️ Restore',f:'loadBackupFromFirebase',c:'#ffa502'},
+      {l:'📋 SAGA/NIR',f:'exportSAGAFormat',c:'#ffa502'},
+      {l:'📋 Vamal',f:'exportCustomsDoc',c:'#6b7a8d'},
+      {l:'🎙️ Rezumat AI',f:'aiDailySummaryVocal',c:'#a78bfa'},
+      {l:'📧 Email Furnizor',f:'aiGenerateSupplierEmail',c:'#ffa502'},
+      {l:'📋 Deviz PDF',f:'generateDevizPrompt',c:'#fd9644'},
+    ],
+  },
+};
+
+function buildToolbar(industry) {
+  const cfg = TOOLBAR_CONFIG[industry] || TOOLBAR_CONFIG.depozit;
+  const tabs = ['stoc','rapoarte','clienti','depozit'];
+  
+  tabs.forEach(tab => {
+    const el = document.getElementById('toolbar-' + tab);
+    if (!el) return;
+    const buttons = cfg[tab] || [];
+    el.innerHTML = buttons.map(b =>
+      '<button class="add-btn" onclick="safeCall(\'' + b.f + '\')" ' +
+      'style="flex-shrink:0;white-space:nowrap;border-color:' + b.c + ';color:' + b.c + '">' +
+      b.l + '</button>'
+    ).join('');
+  });
+  
+  // Update tab labels
+  if (cfg.tabNames) {
+    const tabBtns = document.querySelectorAll('.tab-btn, [onclick*="showTab"]');
+    Object.entries(cfg.tabNames).forEach(([tab, name]) => {
+      tabBtns.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tab)) {
+          btn.textContent = name;
+        }
+      });
+    });
+  }
+  
+  // Update toolbar tab button labels
+  updateToolbarTabNames(cfg.tabNames || {});
+}
+
+function updateToolbarTabNames(names) {
+  const tabMap = {stoc:'STOC', rapoarte:'RAPOARTE', clienti:'CLIENȚI', depozit:'DEPOZIT'};
+  document.querySelectorAll('.toolbar-tab, [data-tab]').forEach(btn => {
+    const tab = btn.dataset.tab || '';
+    if (names[tab]) btn.textContent = names[tab];
+  });
+}
+
+// Add prompts for functions that need parameters
+function cookDishPrompt() {
+  const d = prompt('Preparat de gătit:');
+  const p = parseInt(prompt('Număr porții:')) || 1;
+  if (d && typeof cookDish === 'function') cookDish(d, p);
+}
+function printRestaurantBonPrompt() {
+  const t = prompt('Număr masă:');
+  if (t) printRestaurantBon(t, 'numerar');
+}
+function logFoodWastePrompt() {
+  const p = prompt('Produs:');
+  const q = parseFloat(prompt('Cantitate:')) || 0;
+  const r = prompt('Motiv (expirat/stricat/altul):') || 'expirat';
+  if (p && q) logFoodWaste(p, q, 'kg', r);
+}
+function addPromotionPrompt() {
+  const n = prompt('Nume promoție:');
+  const v = prompt('Discount %:');
+  if (n && v && typeof addPromotion === 'function') addPromotion(n, 'pct', v, []);
+}
+function startCashShiftPrompt() {
+  const op = prompt('Operator:');
+  const cash = prompt('Numerar inițial (RON):') || '0';
+  if (op) startCashShift(op, parseFloat(cash));
+}
+function endCashShiftPrompt() {
+  const cash = prompt('Numerar numărat (RON):') || '0';
+  endCashShift(parseFloat(cash));
+}
+function processRetailReturnPrompt() {
+  const name = prompt('Produs de returnat:');
+  if (!name) return;
+  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
+  if (!p) { setFeedback('Produs negăsit!', 'err'); return; }
+  const qty = parseInt(prompt('Cantitate:')) || 1;
+  const reason = prompt('Motiv retur:') || 'Nespecificat';
+  processRetailReturn(p.id, qty, reason);
+}
+function printRetailReceiptPrompt() {
+  const total = posCart.reduce((s,i)=>s+i.qty*i.price,0);
+  printRetailReceipt(null, total, 'numerar', null);
+}
+function printProductLabelPrompt() {
+  const name = prompt('Produs pentru etichetă:');
+  if (!name) return;
+  const p = stock.find(s => normalizeText(s.name.toLowerCase()).includes(normalizeText(name.toLowerCase())));
+  if (p) printProductLabel(p.id);
+  else setFeedback('Produs negăsit!', 'err');
+}
+function showSiteProgressPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Nu există șantiere. Adaugă un șantier mai întâi!'); return; }
+  showSiteProgress(constructionSites[0].id);
+}
+function generateDevizPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  const lucrari = [
+    { name: 'Fundație beton', unit: 'm³', qty: 10, unitPrice: 500 },
+    { name: 'Zidărie cărămidă', unit: 'm²', qty: 50, unitPrice: 120 },
+  ];
+  generateDeviz(constructionSites[0].id, lucrari);
+}
+function generateRFQPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  generateRFQ(constructionSites[0].id, null);
+}
+function generateMaterialConsumptionPrompt() {
+  if (!constructionSites || !constructionSites.length) { alert('Adaugă un șantier mai întâi!'); return; }
+  const materials = savedCart.map(i=>{const p=stock.find(s=>s.id===i.productId);return p?{name:p.name,qty:i.qty,unit:p.unit,price:p.price_buy||0}:null;}).filter(Boolean);
+  if (!materials.length) { alert('Adaugă materiale în coș mai întâi!'); return; }
+  generateMaterialConsumptionBon(constructionSites[0].id, materials);
+}
+function openPinModal() {
+  const el = document.getElementById('pin-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPersistentChat() {
+  const el = document.getElementById('persistent-chat-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPaymentScheduleModal() {
+  const el = document.getElementById('payment-schedule-modal');
+  if (el) { el.style.display='flex'; if(typeof renderPaymentSchedule==='function') renderPaymentSchedule(); }
+}
+function openClientSearchModal() {
+  const el = document.getElementById('client-search-modal');
+  if (el) el.style.display = 'flex';
+}
+function openPosModal() {
+  const el = document.getElementById('pos-modal');
+  if (el) el.style.display = 'flex';
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -5229,146 +5670,15 @@ function showTab(tab) {
       </div>
       
       <!-- Tab: STOC -->
-      <div id="toolbar-stoc" style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="add-btn" onclick="if(typeof openAddModal==='function'){openAddModal()}else{console.warn('openAddModal not ready');}">+ Produs</button>
-        <button class="add-btn" onclick="if(typeof openImportModal==='function'){openImportModal()}else{console.warn('openImportModal not ready');}" style="border-color:#a78bfa;color:#a78bfa">📊 Excel</button>
-        <button class="add-btn" onclick="if(typeof openTransferModal==='function'){openTransferModal()}else{console.warn('openTransferModal not ready');}" style="border-color:#a78bfa;color:#a78bfa">🔄 Transfer</button>
-        <button class="add-btn" onclick="if(typeof openInventarModal==='function'){openInventarModal()}else{console.warn('openInventarModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">🔁 Inventar</button>
-        <button class="add-btn" onclick="if(typeof openQRModal==='function'){openQRModal()}else{console.warn('openQRModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">📷 Scan</button>
-        <button class="add-btn" onclick="if(typeof openEticheteModal==='function'){openEticheteModal()}else{console.warn('openEticheteModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">🏷️ Etichete</button>
-        <button class="add-btn" onclick="if(typeof openCategoriesModal==='function'){openCategoriesModal()}else{console.warn('openCategoriesModal not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🏷️ Categ.</button>
-        <button class="add-btn" onclick="if(typeof calcAutoMinStock==='function'){calcAutoMinStock()}else{console.warn('calcAutoMinStock not ready');}" style="border-color:#00e5a0;color:#00e5a0">🤖 Auto Min</button>
-        <button class="add-btn" onclick="if(typeof openWarehouseMap==='function'){openWarehouseMap()}else{console.warn('openWarehouseMap not ready');}" style="border-color:#00e5a0;color:#00e5a0">🗺️ Hartă</button>
-        <button class="add-btn" onclick="if(typeof undoLastOperation==='function'){undoLastOperation()}else{console.warn('undoLastOperation not ready');}" style="border-color:#ff4757;color:#ff4757">↩️ Undo</button>
-        <button class="add-btn" onclick="if(typeof transcribeToCSV==='function'){transcribeToCSV()}else{console.warn('transcribeToCSV not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📝 Transcriere</button>
-        <button class="add-btn" onclick="if(typeof startDailyVoiceSummary==='function'){startDailyVoiceSummary()}else{console.warn('startDailyVoiceSummary not ready');}" style="border-color:#00e5a0;color:#00e5a0">🌅 Rezumat</button>
-        <button class="add-btn" onclick="if(typeof filterFavorites==='function'){filterFavorites()}else{console.warn('filterFavorites not ready');}" style="border-color:#ffa502;color:#ffa502">⭐ Favorite</button>
-        <button class="add-btn" onclick="if(typeof sortStock==='function'){sortStock('qty')}else{console.warn('sortStock not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">↕️ Sortare</button>
-        <button class="add-btn" onclick="if(typeof autoArchiveInactive==='function'){autoArchiveInactive(90)}else{console.warn('autoArchiveInactive not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
-        <button class="add-btn" onclick="if(typeof openReceptionModal==='function'){openReceptionModal()}else{console.warn('openReceptionModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">📥 Recepție</button>
-        <button class="add-btn" onclick="if(typeof toggleAIVoice==='function'){toggleAIVoice()}else{console.warn('toggleAIVoice not ready');}" style="border-color:#a78bfa;color:#a78bfa" id="ai-voice-btn">🤖 Voce AI</button>
-        <button class="add-btn" onclick="if(typeof openDeliveryCartModal==='function'){openDeliveryCartModal()}else{console.warn('openDeliveryCartModal not ready');}" style="border-color:#a78bfa;color:#a78bfa">🛒 Livrare</button>
-        <button class="add-btn" onclick="if(typeof openPartialInventory==='function'){openPartialInventory(null)}else{console.warn('openPartialInventory not ready');}" style="border-color:#ffa502;color:#ffa502">🔢 Inventar Rapid</button>
-        <button class="add-btn" onclick="if(typeof openReturnToSupplierModal==='function'){openReturnToSupplierModal()}else{console.warn('openReturnToSupplierModal not ready');}" style="border-color:#ff4757;color:#ff4757">↩️ Retur</button>
-        <button class="add-btn" onclick="if(typeof openTextImportModal==='function'){openTextImportModal()}else{console.warn('openTextImportModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">📋 Import Text</button>
-        <button class="add-btn" onclick="if(typeof updateAllSafetyStocks==='function'){updateAllSafetyStocks()}else{console.warn('updateAllSafetyStocks not ready');}" style="border-color:#ffa502;color:#ffa502">🛡️ Stoc Sigur</button>
-        <button class="add-btn" onclick="if(typeof sortByExpiry==='function'){sortByExpiry()}else{console.warn('sortByExpiry not ready');}" style="border-color:#ffa502;color:#ffa502">📅 FEFO</button>
-        <button class="add-btn" onclick="if(typeof showTransitModal==='function'){showTransitModal()}else{console.warn('showTransitModal not ready');}" style="border-color:#ffa502;color:#ffa502">🚛 Tranzit</button>
-        <button class="add-btn" onclick="if(typeof sortByExpiry==='function'){sortByExpiry()}else{console.warn('sortByExpiry not ready');}" style="border-color:#ffa502;color:#ffa502">📅 FEFO</button>
-        <button class="add-btn" onclick="if(typeof showTransitModal==='function'){showTransitModal()}else{console.warn('showTransitModal not ready');}" style="border-color:#ffa502;color:#ffa502">🚛 Tranzit</button>
-        <button class="add-btn" onclick="if(typeof openInventarAdjust==='function'){openInventarAdjust()}else{console.warn('openInventarAdjust not ready');}" style="border-color:#a78bfa;color:#a78bfa">⚖️ Ajustare</button>
-        <button class="add-btn" onclick="if(typeof updateAllSafetyStocks==='function'){updateAllSafetyStocks()}else{console.warn('updateAllSafetyStocks not ready');}" style="border-color:#00e5a0;color:#00e5a0">🛡️ Stoc Sig.</button>
-        <button class="add-btn" onclick="const sb=document.getElementById('sort-bar');if(sb)sb.style.display=sb.style.display==='none'||!sb.style.display?'flex':'none'">↕️ Sortare</button>
-        <button class="add-btn" onclick="if(typeof autoArchiveInactive==='function'){autoArchiveInactive()}else{console.warn('autoArchiveInactive not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📦 Auto-arhivare</button>
-        <button class="add-btn" onclick="if(typeof printDashboard==='function'){printDashboard()}else{console.warn('printDashboard not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
+      <div id="toolbar-stoc" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
       </div>
-      
-      <!-- Tab: RAPOARTE -->
-      <div id="toolbar-rapoarte" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
-        <button class="add-btn" onclick="if(typeof openRaportLunarModal==='function'){openRaportLunarModal()}else{console.warn('openRaportLunarModal not ready');}" style="border-color:#ffa502;color:#ffa502">📈 Raport Lunar</button>
-        <button class="add-btn" onclick="if(typeof showTop10==='function'){showTop10()}else{console.warn('showTop10 not ready');}" style="border-color:#ffa502;color:#ffa502">🏆 Top 10</button>
-        <button class="add-btn" onclick="if(typeof showStagnant==='function'){showStagnant(30)}else{console.warn('showStagnant not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">💤 Stagnante</button>
-        <button class="add-btn" onclick="if(typeof showOperatorReport==='function'){showOperatorReport()}else{console.warn('showOperatorReport not ready');}" style="border-color:#a78bfa;color:#a78bfa">👤 Operatori</button>
-        <button class="add-btn" onclick="if(typeof exportFullExcel==='function'){exportFullExcel()}else{console.warn('exportFullExcel not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Export Excel</button>
-        <button class="add-btn" onclick="if(typeof openChartsModal==='function'){openChartsModal()}else{console.warn('openChartsModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Grafice</button>
-        <button class="add-btn" onclick="if(typeof showPredictions==='function'){showPredictions()}else{console.warn('showPredictions not ready');}" style="border-color:#ff4757;color:#ff4757">🔮 Predicții</button>
-        <button class="add-btn" onclick="if(typeof generateHeatmap==='function'){generateHeatmap()}else{console.warn('generateHeatmap not ready');}" style="border-color:#a78bfa;color:#a78bfa">🔥 Heatmap</button>
-        <button class="add-btn" onclick="if(typeof aiDetectAnomalies==='function'){aiDetectAnomalies()}else{console.warn('aiDetectAnomalies not ready');}" style="border-color:#ffa502;color:#ffa502">🤖 Anomalii AI</button>
-        <button class="add-btn" onclick="if(typeof exportToGoogleSheets==='function'){exportToGoogleSheets()}else{console.warn('exportToGoogleSheets not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 G.Sheets</button>
-        <button class="add-btn" onclick="if(typeof generatePublicLink==='function'){generatePublicLink()}else{console.warn('generatePublicLink not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🔗 API Link</button>
-        <button class="add-btn" onclick="if(typeof showCategoryPie==='function'){showCategoryPie()}else{console.warn('showCategoryPie not ready');}" style="border-color:#a78bfa;color:#a78bfa">🥧 Categorii</button>
-        <button class="add-btn" onclick="if(typeof showMonthComparison==='function'){showMonthComparison()}else{console.warn('showMonthComparison not ready');}" style="border-color:#ffa502;color:#ffa502">📅 Comparație</button>
-        <button class="add-btn" onclick="if(typeof screenshotDashboard==='function'){screenshotDashboard()}else{console.warn('screenshotDashboard not ready');}" style="border-color:#00e5a0;color:#00e5a0">📸 Telegram</button>
-        <button class="add-btn" onclick="if(typeof showProfitReport==='function'){showProfitReport()}else{console.warn('showProfitReport not ready');}" style="border-color:#00e5a0;color:#00e5a0">💰 Profit</button>
-        <button class="add-btn" onclick="if(typeof showPLReport==='function'){showPLReport()}else{console.warn('showPLReport not ready');}" style="border-color:#ffa502;color:#ffa502">📊 P&L</button>
-        <button class="add-btn" onclick="if(typeof calcVATReport==='function'){calcVATReport()}else{console.warn('calcVATReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🧾 TVA</button>
-        <button class="add-btn" onclick="if(typeof forecastBudget==='function'){forecastBudget()}else{console.warn('forecastBudget not ready');}" style="border-color:#a78bfa;color:#a78bfa">💸 Buget</button>
-        <button class="add-btn" onclick="if(typeof runFullAnalysis==='function'){runFullAnalysis()}else{console.warn('runFullAnalysis not ready');}" style="border-color:#00e5a0;color:#00e5a0">🔬 Analiză</button>
-        <button class="add-btn" onclick="if(typeof aiSuggestOrder==='function'){aiSuggestOrder()}else{console.warn('aiSuggestOrder not ready');}" style="border-color:#a78bfa;color:#a78bfa">🤖 Comandă AI</button>
-        <button class="add-btn" onclick="if(typeof exportForWhatsApp==='function'){exportForWhatsApp()}else{console.warn('exportForWhatsApp not ready');}" style="border-color:#00e5a0;color:#00e5a0">📱 WhatsApp</button>
-        <button class="add-btn" onclick="if(typeof exportAuditPDF==='function'){exportAuditPDF()}else{console.warn('exportAuditPDF not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📋 Audit PDF</button>
-        <button class="add-btn" onclick="if(typeof showTopClientsMonth==='function'){showTopClientsMonth()}else{console.warn('showTopClientsMonth not ready');}" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
-        <button class="add-btn" onclick="if(typeof show3MonthsChart==='function'){show3MonthsChart()}else{console.warn('show3MonthsChart not ready');}" style="border-color:#a78bfa;color:#a78bfa">📊 3 Luni</button>
-        <button class="add-btn" onclick="if(typeof showLocationMovements==='function'){showLocationMovements()}else{console.warn('showLocationMovements not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📍 Loc. Mișcări</button>
-        <button class="add-btn" onclick="if(typeof aiPredictStockBreak==='function'){aiPredictStockBreak()}else{console.warn('aiPredictStockBreak not ready');}" style="border-color:#ff4757;color:#ff4757">🔮 Predicție AI</button>
-        <button class="add-btn" onclick="if(typeof aiOptimizeLocations==='function'){aiOptimizeLocations()}else{console.warn('aiOptimizeLocations not ready');}" style="border-color:#a78bfa;color:#a78bfa">🗺️ Optimizare AI</button>
-        <button class="add-btn" onclick="if(typeof showForecastModal==='function'){showForecastModal()}else{console.warn('showForecastModal not ready');}" style="border-color:#ff4757;color:#ff4757">📈 Forecast 30z</button>
-        <button class="add-btn" onclick="if(typeof showOperatorComparison==='function'){showOperatorComparison()}else{console.warn('showOperatorComparison not ready');}" style="border-color:#a78bfa;color:#a78bfa">👥 Op. Comparație</button>
-        <button class="add-btn" onclick="if(typeof showCategoryMarginReport==='function'){showCategoryMarginReport()}else{console.warn('showCategoryMarginReport not ready');}" style="border-color:#00e5a0;color:#00e5a0">💰 Marjă Cat.</button>
-        <button class="add-btn" onclick="if(typeof calcCategoryRotation==='function'){calcCategoryRotation();alert(JSON.stringify(calcCategoryRotation().slice(0,5).map(c=>c.cat+': '+c.rotation+'/luna'),null,2))}else{console.warn('calcCategoryRotation not ready');}" style="border-color:#ffa502;color:#ffa502">🔄 Rotație Cat.</button>
-        <button class="add-btn" onclick="if(typeof showLostRevenueAlert==='function'){showLostRevenueAlert()}else{console.warn('showLostRevenueAlert not ready');}" style="border-color:#ff4757;color:#ff4757">💸 Pierderi</button>
-        <button class="add-btn" onclick="if(typeof showTop10Chart==='function'){showTop10Chart()}else{console.warn('showTop10Chart not ready');}" style="border-color:#ffa502;color:#ffa502">🏆 Top 10</button>
-        <button class="add-btn" onclick="if(typeof showSupplierEvaluation==='function'){showSupplierEvaluation()}else{console.warn('showSupplierEvaluation not ready');}" style="border-color:#ffa502;color:#ffa502">⭐ Furnizori</button>
-        <button class="add-btn" onclick="if(typeof exportForAccountant==='function'){exportForAccountant()}else{console.warn('exportForAccountant not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Contabil</button>
-        <button class="add-btn" onclick="if(typeof showBossDashboard==='function'){showBossDashboard()}else{console.warn('showBossDashboard not ready');}" style="border-color:#a78bfa;color:#a78bfa">👔 Dashboard Șef</button>
-        <button class="add-btn" onclick="if(typeof generateSupplierOrder==='function'){generateSupplierOrder()}else{console.warn('generateSupplierOrder not ready');}" style="border-color:#ffa502;color:#ffa502">📋 Cmd Furnizor</button>
-        <button class="add-btn" onclick="if(typeof generateAIPredictionReport==='function'){generateAIPredictionReport()}else{console.warn('generateAIPredictionReport not ready');}" style="border-color:#ff4757;color:#ff4757">🔮 Raport AI</button>
-        <button class="add-btn" onclick="if(typeof generateDailyDetailedReport==='function'){generateDailyDetailedReport()}else{console.warn('generateDailyDetailedReport not ready');}" style="border-color:#00e5a0;color:#00e5a0">📅 Raport Azi</button>
-        <button class="add-btn" onclick="if(typeof showTrendsAnalysis==='function'){showTrendsAnalysis()}else{console.warn('showTrendsAnalysis not ready');}" style="border-color:#a78bfa;color:#a78bfa">📈 Tendințe AI</button>
-        <button class="add-btn" onclick="if(typeof exportChartAsPNG==='function'){exportChartAsPNG()}else{console.warn('exportChartAsPNG not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🖼️ Export Grafic</button>
-        <button class="add-btn" onclick="if(typeof exportClientsExcel==='function'){exportClientsExcel()}else{console.warn('exportClientsExcel not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Export Clienți</button>
-        <button class="add-btn" onclick="if(typeof showTopClientsThisMonth==='function'){showTopClientsThisMonth()}else{console.warn('showTopClientsThisMonth not ready');}" style="border-color:#ffa502;color:#ffa502">🏆 Top Clienți</button>
-        <button class="add-btn" onclick="if(typeof showLocationMovements==='function'){showLocationMovements()}else{console.warn('showLocationMovements not ready');}" style="border-color:#00e5a0;color:#00e5a0">📍 Locații</button>
-        <button class="add-btn" onclick="if(typeof show3MonthChart==='function'){show3MonthChart()}else{console.warn('show3MonthChart not ready');}" style="border-color:#a78bfa;color:#a78bfa">📊 3 Luni</button>
-        <button class="add-btn" onclick="if(typeof calcMonthlyMargin==='function'){calcMonthlyMargin()}else{console.warn('calcMonthlyMargin not ready');}" style="border-color:#00e5a0;color:#00e5a0">💰 Marjă</button>
-        <button class="add-btn" onclick="if(typeof exportAuditPDF==='function'){exportAuditPDF()}else{console.warn('exportAuditPDF not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📋 Audit PDF</button>
-        <button class="add-btn" onclick="if(typeof aiPredictStockout==='function'){aiPredictStockout()}else{console.warn('aiPredictStockout not ready');}" style="border-color:#ff4757;color:#ff4757">🤖 Predicție</button>
-        <button class="add-btn" onclick="if(typeof aiOptimizeLocations==='function'){aiOptimizeLocations()}else{console.warn('aiOptimizeLocations not ready');}" style="border-color:#a78bfa;color:#a78bfa">🤖 Optimizare</button>
-        <button class="add-btn" onclick="if(typeof showSupplierReport==='function'){showSupplierReport()}else{console.warn('showSupplierReport not ready');}" style="border-color:#ffa502;color:#ffa502">🏭 Furnizori</button>
-        <button class="add-btn" onclick="if(typeof showLocationReport==='function'){showLocationReport()}else{console.warn('showLocationReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
-        <button class="add-btn" onclick="if(typeof showNoMovementReport==='function'){showNoMovementReport()}else{console.warn('showNoMovementReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">💤 Fără mișcare</button>
-        <button class="add-btn" onclick="if(typeof printDashboard==='function'){printDashboard()}else{console.warn('printDashboard not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🖨️ Print</button>
-        <button class="add-btn" onclick="if(typeof showSupplierReport==='function'){showSupplierReport()}else{console.warn('showSupplierReport not ready');}" style="border-color:#00e5a0;color:#00e5a0">🏭 Furnizori</button>
-        <button class="add-btn" onclick="if(typeof showLocationReport==='function'){showLocationReport()}else{console.warn('showLocationReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📍 Locații</button>
-        <button class="add-btn" onclick="if(typeof showStagnantReport==='function'){showStagnantReport()}else{console.warn('showStagnantReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">💤 Stagnante</button>
-        <button class="add-btn" onclick="if(typeof startLiveChart==='function'){startLiveChart()}else{console.warn('startLiveChart not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Live</button>
-        <button class="add-btn" onclick="if(typeof voiceFullStatus==='function'){voiceFullStatus()}else{console.warn('voiceFullStatus not ready');}" style="border-color:#a78bfa;color:#a78bfa">🤖 Rezumat AI</button>
-      </div>
-      
-      <!-- Tab: CLIENȚI -->
-      <div id="toolbar-clienti" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
-        <button class="add-btn" onclick="if(typeof openClientsModal==='function'){openClientsModal()}else{console.warn('openClientsModal not ready');}" style="border-color:#a78bfa;color:#a78bfa">👥 Clienți</button>
-        <button class="add-btn" onclick="if(typeof openRezervariModal==='function'){openRezervariModal()}else{console.warn('openRezervariModal not ready');}" style="border-color:#a78bfa;color:#a78bfa">⏰ Rezervări</button>
-        <button class="add-btn" onclick="if(typeof openBonReturModal==='function'){openBonReturModal()}else{console.warn('openBonReturModal not ready');}" style="border-color:#ff4757;color:#ff4757">🔄 Bon Retur</button>
-        <button class="add-btn" onclick="if(typeof openComandaModal==='function'){openComandaModal()}else{console.warn('openComandaModal not ready');}" style="border-color:#ffa502;color:#ffa502">📋 Comandă</button>
-        <button class="add-btn" onclick="if(typeof showClientSegments==='function'){showClientSegments()}else{console.warn('showClientSegments not ready');}" style="border-color:#a78bfa;color:#a78bfa">⭐ Segmente</button>
-        <button class="add-btn" onclick="document.getElementById('chatbot-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🤖 AI Chat</button>
-        <button class="add-btn" onclick="document.getElementById('invoice-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">📄 Import Factură</button>
-        <button class="add-btn" onclick="document.getElementById('invoice-photo-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">📸 Factură Foto AI</button>
-        <button class="add-btn" onclick="document.getElementById('advanced-chat-modal').style.display='flex'" style="border-color:#00e5a0;color:#00e5a0">🤖 AI Asistent</button>
-        <button class="add-btn" onclick="if(typeof syncToEcommerce==='function'){syncToEcommerce('WooCommerce')}else{console.warn('syncToEcommerce not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🛒 WooCommerce</button>
-        <button class="add-btn" onclick="if(typeof exportClientsExcel==='function'){exportClientsExcel()}else{console.warn('exportClientsExcel not ready');}" style="border-color:#00e5a0;color:#00e5a0">📊 Export Excel</button>
-        <button class="add-btn" onclick="document.getElementById('client-search-modal').style.display='flex'" style="border-color:#a78bfa;color:#a78bfa">🔍 Caută Client</button>
-      </div>
-      
-      <!-- Tab: DEPOZIT -->
-      <div id="toolbar-depozit" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
-        <button class="add-btn" onclick="if(typeof openDeliveryModal==='function'){openDeliveryModal()}else{console.warn('openDeliveryModal not ready');}" style="border-color:#ffa502;color:#ffa502">🚚 Livrări</button>
-        <button class="add-btn" onclick="if(typeof openCalendarModal==='function'){openCalendarModal()}else{console.warn('openCalendarModal not ready');}" style="border-color:#ffa502;color:#ffa502">📅 Calendar</button>
-        <button class="add-btn" onclick="if(typeof doAutoBackup==='function'){doAutoBackup()}else{console.warn('doAutoBackup not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">💾 Backup</button>
-        <button class="add-btn" onclick="if(typeof toggleKioskMode==='function'){toggleKioskMode()}else{console.warn('toggleKioskMode not ready');}" style="border-color:#00e5a0;color:#00e5a0">📺 Kiosk</button>
-        <button class="add-btn" onclick="if(typeof showHealthMeter==='function'){showHealthMeter()}else{console.warn('showHealthMeter not ready');}" style="border-color:#00e5a0;color:#00e5a0">💚 Sănătate</button>
-        <button class="add-btn" onclick="if(typeof checkReplenishPoints==='function'){checkReplenishPoints()}else{console.warn('checkReplenishPoints not ready');}" style="border-color:#ffa502;color:#ffa502">🔔 Reaproviz.</button>
-        <button class="add-btn" onclick="if(typeof toggleDailyReport==='function'){toggleDailyReport()}else{console.warn('toggleDailyReport not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📄 Raport Auto</button>
-        <button class="add-btn" onclick="if(typeof toggleAutoOrder==='function'){toggleAutoOrder()}else{console.warn('toggleAutoOrder not ready');}" style="border-color:#00e5a0;color:#00e5a0">🤖 Auto-Cmd</button>
-        <button class="add-btn" onclick="if(typeof doManualBackup==='function'){doManualBackup()}else{console.warn('doManualBackup not ready');}" style="border-color:#00e5a0;color:#00e5a0">💾 Backup</button>
-        <button class="add-btn" onclick="if(typeof openRestoreModal==='function'){openRestoreModal()}else{console.warn('openRestoreModal not ready');}" style="border-color:#ff4757;color:#ff4757">♻️ Restore</button>
-        <button class="add-btn" onclick="if(typeof toggleDemoMode==='function'){toggleDemoMode()}else{console.warn('toggleDemoMode not ready');}" style="border-color:#a78bfa;color:#a78bfa">🧪 Demo</button>
-        <button class="add-btn" onclick="if(typeof openQuickAction==='function'){openQuickAction()}else{console.warn('openQuickAction not ready');}" style="border-color:#00e5a0;color:#00e5a0">⚡ Rapid</button>
-        <button class="add-btn" onclick="if(typeof exportGDPRData==='function'){exportGDPRData()}else{console.warn('exportGDPRData not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">📋 GDPR Export</button>
-        <button class="add-btn" onclick="if(typeof generateDepotAPIKey==='function'){generateDepotAPIKey()}else{console.warn('generateDepotAPIKey not ready');}" style="border-color:#6b7a8d;color:#6b7a8d">🔑 API Key</button>
-        <button class="add-btn" onclick="if(typeof exportFullBackupLocal==='function'){exportFullBackupLocal()}else{console.warn('exportFullBackupLocal not ready');}" style="border-color:#00e5a0;color:#00e5a0">💾 Backup Local</button>
-        <button class="add-btn" onclick="document.getElementById('backup-import-file').click()" style="border-color:#ffa502;color:#ffa502">📂 Import Backup</button>
-        <input type="file" id="backup-import-file" accept=".json" style="display:none" onchange="importBackupLocal(this.files[0])">
-        <button class="add-btn" onclick="if(typeof requestPushPermission==='function'){requestPushPermission()}else{console.warn('requestPushPermission not ready');}" style="border-color:#ffa502;color:#ffa502">🔔 Push Notif</button>
-        <button class="add-btn" onclick="if(typeof generatePackingList==='function'){generatePackingList(stock.slice(0,5),'—')}else{console.warn('generatePackingList not ready');}" style="border-color:#ffa502;color:#ffa502">📋 Packing</button>
-      </div>
-      
-      <!-- Tab: GLOBAL -->
-      <div id="toolbar-global" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap">
-        <button class="add-btn" onclick="if(typeof openGlobalStockModal==='function'){openGlobalStockModal()}else{console.warn('openGlobalStockModal not ready');}" style="border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
-        <button class="add-btn" onclick="if(typeof openComparatieDep==='function'){openComparatieDep()}else{console.warn('openComparatieDep not ready');}" style="border-color:#a78bfa;color:#a78bfa">📊 Compară Depozite</button>
-        <button class="add-btn" onclick="if(typeof showConsolidatedStock==='function'){showConsolidatedStock()}else{console.warn('showConsolidatedStock not ready');}" style="border-color:#00e5a0;color:#00e5a0">🔢 Stoc Consolidat</button>
+      <div id="toolbar-rapoarte" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
+      <div id="toolbar-clienti" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
+      <div id="toolbar-depozit" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
+      <div id="toolbar-global" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin">
+        <button class="add-btn" onclick="safeCall('loadConsolidatedStock')" style="flex-shrink:0;white-space:nowrap;border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
+        <button class="add-btn" onclick="safeCall('openComparatieDep')" style="flex-shrink:0;white-space:nowrap;border-color:#00e5a0;color:#00e5a0">⚖️ Compară Depozite</button>
+        <button class="add-btn" onclick="safeCall('loadConsolidatedStock')" style="flex-shrink:0;white-space:nowrap;border-color:#a78bfa;color:#a78bfa">🔢 Stoc Consolidat</button>
       </div>
     </div>
     <div class="stock-grid" id="stock-grid">
