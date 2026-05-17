@@ -196,6 +196,13 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; c
 #add-modal, #settings-modal { -webkit-overflow-scrolling: touch; }
 .add-box { -webkit-overflow-scrolling: touch; }
 
+
+/* Industry Selector */
+.ind-btn { outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+.ind-btn:active { opacity: 0.8; transform: scale(0.97) !important; }
+.ind-btn .ind-name { transition: color 0.2s; }
+#industry-selector button { font-family: inherit; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
 // ── ADJUST INVENTAR ──
@@ -3218,25 +3225,73 @@ function selectIndustry(industry) {
   currentIndustry = industry;
   localStorage.setItem('sv_industry', industry);
   
-  // Update UI buttons
-  document.querySelectorAll('.ind-btn').forEach(btn => {
-    btn.style.background = '#181d24';
-    btn.style.borderColor = '#1e2530';
-    btn.querySelectorAll('div').forEach(d => { if(d.style.fontFamily) d.style.color = '#e8ecf0'; });
-  });
+  const colors = { depozit:'#00e5a0', restaurant:'#ff6b9d', retail:'#ffa502', constructii:'#fd9644' };
+  const icons =  { depozit:'🏭', restaurant:'🍽️', retail:'🏪', constructii:'🏗️' };
+  const subtitles = {
+    depozit: 'Sistem gestiune depozit cu voce',
+    restaurant: 'Gestiune ingrediente, meniu & mese',
+    retail: 'Casă de marcat, stoc & vânzări',
+    constructii: 'Materiale, șantiere & echipamente'
+  };
+  const depotLabels = {
+    depozit: 'Numele Depozitului',
+    restaurant: 'Numele Restaurantului',
+    retail: 'Numele Magazinului',
+    constructii: 'Firma / Societatea'
+  };
+  const depotPlaceholders = {
+    depozit: 'ex: Depozit Cluj, Depozit București...',
+    restaurant: 'ex: Restaurant La Mama, Pizza Roma...',
+    retail: 'ex: Magazin Popescu, SuperShop...',
+    constructii: 'ex: SC Construct SRL, Firma ABC...'
+  };
+
+  const color = colors[industry] || '#00e5a0';
   
-  const cfg = INDUSTRY_CONFIG[industry];
-  const activeBtn = document.getElementById('ind-' + industry);
-  if (activeBtn) {
-    activeBtn.style.background = 'rgba(' + hexToRgb(cfg.color) + ',0.15)';
-    activeBtn.style.borderColor = cfg.color;
-    const nameEl = activeBtn.querySelectorAll('div')[1];
-    if (nameEl) nameEl.style.color = cfg.color;
-  }
+  // Update all buttons
+  ['depozit','restaurant','retail','constructii'].forEach(ind => {
+    const btn = document.getElementById('ind-' + ind);
+    if (!btn) return;
+    const isActive = ind === industry;
+    btn.style.background = isActive ? 'rgba('+hexToRgbSafe(colors[ind])+',0.15)' : '#181d24';
+    btn.style.borderColor = isActive ? colors[ind] : '#1e2530';
+    btn.style.transform = isActive ? 'scale(1.03)' : 'scale(1)';
+    const nameDiv = btn.querySelector('.ind-name');
+    if (nameDiv) nameDiv.style.color = isActive ? colors[ind] : '#e8ecf0';
+  });
   
   // Update subtitle
   const sub = document.querySelector('.auth-sub');
-  if (sub) sub.textContent = cfg.subtitle;
+  if (sub) sub.textContent = subtitles[industry] || subtitles.depozit;
+  
+  // Update depot label in register form
+  const depotLabel = document.querySelector('label[for="reg-depot"], .depot-label');
+  if (depotLabel) depotLabel.textContent = depotLabels[industry] || depotLabels.depozit;
+  const depotInput = document.getElementById('reg-depot');
+  if (depotInput) depotInput.placeholder = depotPlaceholders[industry] || depotPlaceholders.depozit;
+  
+  // Update register industry display
+  const regDisplay = document.getElementById('reg-industry-display');
+  const indIcons = {depozit:'🏭',restaurant:'🍽️',retail:'🏪',constructii:'🏗️'};
+  const indNames = {depozit:'Depozit / Logistică',restaurant:'Restaurant / HoReCa',retail:'Casă / Retail',constructii:'Șantier / Construcții'};
+  if (regDisplay) {
+    regDisplay.textContent = (indIcons[industry]||'📦') + ' ' + (indNames[industry]||industry);
+    regDisplay.style.color = color;
+    regDisplay.style.borderColor = color;
+  }
+  
+  // Update CSS accent color
+  document.documentElement.style.setProperty('--accent', color);
+}
+
+function hexToRgbSafe(hex) {
+  if (!hex || !hex.startsWith('#')) return '0,229,160';
+  try {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return r+','+g+','+b;
+  } catch(e) { return '0,229,160'; }
 }
 
 function hexToRgb(hex) {
@@ -3251,33 +3306,34 @@ function applyIndustryTheme() {
   
   // Apply accent color
   document.documentElement.style.setProperty('--accent', cfg.color);
-  document.documentElement.style.setProperty('--accent2', cfg.accentColor);
   
-  // Update app title/logo
-  const logo = document.querySelector('.auth-logo');
-  if (logo) logo.innerHTML = 'Stoc<span>Voce</span> <small style="font-size:14px;opacity:0.7">' + cfg.icon + '</small>';
-  
-  // Update toolbar tabs labels
+  // Update toolbar tab names
   updateToolbarLabels(cfg);
   
-  // Update voice commands
-  if (typeof VOICE_COMMANDS !== 'undefined' && VOICE_COMMANDS.ro) {
-    cfg.voiceKeywords.in.forEach(kw => { if (!VOICE_COMMANDS.ro.in.includes(kw)) VOICE_COMMANDS.ro.in.push(kw); });
-    cfg.voiceKeywords.out.forEach(kw => { if (!VOICE_COMMANDS.ro.out.includes(kw)) VOICE_COMMANDS.ro.out.push(kw); });
-  }
-  
-  // Show/hide industry-specific toolbar buttons
-  showIndustryButtons(cfg);
+  // Show/hide industry buttons
+  document.querySelectorAll('[data-industry]').forEach(el => {
+    el.style.display = el.dataset.industry === currentIndustry ? '' : 'none';
+  });
   
   // Update depot title
   const depotTitle = document.getElementById('depot-title');
-  if (depotTitle) depotTitle.textContent = cfg.productLabel + 'e ' + cfg.icon;
+  if (depotTitle) {
+    const icons = {depozit:'🏭',restaurant:'🍽️',retail:'🏪',constructii:'🏗️'};
+    depotTitle.textContent = (icons[currentIndustry]||'📦') + ' ' + (userProfile?userProfile.depot:'');
+  }
   
-  // Update add-modal labels
-  updateAddModalLabels(cfg);
+  // Update add-modal unit options
+  if (cfg.units) {
+    const unitSel = document.getElementById('new-unit');
+    if (unitSel) {
+      const current = unitSel.value;
+      unitSel.innerHTML = cfg.units.map(u => '<option value="'+u+'"'+(u===current?' selected':'')+'>'+u+'</option>').join('');
+    }
+  }
   
-  setFeedback(cfg.icon + ' Modul ' + cfg.name + ' activat!', 'ok');
+  setFeedback(cfg.icon + ' Modul ' + cfg.name + ' activ!', 'ok');
 }
+// OLD applyIndustryTheme was here - removed
 
 function updateToolbarLabels(cfg) {
   const tabMap = {
@@ -3320,8 +3376,13 @@ function showIndustryButtons(cfg) {
 
 // Apply on load
 document.addEventListener('DOMContentLoaded', () => {
-  selectIndustry(currentIndustry);
-  setTimeout(applyIndustryTheme, 1000);
+  // Init industry selector
+  const savedIndustry = localStorage.getItem('sv_industry') || 'depozit';
+  currentIndustry = savedIndustry;
+  // Small delay to ensure DOM is ready
+  setTimeout(() => {
+    selectIndustry(savedIndustry);
+  }, 100);
 });
 
 
@@ -4705,24 +4766,24 @@ function showSubcontractors() {
     <div id="industry-selector" style="margin:18px 0 8px">
       <div style="font-size:11px;color:#6b7a8d;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;text-align:center">Alege industria ta</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button onclick="selectIndustry('depozit')" id="ind-depozit" class="ind-btn active-ind" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+        <button type="button" id="ind-depozit" class="ind-btn" style="background:rgba(0,229,160,0.15);border:2px solid #00e5a0;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('depozit')">
           <div style="font-size:24px;margin-bottom:4px">🏭</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#00e5a0;text-transform:uppercase">Depozit</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#00e5a0;text-transform:uppercase">Depozit</div>
           <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Logistică & stoc</div>
         </button>
-        <button onclick="selectIndustry('restaurant')" id="ind-restaurant" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+        <button type="button" id="ind-restaurant" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('restaurant')">
           <div style="font-size:24px;margin-bottom:4px">🍽️</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Restaurant</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Restaurant</div>
           <div style="font-size:10px;color:#6b7a8d;margin-top:2px">HoReCa & meniu</div>
         </button>
-        <button onclick="selectIndustry('retail')" id="ind-retail" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+        <button type="button" id="ind-retail" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('retail')">
           <div style="font-size:24px;margin-bottom:4px">🏪</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Casă / Retail</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Casă / Retail</div>
           <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Magazin & vânzări</div>
         </button>
-        <button onclick="selectIndustry('constructii')" id="ind-constructii" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s">
+        <button type="button" id="ind-constructii" class="ind-btn" style="background:#181d24;border:2px solid #1e2530;border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;touch-action:manipulation;transition:all 0.2s;-webkit-tap-highlight-color:transparent" onclick="selectIndustry('constructii')">
           <div style="font-size:24px;margin-bottom:4px">🏗️</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Construcții</div>
+          <div class="ind-name" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#e8ecf0;text-transform:uppercase">Construcții</div>
           <div style="font-size:10px;color:#6b7a8d;margin-top:2px">Șantier & materiale</div>
         </button>
       </div>
@@ -4754,7 +4815,7 @@ function showSubcontractors() {
         <input class="auth-input" id="reg-name" placeholder="Ion Popescu">
       </div>
       <div class="auth-field">
-        <label class="auth-label">Depozitul tău</label>
+        <label class="auth-label depot-label" for="reg-depot">Depozitul / Locația ta</label>
         <input class="auth-input" id="reg-depot" placeholder="ex: Depozit Cluj, Depozit București...">
       </div>
       <div class="auth-field">
@@ -4767,6 +4828,10 @@ function showSubcontractors() {
       <div class="auth-field">
         <label class="auth-label">Email</label>
         <input class="auth-input" id="reg-email" type="email" placeholder="ion@depozit.ro">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Industrie selectată</label>
+        <div id="reg-industry-display" style="background:#181d24;border:1px solid #1e2530;border-radius:10px;padding:10px 14px;color:#00e5a0;font-weight:700;font-size:13px">🏭 Depozit / Logistică</div>
       </div>
       <div class="auth-field">
         <label class="auth-label">Parolă (minim 6 caractere)</label>
@@ -13077,6 +13142,12 @@ auth.onAuthStateChanged(async (user) => {
     // Load profile
     const snap = await db.ref('users/' + user.uid).once('value');
     userProfile = snap.val() || { name: user.displayName || user.email, depot: 'Depozit', email: user.email, status: 'approved' };
+    
+    // Load industry from profile
+    if (userProfile.industry) {
+      currentIndustry = userProfile.industry;
+      localStorage.setItem('sv_industry', currentIndustry);
+    }
 
     // Check if admin - goes directly to app
     if (user.email === ADMIN_EMAIL) {
@@ -13124,6 +13195,8 @@ auth.onAuthStateChanged(async (user) => {
     loadLogFromFirebase();
 
     if(typeof applyIndustryTheme==="function") setTimeout(applyIndustryTheme, 500);
+    // Apply industry theme after login
+    setTimeout(() => { if(typeof applyIndustryTheme==='function') applyIndustryTheme(); }, 800);
     speak(`Bun venit ${userProfile.name}! ${userProfile.depot} activ.`);
     initUserSettings();
     loadDeliveriesAndClients();
@@ -13154,9 +13227,12 @@ auth.onAuthStateChanged(async (user) => {
 
 // ── FIREBASE STOCK ──
 function getDepotKey() {
-  if (!userProfile) return null;
-  // Convert depot name to safe Firebase key
-  return userProfile.depot.toLowerCase().replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_');
+  if (!userProfile || !userProfile.depot) return 'depozit_default';
+  const industry = userProfile.industry || currentIndustry || 'depozit';
+  const dKey = normalizeText(userProfile.depot.toLowerCase()).replace(/[^a-z0-9]/g,'_');
+  // Each industry gets its OWN Firebase path
+  const prefix = industry === 'depozit' ? 'depozite' : industry + '_depozite';
+  return prefix + '/' + dKey;
 }
 
 function loadStockFromFirebase() {
