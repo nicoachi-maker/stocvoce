@@ -976,140 +976,34 @@ function printProductLabel(productId) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   win.document.close();
@@ -1759,140 +1653,34 @@ function pickingListGenerate(orderItems) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   win.document.close();
@@ -2811,140 +2599,34 @@ function packingSlipGenerate(orderId, items) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   win.document.close();
@@ -4367,140 +4049,34 @@ function printRestaurantBon(tableNo, paymentMethod) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>'); win.document.close();
   setFeedback('✅ Bon generat pentru masa ' + tableNo, 'ok');
@@ -4757,140 +4333,34 @@ function printRetailReceipt(items, total, paymentMethod, clientName) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   win.document.close();
@@ -5136,140 +4606,34 @@ function exportPriceList() {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>';
   const win = window.open('','_blank'); win.document.write(html); win.document.close();
@@ -5500,140 +4864,34 @@ function generateMaterialConsumptionBon(siteId, materials) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   win.document.close();
@@ -6236,15 +5494,7 @@ function showTab(tab) {
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<div id="pwa-install-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111418;border:1px solid #00e5a0;border-radius:16px;padding:14px 20px;z-index:9999;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,229,160,0.2);max-width:380px;width:90%">
-  <div style="font-size:28px">📱</div>
-  <div style="flex:1">
-    <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">Instalează StocVoce</div>
-    <div style="font-size:12px;color:#6b7a8d">Acces rapid de pe ecranul principal</div>
-  </div>
-  <button onclick="safeCall('installPWA')" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;padding:8px 14px;cursor:pointer">INSTALEAZĂ</button>
-  <button onclick="safeCall('dismissPWABanner')" style="background:none;border:none;color:#6b7a8d;cursor:pointer;font-size:18px;padding:4px">✕</button>
-</div>
+
 
 <!-- QUICK ACTION MODAL -->
 <div id="quick-action-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:900;align-items:flex-end;justify-content:center;padding:0">
@@ -7153,10 +6403,7 @@ function showTab(tab) {
 
 
 <!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4757;padding:12px 20px;align-items:center;justify-content:space-between;gap:10px">
-  <span id="alert-text" style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;flex:1"></span>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-size:14px;padding:4px 12px;cursor:pointer;flex-shrink:0">✕</button>
-</div>
+
 
 <!-- HISTORY MODAL -->
 <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -7912,140 +7159,34 @@ function showTab(tab) {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
   pw.document.close();
@@ -11468,10 +10609,7 @@ function openTVDashboard() {
 <!-- SORT BAR -->
 
 <!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4757;padding:12px 20px;align-items:center;justify-content:space-between;gap:10px">
-  <span id="alert-text" style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;flex:1"></span>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-size:14px;padding:4px 12px;cursor:pointer;flex-shrink:0">✕</button>
-</div>
+
 
 <!-- HISTORY MODAL -->
 <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -12220,140 +11358,34 @@ function openTVDashboard() {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>');
 }
@@ -12934,10 +11966,7 @@ async function exportReportWord() {
 <!-- SORT BAR -->
 
 <!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4757;padding:12px 20px;align-items:center;justify-content:space-between;gap:10px">
-  <span id="alert-text" style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;flex:1"></span>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-size:14px;padding:4px 12px;cursor:pointer;flex-shrink:0">✕</button>
-</div>
+
 
 <!-- HISTORY MODAL -->
 <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -13686,140 +12715,34 @@ async function exportReportWord() {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>';
 
@@ -23288,15 +22211,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <!-- PWA INSTALL BANNER -->
-<div id="pwa-install-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111418;border:1px solid #00e5a0;border-radius:16px;padding:14px 20px;z-index:9999;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,229,160,0.2);max-width:380px;width:90%">
-  <div style="font-size:28px">📱</div>
-  <div style="flex:1">
-    <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">Instalează StocVoce</div>
-    <div style="font-size:12px;color:#6b7a8d">Acces rapid de pe ecranul principal</div>
-  </div>
-  <button onclick="installPWA()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;padding:8px 14px;cursor:pointer">INSTALEAZĂ</button>
-  <button onclick="dismissPWABanner()" style="background:none;border:none;color:#6b7a8d;cursor:pointer;font-size:18px;padding:4px">✕</button>
-</div>
+
 
 
 
@@ -23325,10 +22240,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- SORT BAR -->
 
 <!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4757;padding:12px 20px;align-items:center;justify-content:space-between;gap:10px">
-  <span id="alert-text" style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;flex:1"></span>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-size:14px;padding:4px 12px;cursor:pointer;flex-shrink:0">✕</button>
-</div>
+
 
 <!-- HISTORY MODAL -->
 <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -24077,140 +22989,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>';
   
@@ -24358,15 +23164,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- CHART 3 MONTHS MODAL -->
 <!-- PWA INSTALL BANNER -->
-<div id="pwa-install-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111418;border:1px solid #00e5a0;border-radius:16px;padding:14px 20px;z-index:9999;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,229,160,0.2);max-width:380px;width:90%">
-  <div style="font-size:28px">📱</div>
-  <div style="flex:1">
-    <div style="font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:16px;color:#e8ecf0">Instalează StocVoce</div>
-    <div style="font-size:12px;color:#6b7a8d">Acces rapid de pe ecranul principal</div>
-  </div>
-  <button onclick="installPWA()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:13px;padding:8px 14px;cursor:pointer">INSTALEAZĂ</button>
-  <button onclick="dismissPWABanner()" style="background:none;border:none;color:#6b7a8d;cursor:pointer;font-size:18px;padding:4px">✕</button>
-</div>
+
 
 
 
@@ -24395,10 +23193,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- SORT BAR -->
 
 <!-- ALERT BANNER -->
-<div id="alert-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff4757;padding:12px 20px;align-items:center;justify-content:space-between;gap:10px">
-  <span id="alert-text" style="color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;flex:1"></span>
-  <button onclick="closeAlert()" style="background:rgba(255,255,255,0.2);border:none;border-radius:6px;color:#fff;font-size:14px;padding:4px 12px;cursor:pointer;flex-shrink:0">✕</button>
-</div>
+
 
 <!-- HISTORY MODAL -->
 <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;padding:20px">
@@ -25147,140 +23942,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <!-- GANTT MODAL -->
-<div id="gantt-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📅 Grafic Gantt</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];if(s){const n=prompt('Etapă:');const sd=prompt('Start (YYYY-MM-DD):');const ed=prompt('Final (YYYY-MM-DD):');const r=prompt('Responsabil:');if(n&&sd&&ed)addGanttTask(s.id,n,sd,ed,r);createGanttChart(s.id)}" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Etapă</button>
-        <button onclick="document.getElementById('gantt-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="gantt-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- TOOL INVENTORY MODAL -->
-<div id="tool-inventory-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🔧 Inventar Scule</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Denumire sculă:');const c=prompt('Categorie (Electrice/Manuale/Măsurare):');const b=prompt('Cod bare (opțional):');if(n)addTool(n,c,b);toolInventory()" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Sculă</button>
-        <button onclick="document.getElementById('tool-inventory-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div style="padding:10px 20px;border-bottom:1px solid #1e2530;flex-shrink:0;display:flex;gap:8px">
-      <input id="tool-action-name" placeholder="Denumire sculă..." style="flex:1;background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#e8ecf0;font-size:13px;padding:8px;outline:none">
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');if(n&&w)checkOutTool(n,w,null);toolInventory()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">IAU</button>
-      <button onclick="const n=document.getElementById('tool-action-name').value;const w=userProfile?userProfile.name:prompt('Numele dvs:');const c=prompt('Stare (bună/defectă):');if(n&&w)checkInTool(n,w,c);toolInventory()" style="background:#00e5a0;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">ADUC</button>
-    </div>
-    <div id="tool-inventory-content" style="padding:12px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PHASE REPORT MODAL -->
-<div id="phase-report-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:520px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📐 Consum pe Faze</div>
-      <button onclick="document.getElementById('phase-report-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="phase-report-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PLANNED VS ACTUAL MODAL -->
-<div id="planned-actual-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:460px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📊 Planificat vs Actual</div>
-      <button onclick="document.getElementById('planned-actual-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="planned-actual-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT EXPIRY MODAL -->
-<div id="equipment-expiry-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ffa502;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ffa502;text-transform:uppercase">⚙️ ITP & Documente</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const n=prompt('Echipament:');const itp=prompt('Data ITP (YYYY-MM-DD):');const rev=prompt('Data revizie (YYYY-MM-DD):');if(n)addEquipmentITP(n,itp,rev,null,null);checkEquipmentExpiry()" style="background:#ffa502;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ ITP</button>
-        <button onclick="document.getElementById('equipment-expiry-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="equipment-expiry-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- EQUIPMENT COST MODAL -->
-<div id="equipment-cost-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">💰 Costuri Echipamente</div>
-      <button onclick="document.getElementById('equipment-cost-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="equipment-cost-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DECONTARE MODAL -->
-<div id="decontare-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">📋 Decontări</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const cat=prompt('Categorie (Carburant/Materiale/Manoperă/Diverse):');const desc=prompt('Descriere:');const amt=prompt('Suma RON:');if(s&&cat&&amt)addDecontare(s.id,cat,desc,amt,'','');decontareReport(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Adaugă</button>
-        <button onclick="document.getElementById('decontare-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="decontare-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- PENALTIES MODAL -->
-<div id="penalties-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #ff4757;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#ff4757;text-transform:uppercase">⚠️ Penalități</div>
-      <button onclick="document.getElementById('penalties-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div id="penalties-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- DEADLINE COUNTDOWN MODAL -->
-<div id="deadline-countdown-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:480px;width:100%;max-height:92vh;display:flex;flex-direction:column">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530;flex-shrink:0">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">⏰ Termene Contractuale</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="const s=constructionSites[0];const ph=prompt('Fază/Etapă:');const d=prompt('Termen (YYYY-MM-DD):');const p=prompt('Penalitate RON/zi:');if(s&&d)addContractDeadline(s.id,ph,d,p);deadlineCountdown(s?s.id:null)" style="background:#fd9644;border:none;border-radius:8px;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:6px 12px;cursor:pointer;touch-action:manipulation">+ Termen</button>
-        <button onclick="document.getElementById('deadline-countdown-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-      </div>
-    </div>
-    <div id="deadline-countdown-content" style="padding:16px 20px;overflow-y:auto;flex:1"></div>
-  </div>
-</div>
+
 
 <!-- CALCULATOR MODAL -->
-<div id="calculator-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;padding:12px">
-  <div style="background:#111418;border:1px solid #fd9644;border-radius:20px;max-width:500px;width:100%">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid #1e2530">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:#fd9644;text-transform:uppercase">🧮 Calculatoare</div>
-      <button onclick="document.getElementById('calculator-modal').style.display='none'" style="background:#181d24;border:1px solid #1e2530;border-radius:8px;color:#6b7a8d;font-size:16px;width:34px;height:34px;cursor:pointer;touch-action:manipulation">✕</button>
-    </div>
-    <div style="padding:12px 20px;border-bottom:1px solid #1e2530;display:flex;gap:6px;flex-wrap:wrap">
-      <button onclick="const v=prompt('Volum beton (m³):');const c=prompt('Clasa (C8/10, C12/15, C16/20, C20/25, C25/30):');if(v)calcBeton(v,c)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Beton</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const g=prompt('Grosime (mm, implicit 20):');if(s)calcMortar(s,g)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🪣 Mortar</button>
-      <button onclick="const s=prompt('Suprafață zid (m²):');const t=prompt('Tip (simplu/dublu/BCA):');if(s)calcCaramida(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">🧱 Zidărie</button>
-      <button onclick="const s=prompt('Suprafață (m²):');const t=prompt('Tip (placa/grinda/stalp/fundatie):');if(s)calcArmatura(s,t)" style="background:#181d24;border:1px solid #fd9644;border-radius:8px;color:#fd9644;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;padding:8px 12px;cursor:pointer;touch-action:manipulation">⚙️ Armătură</button>
-    </div>
-    <div id="calculator-result" style="padding:16px 20px;min-height:80px;color:#6b7a8d;font-size:13px">Selectați un calculator de mai sus...</div>
-  </div>
-</div>
+
 
 </body></html>';
   printWindow.document.write(html);
