@@ -5453,12 +5453,12 @@ function showTab(tab) {
       </div>
       
       <!-- Tab: STOC -->
-      <div id="toolbar-stoc" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
+      <div id="toolbar-stoc" style="display:flex;flex-wrap:wrap;gap:4px;padding-bottom:4px;"></div>
       </div>
-      <div id="toolbar-rapoarte" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
-      <div id="toolbar-clienti" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
-      <div id="toolbar-depozit" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin"></div>
-      <div id="toolbar-global" style="display:none;gap:6px;overflow-x:auto;padding-bottom:4px;white-space:nowrap;scrollbar-width:thin">
+      <div id="toolbar-rapoarte" style="display:none;flex-wrap:wrap;gap:4px;padding-bottom:4px;"></div>
+      <div id="toolbar-clienti" style="display:none;flex-wrap:wrap;gap:4px;padding-bottom:4px;"></div>
+      <div id="toolbar-depozit" style="display:none;flex-wrap:wrap;gap:4px;padding-bottom:4px;"></div>
+      <div id="toolbar-global" style="display:none;flex-wrap:wrap;gap:4px;padding-bottom:4px;">
         <button class="add-btn" onclick="safeCall('loadConsolidatedStock')" style="flex-shrink:0;white-space:nowrap;border-color:#00e5a0;color:#00e5a0">🌐 Stoc Global</button>
         <button class="add-btn" onclick="safeCall('openComparatieDep')" style="flex-shrink:0;white-space:nowrap;border-color:#00e5a0;color:#00e5a0">⚖️ Compară Depozite</button>
         <button class="add-btn" onclick="safeCall('loadConsolidatedStock')" style="flex-shrink:0;white-space:nowrap;border-color:#a78bfa;color:#a78bfa">🔢 Stoc Consolidat</button>
@@ -18033,7 +18033,7 @@ function showToolbarTab(tab) {
   tabs.forEach(t => {
     const el = document.getElementById('toolbar-' + t);
     const btn = document.getElementById('tab-' + t);
-    if (el) el.style.display = t === tab ? 'flex' : 'none';
+    if (el) { el.style.display = t === tab ? 'flex' : 'none'; if (t===tab) el.style.flexWrap='wrap'; }
     if (btn) {
       btn.style.borderColor = t === tab ? '#00e5a0' : '#6b7a8d';
       btn.style.color = t === tab ? '#00e5a0' : '#6b7a8d';
@@ -21202,7 +21202,7 @@ function buildToolbar(industry) {
     const buttons = cfg[tab] || [];
     el.innerHTML = buttons.map(b =>
       '<button class="add-btn" onclick="safeCall(\'' + b.f + '\')" ' +
-      'style="flex-shrink:0;white-space:nowrap;border-color:' + b.c + ';color:' + b.c + '">' +
+      'style="border-color:' + b.c + ';color:' + b.c + ';font-size:11px;padding:5px 10px;' + '">' +
       b.l + '</button>'
     ).join('');
   });
